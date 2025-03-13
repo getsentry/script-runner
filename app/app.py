@@ -5,10 +5,21 @@ import inspect
 import yaml
 from typing import Literal
 import os
+from functools import wraps
+from datetime import timedelta
 
 from types import ModuleType
 
 app = Flask(__name__)
+
+
+def cache_static_files(f):
+    @wraps(f)
+    def add_cache_headers(*args, **kwargs):
+        res = f(*args, **kwargs)
+        res.headers['Cache-Control'] = 'public, max-age=3600'
+        return res
+    return add_cache_headers
 
 
 def get_module_exports(module: ModuleType) -> list[str]:
@@ -106,11 +117,18 @@ def get_functions():
 
 
 @app.route("/")
+@cache_static_files
 def home():
     return send_from_directory("frontend/dist", "index.html")
 
+@app.route("/health")
+def health():
+    return jsonify({"status": "ok"}), 200
+
+
 
 @app.route("/jq.wasm")
+@cache_static_files
 def jq_wasm():
     return send_from_directory("frontend/dist", "jq.wasm")
 
@@ -126,6 +144,7 @@ def functions():
 
 
 @app.route("/assets/<filename>")
+@cache_static_files
 def static_file(filename: str):
     return send_from_directory("frontend/dist/assets", filename)
 

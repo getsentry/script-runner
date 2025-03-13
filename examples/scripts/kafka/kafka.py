@@ -7,10 +7,18 @@ from confluent_kafka import (
 )
 from confluent_kafka.admin import AdminClient, OffsetSpec, ConfigResource
 
-from typing import Any
+from typing import Any, TypedDict
 import functools
 
 KAFKA_TIMEOUT = 20
+
+class KafkaCluster(TypedDict):
+    name: str
+    brokers: list[str]
+
+
+class KafkaConfig(TypedDict):
+    clusters: list[KafkaCluster]
 
 
 class HashableConfig(dict[str, str]):
@@ -23,12 +31,12 @@ def _get_cached_client(broker_config: HashableConfig) -> AdminClient:
     return AdminClient(broker_config)
 
 
-def get_admin_client(config: Any, cluster: str) -> AdminClient:
+def get_admin_client(config: KafkaConfig, cluster: str) -> AdminClient:
     broker_config = get_config(config, cluster)
     return _get_cached_client(HashableConfig(broker_config))
 
 
-def get_config(config: Any, cluster: str) -> dict[str, str]:
+def get_config(config: KafkaConfig, cluster: str) -> dict[str, str]:
     cluster_spec = next((c for c in config["clusters"] if c["name"] == cluster), None)
 
     if cluster_spec is None:
@@ -37,11 +45,11 @@ def get_config(config: Any, cluster: str) -> dict[str, str]:
     return {"bootstrap.servers": ",".join(cluster_spec["brokers"])}
 
 
-def list_clusters(config: Any) -> list[str]:
+def list_clusters(config: KafkaConfig) -> list[str]:
     return [c for c in config["clusters"]]
 
 
-def describe_cluster(config: Any, cluster: str) -> list[dict[str, Any]]:
+def describe_cluster(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     """
     Returns the list of nodes in a cluster.
     """
@@ -63,7 +71,7 @@ def describe_cluster(config: Any, cluster: str) -> list[dict[str, Any]]:
     ]
 
 
-def describe_broker_configs(config: Any, cluster: str) -> Any:
+def describe_broker_configs(config: KafkaConfig, cluster: str) -> Any:
     """
     Returns configuration for all brokers in a cluster.
     """
@@ -72,25 +80,25 @@ def describe_broker_configs(config: Any, cluster: str) -> Any:
         ConfigResource(ConfigResource.Type.BROKER, f"{id}")
         for id in client.list_topics().brokers
     ]
-    res = {k: v.result(KAFKA_TIMEOUT) for (k, v) in client.describe_configs(broker_resources).items()}
 
     all_configs = []
 
-    for broker, configs in res.items():
+    for broker_resource in broker_resources:
+        configs = {k: v.result(KAFKA_TIMEOUT) for (k, v) in client.describe_configs([broker_resource]).items()}[broker_resource]
         for (k, v) in configs.items():
             config_item = {
                 "config": k,
                 "value": v.value,
                 "isDefault": v.is_default,
                 "isReadOnly": v.is_read_only,
-                "broker": broker.name
+                "broker": broker_resource.name
             }
             all_configs.append(config_item)
 
     return all_configs
 
 
-def list_topics(config: dict[str, Any], cluster: str) -> list[dict[str, Any]]:
+def list_topics(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     """
     Returns the list of topics in a cluster.
     """
@@ -101,7 +109,7 @@ def list_topics(config: dict[str, Any], cluster: str) -> list[dict[str, Any]]:
     return [{"name": t, "partitions": len(meta.partitions)} for (t, meta) in topics.items()]
 
 
-def list_offsets(config: dict[str, Any], cluster: str, topic: str):
+def list_offsets(config: KafkaConfig, cluster: str, topic: str):
     """
     Returns the earliest and latest stored offsets for every partition of a topic.
     """
@@ -128,7 +136,7 @@ def list_offsets(config: dict[str, Any], cluster: str, topic: str):
 
 
 def describe_topic_partitions(
-    config: dict[str, Any],
+    config: KafkaConfig,
     cluster: str,
     topic: str,
 ) -> list[dict[str, Any]]:
@@ -177,7 +185,7 @@ def list_consumer_groups(config: dict[str, Any], cluster: str):
     ]
 
 
-def list_consumer_group_offsets(config: dict[str, Any], cluster: str, consumer_group: str):
+def list_consumer_group_offsets(config: KafkaConfig, cluster: str, consumer_group: str):
     """
     Returns the offsets for each topic partition of a consumer group.
     """

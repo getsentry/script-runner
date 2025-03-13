@@ -21,9 +21,9 @@ COPY examples/requirements.txt /app/examples/
 RUN pip install -r app/requirements.txt
 RUN pip install -r examples/requirements.txt
 
-EXPOSE 8000
+EXPOSE 5000
 
 ENV FLASK_ENV=production
 ENV CONFIG_FILE_PATH=/app/example_config.yaml
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app.app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "app.app:app"]
