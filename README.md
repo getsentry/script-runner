@@ -1,4 +1,12 @@
-# Examples:
+# script-runner
+Run Python scripts on production data.
+
+This application can run in either combined or multi-region mode.
+
+For multi-region mode, set `mode: region` for region, and `mode: main` for the main deployment. `mode: combined` runs both together.
+
+
+## Example data:
 - These are in the examples/scripts directory
-- You can generate sample data for access log via `make generate-example-data`
+- You can generate data for the examples via `make generate-example-data`
 

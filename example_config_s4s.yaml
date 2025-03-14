@@ -1,0 +1,24 @@
+mode: region
+python_scripts_module_name: examples.scripts
+groups:
+  kafka:
+    iap_principals:
+    - team-ops@sentry.io
+    - team-streaming@sentry.io
+  access_logs:
+    iap_principals: []
+  example:
+    iap_principals: []
+region:
+  name: s4s
+  configs:
+    kafka:
+      clusters:
+      - name: local
+        brokers:
+          - localhost:9092
+    access_logs:
+      host: localhost
+      port: 9000
+      database: clicktail
+      table_name: access_log_local

@@ -10,7 +10,7 @@ from confluent_kafka.admin import AdminClient, OffsetSpec, ConfigResource
 from typing import Any, TypedDict
 import functools
 
-KAFKA_TIMEOUT = 20
+KAFKA_TIMEOUT = 5
 
 class KafkaCluster(TypedDict):
     name: str
@@ -71,7 +71,7 @@ def describe_cluster(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     ]
 
 
-def describe_broker_configs(config: KafkaConfig, cluster: str) -> Any:
+def describe_broker_configs(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     """
     Returns configuration for all brokers in a cluster.
     """
@@ -84,7 +84,10 @@ def describe_broker_configs(config: KafkaConfig, cluster: str) -> Any:
     all_configs = []
 
     for broker_resource in broker_resources:
-        configs = {k: v.result(KAFKA_TIMEOUT) for (k, v) in client.describe_configs([broker_resource]).items()}[broker_resource]
+        configs = {
+            k: v.result(KAFKA_TIMEOUT)
+            for (k, v) in client.describe_configs([broker_resource]).items()
+        }[broker_resource]
         for (k, v) in configs.items():
             config_item = {
                 "config": k,
@@ -106,10 +109,13 @@ def list_topics(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
 
     topics = client.list_topics().topics
 
-    return [{"name": t, "partitions": len(meta.partitions)} for (t, meta) in topics.items()]
+    return [
+        {"name": t, "partitions": len(meta.partitions)}
+        for (t, meta) in topics.items()
+    ]
 
 
-def list_offsets(config: KafkaConfig, cluster: str, topic: str):
+def list_offsets(config: KafkaConfig, cluster: str, topic: str) -> list[dict[str, Any]]:
     """
     Returns the earliest and latest stored offsets for every partition of a topic.
     """
@@ -168,7 +174,7 @@ def describe_topic_partitions(
     ]
 
 
-def list_consumer_groups(config: dict[str, Any], cluster: str):
+def list_consumer_groups(config: dict[str, Any], cluster: str) -> list[dict[str, Any]]:
     """
     List the consumer groups of the specified cluster.
     """

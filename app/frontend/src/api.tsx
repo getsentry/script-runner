@@ -1,25 +1,7 @@
 import {Config} from './types.tsx'
 
 class Api {
-  private useMockData: boolean;
-
-  constructor(useMockData: boolean = false) {
-    this.useMockData = useMockData;
-  }
-
-  private fetchMockData(endpoint: string): any {
-    const mockResponses: {[key: string]: any} = {
-      '/config': { data: {'regions': ['us', 'de', 's4s', 'c1', 'c2'], 'functions': []}},
-      '/run': { success: true },
-    };
-    return mockResponses[endpoint] || { message: 'Unknown endpoint' };
-  }
-
   private getJson(endpoint: string) {
-    if (this.useMockData === true) {
-      return this.fetchMockData(endpoint)
-    }
-
     return fetch(endpoint).then(response => response.json())
   }
 

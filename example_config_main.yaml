@@ -1,0 +1,16 @@
+mode: main
+python_scripts_module_name: examples.scripts
+groups:
+  kafka:
+    iap_principals:
+    - team-ops@sentry.io
+    - team-streaming@sentry.io
+  access_logs:
+    iap_principals: []
+  example:
+    iap_principals: []
+main:
+  regions:
+    - name: s4s
+      url: localhost:5002
+
