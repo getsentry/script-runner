@@ -13,7 +13,7 @@ COPY --from=frontend-build /frontend/dist /app/app/frontend/dist
 
 COPY app/requirements.txt /app/app/
 COPY app/*.py /app/app/
-COPY example_config.yaml /app/
+COPY example_config_combined.yaml /app/
 
 COPY examples/scripts/ /app/examples/scripts/
 COPY examples/requirements.txt /app/examples/
@@ -24,6 +24,6 @@ RUN pip install -r examples/requirements.txt
 EXPOSE 5000
 
 ENV FLASK_ENV=production
-ENV CONFIG_FILE_PATH=/app/example_config.yaml
+ENV CONFIG_FILE_PATH=/app/example_config_combined.yaml
 
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "app.app:app"]
