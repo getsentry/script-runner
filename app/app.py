@@ -85,9 +85,10 @@ if not isinstance(config, RegionConfig):
 
         results = {}
 
-        group = data["group"]
+        group_name = data["group"]
+        group = config.groups[group_name]
         requested_function = data["function"]
-        function = next((f for f in config.groups[group].functions if f.name == requested_function), None)
+        function = next((f for f in group.functions if f.name == requested_function), None)
         params = data["parameters"]
 
         for requested_region in data["regions"]:
@@ -97,12 +98,11 @@ if not isinstance(config, RegionConfig):
             res = requests.post(
                 f"{request.scheme}://{region.url}/run_region",
                 json={
-                    "group": group,
+                    "group": group_name,
                     "function": function.name,
                     "function_checksum": function.checksum,
                     "parameters": params,
                     "region": region.name,
-                    "module_name": config.module_name,
                 }
             )
 
@@ -122,20 +122,20 @@ if not isinstance(config, MainConfig):
         assert isinstance(config, (RegionConfig, CombinedConfig))
 
         data = request.get_json()
-        group = data["group"]
+        group_name = data["group"]
+        group = config.groups[group_name]
         requested_function = data["function"]
-        module_name = data["module_name"]
 
-        function = next((f for f in config.groups[group].functions if f.name == requested_function), None)
+        function = next((f for f in group.functions if f.name == requested_function), None)
 
         # Do not run the function if it doesn't appear to be the same
         if function.checksum != data["function_checksum"]:
             raise ValueError("Function mismatch")
 
         params = data["parameters"]
-        module = importlib.import_module(f"{module_name}.{group}")
+        module = importlib.import_module(group.module)
         func = getattr(module, requested_function)
-        group_config = config.region.configs.get(group, None)
+        group_config = config.region.configs.get(group_name, None)
         return jsonify(func(group_config, *params))
 
 

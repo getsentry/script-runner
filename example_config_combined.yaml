@@ -1,14 +1,16 @@
 mode: combined
-python_scripts_module_name: examples.scripts
 groups:
   kafka:
+    python_module: examples.scripts.kafka
     iap_principals:
       - team-ops@sentry.io
       - team-streaming@sentry.io
   access_logs:
+    python_module: examples.scripts.access_logs
     iap_principals:
       - team-ops@sentry.io
   example:
+    python_module: examples.scripts.example
     iap_principals: []
 main:
   regions:
