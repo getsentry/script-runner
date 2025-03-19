@@ -19,5 +19,5 @@ jobs:
           tags: |
             ghcr.io/getsentry/script-runner:${{ github.sha }}
             ghcr.io/getsentry/script-runner:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          # cache-from: type=gha
+          # cache-to: type=gha,mode=max
