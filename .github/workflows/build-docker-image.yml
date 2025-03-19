@@ -3,7 +3,6 @@ on:
   push:
     branches:
       - main
-      - docker-test
 jobs:
   docker:
     runs-on: ubuntu-latest
