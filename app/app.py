@@ -3,7 +3,7 @@ import functools
 import importlib
 from functools import wraps
 import requests
-from app.utils import load_config, get_module_exports, MainConfig, CombinedConfig, RegionConfig
+from app.utils import load_config, MainConfig, CombinedConfig, RegionConfig
 
 
 app = Flask(__name__)
