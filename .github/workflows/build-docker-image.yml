@@ -16,3 +16,8 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           push: true
+          tags: |
+            ghcr.io/getsentry/script-runner:${{ github.sha }}
+            ghcr.io/getsentry/script-runner:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
