@@ -10,10 +10,9 @@ def test_validate_config_functions() -> None:
 
     group = load_group(module, group, iap_principals)
     assert group.module == module
+    assert group.iap_principals == ["test@sentry.io"]
     assert [f.name for f in  group.functions] == ["hello", "hello_with_enum"]
     assert [f.parameters for f in  group.functions] == [
         [FunctionParameter(name="to", default="world", enumValues=None)],
         [FunctionParameter(name="to", default="foo", enumValues=["foo", "bar"])],
     ]
-
-    assert group.iap_principals == ["test@sentry.io"]
