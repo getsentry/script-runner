@@ -8,6 +8,9 @@ import inspect
 from typing import Any, Literal
 from dataclasses import dataclass
 import hashlib
+import jsonschema
+import json
+from pathlib import Path
 
 
 def get_module_exports(module: ModuleType) -> list[str]:
@@ -52,24 +55,22 @@ class Function:
 @dataclass(frozen=True)
 class FunctionGroup:
     group: str
+    module: str
     functions: list[Function]
     iap_principals: list[str]
 
 
 @dataclass(frozen=True)
 class CommonFields:
-    module_name: str
     groups: dict[str, FunctionGroup]
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
-        module_name = data["python_scripts_module_name"]
         groups = {
-            g: load_group(module_name, g, val["iap_principals"]) for (g, val) in data["groups"].items()
+            g: load_group(val["python_module"], g, val["iap_principals"]) for (g, val) in data["groups"].items()
         }
 
         return cls(
-            module_name=module_name,
             groups=groups
         )
 
@@ -104,7 +105,6 @@ class RegionConfig(CommonFields):
         common = CommonFields.from_dict(data)
 
         return cls(
-            module_name=common.module_name,
             groups=common.groups,
             region=RegionFields.from_dict(data["region"])
         )
@@ -119,7 +119,6 @@ class MainConfig(CommonFields):
         common = CommonFields.from_dict(data)
 
         return cls(
-            module_name=common.module_name,
             groups=common.groups,
             main=MainFields.from_dict(data["main"])
 
@@ -135,7 +134,6 @@ class CombinedConfig(CommonFields):
         common = CommonFields.from_dict(data)
 
         return cls(
-            module_name=common.module_name,
             groups=common.groups,
             main=MainFields.from_dict(data["main"]),
             region=RegionFields.from_dict(data["region"])
@@ -160,11 +158,11 @@ def validate_function(func: str, module: ModuleType) -> bool:
     """
     sig = inspect.signature(getattr(module, func, None))
     parameters = [p for p in sig.parameters]
-    assert parameters[0] == "config", f"First parameter of {f} must be 'config'"
+    assert parameters[0] == "config", f"First parameter of {func} must be 'config'"
 
 
 def load_group(module_name: str, group: str, iap_principals: list[str]) -> FunctionGroup:
-    module = importlib.import_module(f"{module_name}.{group}")
+    module = importlib.import_module(module_name)
     module_exports = get_module_exports(module)
 
     for f in module_exports:
@@ -195,6 +193,7 @@ def load_group(module_name: str, group: str, iap_principals: list[str]) -> Funct
 
     return FunctionGroup(
         group=group,
+        module=module_name,
         functions=functions,
         iap_principals=iap_principals,
     )
@@ -206,6 +205,8 @@ def load_config() -> RegionConfig | MainConfig | CombinedConfig:
     with open(config_file_path, "r") as file:
         config = yaml.safe_load(file)
 
+    validate_config(config)
+
     mode = Mode(config["mode"])
 
     if mode == Mode.region:
@@ -214,3 +215,12 @@ def load_config() -> RegionConfig | MainConfig | CombinedConfig:
         return MainConfig.from_dict(config)
     else:
         return CombinedConfig.from_dict(config)
+
+
+def validate_config(config: Any) -> None:
+    schema_path = Path(__file__).parent / "config.schema.json"
+    with open(schema_path, "r") as f:
+        schema = json.load(f)
+
+    jsonschema.validate(instance=config, schema=schema)
+
