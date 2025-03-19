@@ -25,5 +25,6 @@ jobs:
           tags: |
             ghcr.io/getsentry/script-runner:${{ github.sha }}
             ghcr.io/getsentry/script-runner:latest
+          platforms: linux/amd64,linux/arm64,darwin/arm64
           cache-from: type=gha
           cache-to: type=gha,mode=max
