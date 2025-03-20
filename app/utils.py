@@ -35,7 +35,7 @@ class Region:
 
 
 @dataclass(frozen=True)
-class FunctionParameters:
+class FunctionParameter:
     name: str
     default: str | None
     enumValues: list[str] | None
@@ -45,7 +45,7 @@ class Function:
     name: str
     source: str
     docstring: str
-    parameters: list[FunctionParameters]
+    parameters: list[FunctionParameter]
 
     @functools.cached_property
     def checksum(self) -> str:
@@ -180,7 +180,7 @@ def load_group(module_name: str, group: str, iap_principals: list[str]) -> Funct
                 source=source,
                 docstring=func.__doc__ or "",
                 parameters=[
-                    FunctionParameters(
+                    FunctionParameter(
                         name=k,
                         default=str(v.default) if v.default is not inspect.Parameter.empty else None,
                         enumValues=get_enum_values(v.annotation),
