@@ -11,7 +11,7 @@ FROM python:3.11.7-slim
 WORKDIR /app
 COPY --from=frontend-build /frontend/dist /app/app/frontend/dist
 
-COPY app/requirements.txt /app/app/
+COPY requirements.txt /app/app/
 COPY app/*.py /app/app/
 COPY example_config_combined.yaml /app/
 

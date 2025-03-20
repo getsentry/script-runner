@@ -1,5 +1,5 @@
 devserver:
-	pip install -r app/requirements.txt
+	pip install -r requirements.txt
 	pip install -r examples/requirements.txt
 	cd app/frontend && npm run build
 	FLASK_APP=app.app FLASK_ENV=development CONFIG_FILE_PATH=example_config_combined.yaml PYTHONPATH=$PYTHONPATH:../examples flask run
@@ -7,14 +7,14 @@ devserver:
 .PHONY: devserver
 
 devserver-main:
-	pip install -r app/requirements.txt
+	pip install -r requirements.txt
 	cd app/frontend && npm run build
 	FLASK_APP=app.app FLASK_ENV=development CONFIG_FILE_PATH=example_config_main.yaml PYTHONPATH=$PYTHONPATH:../examples flask run --port 5001
 
 .PHONY: devserver-main
 
 devserver-region:
-	pip install -r app/requirements.txt
+	pip install -r requirements.txt
 	pip install -r examples/requirements.txt
 	FLASK_APP=app.app FLASK_ENV=development CONFIG_FILE_PATH=example_config_s4s.yaml PYTHONPATH=$PYTHONPATH:../examples flask run --port 5002
 .PHONY: devserver-region
