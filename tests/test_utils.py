@@ -1,4 +1,4 @@
-from app.utils import load_group, Function, FunctionParameter
+from app.utils import load_group, FunctionParameter
 
 def test_validate_config_functions() -> None:
     """
