@@ -3,8 +3,12 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  docker:
+  build-docker:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,7 +24,7 @@ jobs:
       - name: Build Docker image
         uses: docker/build-push-action@v6
         with:
-          push: true
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           tags: |
             ghcr.io/getsentry/script-runner:${{ github.sha }}
             ghcr.io/getsentry/script-runner:latest
