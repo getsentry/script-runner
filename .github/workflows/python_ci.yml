@@ -5,9 +5,8 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - run: |
-          pwd
-          ls -a ../../
+      - name: Checkout code
+        uses: actions/checkout@v2
       - uses: ./.github/actions/install-python-deps
       - name: Run linters
         run: |
@@ -17,6 +16,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - uses: ./.github/actions/install-python-deps
       - name: Run tests
         run: |
@@ -24,6 +25,8 @@ jobs:
   type-check:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
       - uses: ./.github/actions/install-python-deps
       - name: Run type checker
         run: |
