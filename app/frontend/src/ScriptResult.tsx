@@ -226,7 +226,7 @@ function ScriptResult(props: Props) {
     }
 
 
-  }, [filteredData, props.regions]);
+  }, [filteredData, props.regions, displayOptions, displayType]);
 
   return (
     <div className="function-result">

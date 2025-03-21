@@ -30,7 +30,7 @@ function Script(props: Props) {
     setHasResult(false);
     setCodeCollapsed(false);
     setError(null);
-  }, [props.group, props.function, props.canExecute, props.execute]);
+  }, [parameters, props.group, props.function, props.canExecute, props.execute]);
 
   function handleInputChange(idx: number, value: string) {
     setParams(prev => {
