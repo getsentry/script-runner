@@ -1,10 +1,11 @@
-from clickhouse_driver import Client
 import random
+
+from clickhouse_driver import Client
 
 
 def generate():
-    client = Client('localhost')
-    client.execute('CREATE DATABASE IF NOT EXISTS clicktail')
+    client = Client("localhost")
+    client.execute("CREATE DATABASE IF NOT EXISTS clicktail")
 
     create_table_statement = """
     CREATE TABLE IF NOT EXISTS clicktail.access_log_local
@@ -62,5 +63,5 @@ def generate():
             )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     generate()

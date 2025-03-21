@@ -1,0 +1,33 @@
+name: python_ci
+on:
+  pull_request:
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: ./.github/actions/install-python-deps
+      - name: Run linters
+        run: |
+          flake8 app tests
+          black app tests --check
+          isort app tests --check-only
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: ./.github/actions/install-python-deps
+      - name: Run tests
+        run: |
+          pytest tests
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - uses: ./.github/actions/install-python-deps
+      - name: Run type checker
+        run: |
+          mypy app tests

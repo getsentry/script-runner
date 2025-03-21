@@ -1,16 +1,17 @@
 import functools
-import yaml
-import os
-from types import ModuleType
-from enum import Enum
+import hashlib
 import importlib
 import inspect
-from typing import Any, Literal
-from dataclasses import dataclass
-import hashlib
-import jsonschema
 import json
+import os
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
+from types import ModuleType
+from typing import Any, Literal
+
+import jsonschema
+import yaml
 
 
 def get_module_exports(module: ModuleType) -> list[str]:
@@ -40,6 +41,7 @@ class FunctionParameter:
     default: str | None
     enumValues: list[str] | None
 
+
 @dataclass(frozen=True)
 class Function:
     name: str
@@ -65,14 +67,14 @@ class CommonFields:
     groups: dict[str, FunctionGroup]
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]):
+    def from_dict(cls, data: dict[str, Any]) -> "CommonFields":
         groups = {
-            g: load_group(val["python_module"], g, val["iap_principals"]) for (g, val) in data["groups"].items()
+            g: load_group(val["python_module"], g, val["iap_principals"])
+            for (g, val) in data["groups"].items()
         }
 
-        return cls(
-            groups=groups
-        )
+        return cls(groups=groups)
+
 
 @dataclass(frozen=True)
 class RegionFields:
@@ -80,34 +82,30 @@ class RegionFields:
     configs: dict[str, Any]
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]):
-        return cls(
-            name=data["name"],
-            configs=data["configs"]
-        )
+    def from_dict(cls, data: dict[str, Any]) -> "RegionFields":
+        return cls(name=data["name"], configs=data["configs"])
+
 
 @dataclass(frozen=True)
 class MainFields:
     regions: list[Region]
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]):
+    def from_dict(cls, data: dict[str, Any]) -> "MainFields":
         return cls(
             regions=[Region(name=r["name"], url=r["url"]) for r in data["regions"]],
         )
+
 
 @dataclass(frozen=True)
 class RegionConfig(CommonFields):
     region: RegionFields
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]):
+    def from_dict(cls, data: dict[str, Any]) -> "RegionConfig":
         common = CommonFields.from_dict(data)
 
-        return cls(
-            groups=common.groups,
-            region=RegionFields.from_dict(data["region"])
-        )
+        return cls(groups=common.groups, region=RegionFields.from_dict(data["region"]))
 
 
 @dataclass(frozen=True)
@@ -115,14 +113,11 @@ class MainConfig(CommonFields):
     main: MainFields
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]):
+    def from_dict(cls, data: dict[str, Any]) -> "MainConfig":
         common = CommonFields.from_dict(data)
 
-        return cls(
-            groups=common.groups,
-            main=MainFields.from_dict(data["main"])
+        return cls(groups=common.groups, main=MainFields.from_dict(data["main"]))
 
-        )
 
 @dataclass(frozen=True)
 class CombinedConfig(CommonFields):
@@ -130,38 +125,41 @@ class CombinedConfig(CommonFields):
     region: RegionFields
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]):
+    def from_dict(cls, data: dict[str, Any]) -> "CombinedConfig":
         common = CommonFields.from_dict(data)
 
         return cls(
             groups=common.groups,
             main=MainFields.from_dict(data["main"]),
-            region=RegionFields.from_dict(data["region"])
+            region=RegionFields.from_dict(data["region"]),
         )
 
 
-
-def get_enum_values(annotation: type):
+def get_enum_values(annotation: type) -> list[str] | None:
     """
     Return allowed values or None
     """
 
     if getattr(annotation, "__origin__", None) is Literal:
-        return [arg for arg in annotation.__args__]
+        return [arg for arg in annotation.__args__]  # type:ignore[attr-defined]
 
     return None
 
 
-def validate_function(func: str, module: ModuleType) -> bool:
+def validate_function(func: str, module: ModuleType) -> None:
     """
     Validate that the function has a valid signature.
     """
-    sig = inspect.signature(getattr(module, func, None))
+    function = getattr(module, func, None)
+    assert function is not None
+    sig = inspect.signature(function)
     parameters = [p for p in sig.parameters]
     assert parameters[0] == "config", f"First parameter of {func} must be 'config'"
 
 
-def load_group(module_name: str, group: str, iap_principals: list[str]) -> FunctionGroup:
+def load_group(
+    module_name: str, group: str, iap_principals: list[str]
+) -> FunctionGroup:
     module = importlib.import_module(module_name)
     module_exports = get_module_exports(module)
 
@@ -170,19 +168,24 @@ def load_group(module_name: str, group: str, iap_principals: list[str]) -> Funct
 
     functions = []
     for f in module_exports:
-        source = inspect.getsource(getattr(module, f, None))
-        func = getattr(module, f, None)
-        sig = inspect.signature(func)
+        function = getattr(module, f, None)
+        assert function is not None
+        source = inspect.getsource(function)
+        sig = inspect.signature(function)
 
         functions.append(
             Function(
                 name=f,
                 source=source,
-                docstring=func.__doc__ or "",
+                docstring=function.__doc__ or "",
                 parameters=[
                     FunctionParameter(
                         name=k,
-                        default=str(v.default) if v.default is not inspect.Parameter.empty else None,
+                        default=(
+                            str(v.default)
+                            if v.default is not inspect.Parameter.empty
+                            else None
+                        ),
                         enumValues=get_enum_values(v.annotation),
                     )
                     for (k, v) in sig.parameters.items()
@@ -198,9 +201,11 @@ def load_group(module_name: str, group: str, iap_principals: list[str]) -> Funct
         iap_principals=iap_principals,
     )
 
+
 @functools.lru_cache(maxsize=1)
 def load_config() -> RegionConfig | MainConfig | CombinedConfig:
     config_file_path = os.getenv("CONFIG_FILE_PATH")
+    assert isinstance(config_file_path, str)
 
     with open(config_file_path, "r") as file:
         config = yaml.safe_load(file)
@@ -223,4 +228,3 @@ def validate_config(config: Any) -> None:
         schema = json.load(f)
 
     jsonschema.validate(instance=config, schema=schema)
-

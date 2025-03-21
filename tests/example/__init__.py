@@ -1,7 +1,6 @@
 from typing import Any, Literal
 
 
-
 def hello(config: Any, to: str = "world") -> str:
     """
     This function says hello to someone
