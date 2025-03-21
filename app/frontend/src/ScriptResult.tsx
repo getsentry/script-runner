@@ -4,20 +4,30 @@ import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { AgGridReact } from 'ag-grid-react';
 import jq from 'jq-web';
 import { AgCharts } from 'ag-charts-react';
+import { RunResult } from './types';
 
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 ModuleRegistry.registerModules([AllCommunityModule]);
 
+type RowData = {
+  [key: string]: unknown;
+}
+
+type ChartData = {
+  data: unknown[],
+  series: { xKey: string, yKey: string, yName: string }[]
+}
+
 type Props = {
   group: string,
   function: string,
-  data: any;
+  data: RunResult | null;
   regions: string[]
 }
 
 
 // Either return merged data or null
-function mergeRegionKeys(data: any, regions: string[]) {
+function mergeRegionKeys(data: unknown, regions: string[]) {
   try {
     if (typeof data === 'object' && data !== null) {
       const shouldMerge = Object.keys(data).every((r: string) => regions.includes(r));
@@ -50,8 +60,8 @@ function mergeRegionKeys(data: any, regions: string[]) {
             return null;
           }
 
-          return regionData.map((row: any) => {
-            const rowData = Object.keys(row).reduce((acc: { [k: string]: any }, key) => {
+          return regionData.map((row) => {
+            const rowData = Object.keys(row).reduce((acc: RowData, key) => {
               const value = row[key];
               acc[key] = typeof value === 'object' && value !== null ? JSON.stringify(value) : value;
               return acc;
@@ -78,7 +88,7 @@ function mergeRegionKeys(data: any, regions: string[]) {
 
 // returns table formatted data if data is table like
 // otherwise return null
-function getGridData(data: { [region: string]: any[] } | any, regions: string[]) {
+function getGridData(data: { [region: string]: unknown[] } | unknown, regions: string[]) {
   const mergedData = mergeRegionKeys(data, regions) || data;
 
   if (Array.isArray(mergedData) && mergedData.every(row => typeof row === 'object' && row !== null)) {
@@ -99,12 +109,11 @@ const DATE_KEY = "date";
 
 // returns chart formatted data if data can be rendered as line chart
 // otherwise return null
-function getChartData(data: any, regions: string[]) {
+function getChartData(data: unknown, regions: string[]) {
   try {
     const merged = mergeRegionKeys(data, regions) || data;
 
-
-    if (merged) {
+    if (merged && Array.isArray(merged)) {
       if (DATE_KEY in merged[0]) {
         const numericFields = Object.entries(merged[0]).filter(([, value]) => typeof value === 'number').map(([key,]) => key);
 
@@ -112,7 +121,7 @@ function getChartData(data: any, regions: string[]) {
           return numericFields.map(f => [region, f])
         }).flat(1);
 
-        const mergedByDate: object = merged.reduce((acc: { [date: string]: { [key: string]: any } }, curr: { date: string, [key: string]: any }) => {
+        const mergedByDate: object = merged.reduce((acc: { [date: string]: { [key: string]: unknown } }, curr: { date: string, [key: string]: unknown }) => {
           const date = curr[DATE_KEY];
           if (!acc[date]) {
             acc[date] = {};
@@ -153,13 +162,13 @@ function getChartData(data: any, regions: string[]) {
 function ScriptResult(props: Props) {
   const [displayType, setDisplayType] = useState<string>('json');
 
-  const [filteredData, setFilteredData] = useState<any>(props.data);
+  const [filteredData, setFilteredData] = useState(props.data);
   const [displayOptions, setDisplayOptions] = useState<{ [k: string]: boolean }>(
     { 'json': true, 'grid': false, 'chart': false, 'download': true }
   );
-  const [rowData, setRowData] = useState<any[] | null>(null);
+  const [rowData, setRowData] = useState<RowData[] | null>(null);
   const [colDefs, setColumnDefs] = useState<{ field: string }[] | null>(null);
-  const [chartOptions, setChartOptions] = useState<any | null>(null);
+  const [chartOptions, setChartOptions] = useState<ChartData | null>(null);
 
 
   function download() {
@@ -178,7 +187,8 @@ function ScriptResult(props: Props) {
     navigator.clipboard.writeText(data);
   }
 
-  function process_json(raw: any, filter: string) {
+  function applyJqFilter(raw: RunResult | null, filter: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     jq.then((jq: any) => jq.json(raw, filter)).catch(() => {
       // If any error occurs, display the raw data
       return raw
@@ -228,7 +238,7 @@ function ScriptResult(props: Props) {
         ))}
       </div>
       <div className="function-result-filter">
-        <input type="text" placeholder="Filter results with jq" onChange={(e) => process_json(props.data, e.target.value)} />
+        <input type="text" placeholder="Filter results with jq" onChange={(e) => applyJqFilter(props.data, e.target.value)} />
       </div>
       {
         displayType === 'json' && <div className="json-viewer">
@@ -247,10 +257,8 @@ function ScriptResult(props: Props) {
         </div>
       }
       {
-        displayType === "chart" && <div className="function-result-chart">
-          <AgCharts
-            options={chartOptions}
-          />
+        displayType === "chart" && chartOptions && <div className="function-result-chart">
+          <AgCharts options={chartOptions} />
         </div>
       }
 
