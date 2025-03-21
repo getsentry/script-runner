@@ -1,12 +1,12 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 import './App.css'
 import Home from './Home.tsx'
 import Scripts from './Scripts.tsx'
 import Script from './Script.tsx'
 import Nav from './Nav.tsx'
-import {Config, Route} from './types.tsx'
+import { Config, Route } from './types.tsx'
 import Header from './Header.tsx'
 import NotFound from './NotFound.tsx'
 import Api from './api.tsx'
@@ -14,7 +14,10 @@ import Api from './api.tsx'
 function App() {
   const [route, setRoute] = useState<Route | null>(null);
   const [config, setConfig] = useState<Config | null>(null);
-  const api = new Api();
+  const api = useMemo(() => {
+    return new Api();
+  }, []);
+
 
 
   // Run once on app load to parse the initial hash and set route
@@ -36,7 +39,7 @@ function App() {
       .then(() => {
         parseHashAndSetRoute();
       })
-  }, [])
+  }, [api])
 
   const parseHashAndSetRoute = () => {
     const hash = window.location.hash.slice(1);
@@ -53,13 +56,13 @@ function App() {
     let route;
     switch (fragments.length) {
       case 1:
-        route = {"regions": regions, "group": fragments[0]}
+        route = { "regions": regions, "group": fragments[0] }
         break;
       case 2:
-        route = {"regions": regions, "group": fragments[0], "function": fragments[1]}
+        route = { "regions": regions, "group": fragments[0], "function": fragments[1] }
         break;
       default:
-        route = {"regions": regions}
+        route = { "regions": regions }
     }
     setRoute(route);
   };

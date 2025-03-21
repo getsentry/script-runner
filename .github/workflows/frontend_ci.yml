@@ -1,0 +1,17 @@
+name: frontend_ci
+on:
+  pull_request:
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v3
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./app/frontend
+      - name: Run ESLint
+        run: npm run lint
+        working-directory: ./app/frontend

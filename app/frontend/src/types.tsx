@@ -1,4 +1,6 @@
-export type ConfigParam = {name: string, default: string | null, enumValues: string[] | null};
+export type RunResult = { [region: string]: unknown };
+
+export type ConfigParam = { name: string, default: string | null, enumValues: string[] | null };
 
 export interface ConfigFunction {
   name: string,
