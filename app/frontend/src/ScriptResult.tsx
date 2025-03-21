@@ -51,7 +51,7 @@ function mergeRegionKeys(data: any, regions: string[]) {
           }
 
           return regionData.map((row: any) => {
-            const rowData = Object.keys(row).reduce((acc: {[k: string]: any}, key) => {
+            const rowData = Object.keys(row).reduce((acc: { [k: string]: any }, key) => {
               const value = row[key];
               acc[key] = typeof value === 'object' && value !== null ? JSON.stringify(value) : value;
               return acc;
@@ -78,7 +78,7 @@ function mergeRegionKeys(data: any, regions: string[]) {
 
 // returns table formatted data if data is table like
 // otherwise return null
-function getGridData(data: {[region: string]: any[]} | any, regions: string[]) {
+function getGridData(data: { [region: string]: any[] } | any, regions: string[]) {
   const mergedData = mergeRegionKeys(data, regions) || data;
 
   if (Array.isArray(mergedData) && mergedData.every(row => typeof row === 'object' && row !== null)) {
@@ -106,13 +106,13 @@ function getChartData(data: any, regions: string[]) {
 
     if (merged) {
       if (DATE_KEY in merged[0]) {
-        const numericFields = Object.entries(merged[0]).filter(([_key, value]) => typeof value === 'number').map(([key, _value]) => key);
+        const numericFields = Object.entries(merged[0]).filter(([, value]) => typeof value === 'number').map(([key,]) => key);
 
         const series = regions.map(region => {
           return numericFields.map(f => [region, f])
         }).flat(1);
 
-        const mergedByDate: object = merged.reduce((acc: {[date: string]: {[key: string]: any}}, curr: {date: string, [key: string]: any}) => {
+        const mergedByDate: object = merged.reduce((acc: { [date: string]: { [key: string]: any } }, curr: { date: string, [key: string]: any }) => {
           const date = curr[DATE_KEY];
           if (!acc[date]) {
             acc[date] = {};
@@ -126,7 +126,7 @@ function getChartData(data: any, regions: string[]) {
         }, {});
 
         const arr = Object.entries(mergedByDate).map(([date, obj]) => {
-          return {date, ...obj};
+          return { date, ...obj };
         });
 
         if (numericFields.length > 0) {
@@ -154,11 +154,11 @@ function ScriptResult(props: Props) {
   const [displayType, setDisplayType] = useState<string>('json');
 
   const [filteredData, setFilteredData] = useState<any>(props.data);
-  const [displayOptions, setDisplayOptions] = useState<{[k: string]: boolean}>(
-    {'json': true, 'grid': false, 'chart': false, 'download': true}
+  const [displayOptions, setDisplayOptions] = useState<{ [k: string]: boolean }>(
+    { 'json': true, 'grid': false, 'chart': false, 'download': true }
   );
   const [rowData, setRowData] = useState<any[] | null>(null);
-  const [colDefs, setColumnDefs] = useState<{field: string}[] | null>(null);
+  const [colDefs, setColumnDefs] = useState<{ field: string }[] | null>(null);
   const [chartOptions, setChartOptions] = useState<any | null>(null);
 
 
@@ -183,7 +183,7 @@ function ScriptResult(props: Props) {
       // If any error occurs, display the raw data
       return raw
     }
-    ).then(setFilteredData).catch(() => {})
+    ).then(setFilteredData).catch(() => { })
   }
 
   useEffect(() => {
@@ -192,7 +192,7 @@ function ScriptResult(props: Props) {
 
 
     if (gridData) {
-      setColumnDefs(gridData.columns.map(f => ({"field": f})))
+      setColumnDefs(gridData.columns.map(f => ({ "field": f })))
       setRowData(gridData.data);
     } else {
       setColumnDefs(null)
@@ -221,7 +221,7 @@ function ScriptResult(props: Props) {
   return (
     <div className="function-result">
       <div className="function-result-header">
-        {Object.entries(displayOptions).filter(([_opt, active]) => active).map(([opt, _active]) => (
+        {Object.entries(displayOptions).filter(([, active]) => active).map(([opt,]) => (
           <div className={`function-result-header-item${displayType === opt ? ' active' : ''}`} >
             <a onClick={() => setDisplayType(opt)}>{opt}</a>
           </div>
@@ -232,8 +232,8 @@ function ScriptResult(props: Props) {
       </div>
       {
         displayType === 'json' && <div className="json-viewer">
-        <SyntaxHighlighter language="json" style={coy} customStyle={{fontSize: 12, width: "100%"}} wrapLines={true} lineProps={{style: {whiteSpace: 'pre-wrap'}}}>
-          {JSON.stringify(filteredData)}
+          <SyntaxHighlighter language="json" style={coy} customStyle={{ fontSize: 12, width: "100%" }} wrapLines={true} lineProps={{ style: { whiteSpace: 'pre-wrap' } }}>
+            {JSON.stringify(filteredData)}
           </SyntaxHighlighter>
         </div>
       }
@@ -242,7 +242,7 @@ function ScriptResult(props: Props) {
           <AgGridReact
             rowData={rowData}
             columnDefs={colDefs}
-            defaultColDef={{sortable: true}}
+            defaultColDef={{ sortable: true }}
           />
         </div>
       }

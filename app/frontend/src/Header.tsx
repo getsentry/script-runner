@@ -1,12 +1,12 @@
-import {Route} from './types.tsx'
-import {useEffect, useState, useRef} from 'react';
+import { Route } from './types.tsx'
+import { useEffect, useState, useRef } from 'react';
 import { ChevronDownIcon } from '@heroicons/react/24/solid'
 
 
 interface Props {
-	regions: string[],
+  regions: string[],
   route: Route,
-	navigate: (to: Route) => void,
+  navigate: (to: Route) => void,
 }
 
 function Header(props: Props) {
@@ -20,13 +20,13 @@ function Header(props: Props) {
   }
 
 
-  function handleClick(event: any) {
-    if (linkRef.current && linkRef.current.contains(event.target)) {
+  function handleClick(event: MouseEvent) {
+    if (linkRef.current && linkRef.current.contains(event.target as HTMLElement)) {
       setIsOpen(prev => !prev);
-    } else if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    } else if (dropdownRef.current && !dropdownRef.current.contains(event.target as HTMLElement)) {
       if (isOpen) {
         setIsOpen(false);
-        const newRoute = {...props.route};
+        const newRoute = { ...props.route };
         newRoute.regions = orderRegions(selected);
         props.navigate(newRoute);
       }
@@ -53,13 +53,13 @@ function Header(props: Props) {
     });
   }
 
-	return (
-		<div className="header">
-			<div>
-				<a className="header-title" onClick={() => props.navigate({regions: props.route.regions})}>
-					⚡️ ops script runner ⚡ ️
-				</a>
-			</div>
+  return (
+    <div className="header">
+      <div>
+        <a className="header-title" onClick={() => props.navigate({ regions: props.route.regions })}>
+          ⚡️ ops script runner ⚡ ️
+        </a>
+      </div>
       <div className="header-right">
         <a ref={linkRef} className='header-region-dropdown'>
           {props.route.regions.length > 0 && <span>{props.route.regions.join(', ')}</span>}
@@ -75,19 +75,19 @@ function Header(props: Props) {
                   {c}
                 </label>
                 <input
-                    type="checkbox"
-                    value={c}
-                    checked={selected.includes(c)}
-                    onChange={() => toggleProject(c)}
-                  />
+                  type="checkbox"
+                  value={c}
+                  checked={selected.includes(c)}
+                  onChange={() => toggleProject(c)}
+                />
               </li>
             ))}
           </ul>
         </div>
 
       </div>
-		</div>
-	)
+    </div>
+  )
 }
 
 
