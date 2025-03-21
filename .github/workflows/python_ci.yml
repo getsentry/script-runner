@@ -5,7 +5,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-python
+      - uses: .github/actions/install-python-deps
       - name: Run linters
         run: |
           flake8 app tests
@@ -14,14 +14,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-python
+      - uses: .github/actions/install-python-deps
       - name: Run tests
         run: |
           pytest tests
   type-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/actions/setup-python
+      - uses: .github/actions/install-python-deps
       - name: Run type checker
         run: |
           mypy app tests
