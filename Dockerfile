@@ -18,6 +18,7 @@ COPY example_config_combined.yaml /app/
 COPY examples/scripts/ /app/examples/scripts/
 COPY examples/requirements.txt /app/examples/
 
+# For clickhouse-driver, remove once scripts are split into separate repo
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends build-essential
 
 RUN pip install -r app/requirements.txt
