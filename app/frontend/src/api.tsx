@@ -1,7 +1,7 @@
 import { Config } from './types.tsx'
 
 class Api {
-  private getJson(endpoint: number) {
+  private getJson(endpoint: string) {
     return fetch(endpoint).then(response => response.json())
   }
 
