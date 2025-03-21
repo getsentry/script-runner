@@ -10,3 +10,9 @@ For multi-region mode, set `mode: region` for region, and `mode: main` for the m
 - These are in the examples/scripts directory
 - You can generate data for the examples via `make generate-example-data`
 
+
+## Configuration
+Runs in `combined`, `main` and `region` mode. Combined is mostly for dev and testing.
+
+check `config.schema.json`
+

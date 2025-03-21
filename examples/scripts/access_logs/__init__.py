@@ -1,6 +1,7 @@
-from typing import Any
-from clickhouse_driver import Client
 from datetime import datetime, timedelta
+from typing import Any
+
+from clickhouse_driver import Client
 
 
 def get_date_n_days_ago(n: int) -> str:

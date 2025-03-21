@@ -7,7 +7,7 @@ RUN npm install
 RUN npm run build
 
 # Stage 2 - copy files, build and serve python app
-FROM python:3.11.7-slim
+FROM python:3.13.2-slim
 WORKDIR /app
 COPY --from=frontend-build /frontend/dist /app/app/frontend/dist
 
