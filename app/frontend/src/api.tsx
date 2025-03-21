@@ -1,7 +1,7 @@
-import {Config} from './types.tsx'
+import { Config } from './types.tsx'
 
 class Api {
-  private getJson(endpoint: string) {
+  private getJson(endpoint: number) {
     return fetch(endpoint).then(response => response.json())
   }
 
@@ -13,14 +13,14 @@ class Api {
       },
       body: JSON.stringify(data),
     })
-    .then(response => {
-      if (!response.ok) {
-        return response.json().then(err => {
+      .then(response => {
+        if (!response.ok) {
+          return response.json().then(err => {
             return Promise.reject(err);
-        });
-      }
-      return response.json();
-    })
+          });
+        }
+        return response.json();
+      })
   }
 
   async getConfig(): Promise<Config> {
