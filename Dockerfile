@@ -18,6 +18,10 @@ COPY example_config_combined.yaml /app/
 COPY examples/scripts/ /app/examples/scripts/
 COPY examples/requirements.txt /app/examples/
 
+RUN apt-get update &&
+    apt-get upgrade -y &&
+    apt-get install -y --no-install-recommends build-essential
+
 RUN pip install -r app/requirements.txt
 RUN pip install -r examples/requirements.txt
 
