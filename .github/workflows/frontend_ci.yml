@@ -2,7 +2,7 @@ name: frontend_ci
 on:
   pull_request:
 jobs:
-  typescript:
+  eslint:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -12,6 +12,6 @@ jobs:
       - name: Install dependencies
         run: npm install
         working-directory: ./app/frontend
-      - name: Run TypeScript type check
-        run: npx tsc --noEmit
+      - name: Run ESLint
+        run: npm run lint
         working-directory: ./app/frontend
