@@ -11,3 +11,7 @@ jobs:
         uses: actions/setup-node@v3
       - name: Install dependencies
         run: npm install
+        working-directory: ./app/frontend
+      - name: Run TypeScript type check
+        run: npx tsc --noEmit
+        working-directory: ./app/frontend
