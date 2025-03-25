@@ -17,8 +17,6 @@ config = load_config()
 def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
     @wraps(f)
     def authenticate(*args: Any, **kwargs: Any) -> Response:
-        data = request.get_json()
-
         try:
             config.auth.authenticate_request(request)
         except UnauthorizedUser:
