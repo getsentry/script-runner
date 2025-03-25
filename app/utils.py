@@ -9,9 +9,14 @@ from enum import Enum
 from pathlib import Path
 from types import ModuleType
 from typing import Any, Literal
+from app.auth import AuthMethod, NoAuth, GoogleAuth
 
 import jsonschema
 import yaml
+
+
+class ConfigError(Exception):
+    pass
 
 
 def get_module_exports(module: ModuleType) -> list[str]:
@@ -59,21 +64,34 @@ class FunctionGroup:
     group: str
     module: str
     functions: list[Function]
-    iap_principals: list[str]
 
 
 @dataclass(frozen=True)
 class CommonFields:
+    auth: AuthMethod
     groups: dict[str, FunctionGroup]
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "CommonFields":
+        auth_data = data["authentication"]
+        auth_method = auth_data["method"]
+
+        auth: AuthMethod
+
+        if auth_method == "google_iap":
+            iap_principals = auth_data["google_iap"]["iap_principals"]
+            auth = GoogleAuth("TODO: audience code", iap_principals)
+        elif auth_method == "no_auth":
+            auth = NoAuth()
+        else:
+            raise ConfigError(f"Invalid authentication method: {auth_method}")
+
         groups = {
-            g: load_group(val["python_module"], g, val["iap_principals"])
+            g: load_group(val["python_module"], g)
             for (g, val) in data["groups"].items()
         }
 
-        return cls(groups=groups)
+        return cls(auth=auth, groups=groups)
 
 
 @dataclass(frozen=True)
@@ -105,7 +123,11 @@ class RegionConfig(CommonFields):
     def from_dict(cls, data: dict[str, Any]) -> "RegionConfig":
         common = CommonFields.from_dict(data)
 
-        return cls(groups=common.groups, region=RegionFields.from_dict(data["region"]))
+        return cls(
+            auth=common.auth,
+            groups=common.groups,
+            region=RegionFields.from_dict(data["region"]),
+        )
 
 
 @dataclass(frozen=True)
@@ -116,7 +138,11 @@ class MainConfig(CommonFields):
     def from_dict(cls, data: dict[str, Any]) -> "MainConfig":
         common = CommonFields.from_dict(data)
 
-        return cls(groups=common.groups, main=MainFields.from_dict(data["main"]))
+        return cls(
+            auth=common.auth,
+            groups=common.groups,
+            main=MainFields.from_dict(data["main"]),
+        )
 
 
 @dataclass(frozen=True)
@@ -129,6 +155,7 @@ class CombinedConfig(CommonFields):
         common = CommonFields.from_dict(data)
 
         return cls(
+            auth=common.auth,
             groups=common.groups,
             main=MainFields.from_dict(data["main"]),
             region=RegionFields.from_dict(data["region"]),
@@ -157,9 +184,7 @@ def validate_function(func: str, module: ModuleType) -> None:
     assert parameters[0] == "config", f"First parameter of {func} must be 'config'"
 
 
-def load_group(
-    module_name: str, group: str, iap_principals: list[str]
-) -> FunctionGroup:
+def load_group(module_name: str, group: str) -> FunctionGroup:
     module = importlib.import_module(module_name)
     module_exports = get_module_exports(module)
 
@@ -198,7 +223,6 @@ def load_group(
         group=group,
         module=module_name,
         functions=functions,
-        iap_principals=iap_principals,
     )
 
 
