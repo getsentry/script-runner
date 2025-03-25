@@ -1,5 +1,5 @@
-from app.utils import FunctionParameter, load_group, CommonFields
 from app.auth import GoogleAuth, NoAuth
+from app.utils import CommonFields, FunctionParameter, load_group
 
 
 def test_common_fields() -> None:

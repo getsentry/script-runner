@@ -9,10 +9,11 @@ from enum import Enum
 from pathlib import Path
 from types import ModuleType
 from typing import Any, Literal
-from app.auth import AuthMethod, NoAuth, GoogleAuth
 
 import jsonschema
 import yaml
+
+from app.auth import AuthMethod, GoogleAuth, NoAuth
 
 
 class ConfigError(Exception):
