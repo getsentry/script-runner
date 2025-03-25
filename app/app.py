@@ -6,11 +6,27 @@ from typing import Any, Callable
 import requests
 from flask import Flask, Response, jsonify, request, send_from_directory
 
+from app.auth import UnauthorizedUser
 from app.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
 app = Flask(__name__)
 
 config = load_config()
+
+
+def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
+    @wraps(f)
+    def authenticate(*args: Any, **kwargs: Any) -> Response:
+        try:
+            config.auth.authenticate_request(request)
+        except UnauthorizedUser:
+            err_response = jsonify({"error": "Unauthorized"})
+            err_response.status_code = 401
+            return err_response
+        res = f(*args, **kwargs)
+        return res
+
+    return authenticate
 
 
 def cache_static_files(f: Callable[..., Response]) -> Callable[..., Response]:
@@ -82,6 +98,7 @@ if not isinstance(config, RegionConfig):
         return send_from_directory("frontend/dist/assets", filename)
 
     @app.route("/run", methods=["POST"])
+    @authenticate_request
     def run_all() -> Response:
         """
         Run a script for all regions
@@ -138,6 +155,7 @@ if not isinstance(config, RegionConfig):
 if not isinstance(config, MainConfig):
 
     @app.route("/run_region", methods=["POST"])
+    @authenticate_request
     def run_one_region() -> Response:
         """
         Run a script for a specific region. Called from the `/run` endpoint.

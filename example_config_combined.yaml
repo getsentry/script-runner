@@ -2,16 +2,19 @@ mode: combined
 groups:
   kafka:
     python_module: examples.scripts.kafka
-    iap_principals:
-      - team-ops@sentry.io
-      - team-streaming@sentry.io
   access_logs:
     python_module: examples.scripts.access_logs
-    iap_principals:
-      - team-ops@sentry.io
   example:
     python_module: examples.scripts.example
-    iap_principals: []
+authentication:
+  method: google_iap
+  google_iap:
+    iap_principals:
+      kafka:
+        - team-ops@sentry.io
+        - team-streaming-platform@sentry.io
+      access_logs:
+        - team-ops@sentry.io
 main:
   regions:
     - name: s4s
@@ -21,9 +24,9 @@ region:
   configs:
     kafka:
       clusters:
-      - name: local
-        brokers:
-          - localhost:9092
+        - name: local
+          brokers:
+            - localhost:9092
     access_logs:
       host: localhost
       port: 9000

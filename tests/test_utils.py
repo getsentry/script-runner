@@ -1,4 +1,28 @@
-from app.utils import FunctionParameter, load_group
+from app.auth import GoogleAuth, NoAuth
+from app.utils import CommonFields, FunctionParameter, load_group
+
+
+def test_common_fields() -> None:
+    no_auth = CommonFields.from_dict(
+        {
+            "groups": {},
+            "authentication": {
+                "method": "no_auth",
+            },
+        }
+    )
+    assert isinstance(no_auth.auth, NoAuth)
+
+    google_auth = CommonFields.from_dict(
+        {
+            "groups": {"example": {"python_module": "tests.example"}},
+            "authentication": {
+                "method": "google_iap",
+                "google_iap": {"iap_principals": {"example": ["test@test.com"]}},
+            },
+        }
+    )
+    assert isinstance(google_auth.auth, GoogleAuth)
 
 
 def test_validate_config_functions() -> None:
@@ -7,11 +31,9 @@ def test_validate_config_functions() -> None:
     """
     module = "tests.example"
     group_name = "example"
-    iap_principals = ["test@sentry.io"]
 
-    group = load_group(module, group_name, iap_principals)
+    group = load_group(module, group_name)
     assert group.module == module
-    assert group.iap_principals == ["test@sentry.io"]
     assert [f.name for f in group.functions] == ["hello", "hello_with_enum"]
     assert [f.parameters for f in group.functions] == [
         [FunctionParameter(name="to", default="world", enumValues=None)],

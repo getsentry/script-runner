@@ -2,82 +2,142 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "description": "Config schema",
   "type": "object",
-    "properties": {
-      "mode": {
-        "enum": ["combined", "main", "region"]
-      },
-      "groups": {
-        "additionalProperties": {
-          "type": "object",
-          "properties": {
-            "python_module": {
-              "type": "string"
-            },
-            "iap_principals": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "required": ["python_module", "iap_principals"]
-        }
-      },
-      "main": {
+  "properties": {
+    "mode": {
+      "enum": [
+        "combined",
+        "main",
+        "region"
+      ]
+    },
+    "groups": {
+      "additionalProperties": {
         "type": "object",
         "properties": {
-          "regions": {
-            "type": "array",
-            "items": {
+          "python_module": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "required": [
+          "python_module"
+        ]
+      }
+    },
+    "authentication": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "no_auth",
+            "google_iap"
+          ]
+        },
+        "additionalProperties": false,
+        "google_iap": {
+          "type": "object",
+          "properties": {
+            "iap_principals": {
               "type": "object",
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "url": {
+              "additionalProperties": {
+                "type": "array",
+                "items": {
                   "type": "string"
                 }
               }
-            }
-          }
+            },
+            "additionalProperties": false
+          },
+          "additionalProperties": false
         }
       },
-      "region": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
+      "required": [
+        "method"
+      ],
+      "dependencies": {
+        "google_iap": {
+          "properties": {
+            "method": {
+              "const": "google_iap"
+            }
           },
-          "configs": {
-            "type": "object"
+          "required": [
+            "google_iap"
+          ]
+        }
+      }
+    },
+    "main": {
+      "type": "object",
+      "properties": {
+        "regions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            }
           }
         }
       }
     },
-    "required": ["mode", "groups"],
-    "dependencies": {
-      "mode": {
-        "oneOf": [
-          {
-            "properties": {
-              "mode": {"const": "combined"}
-            },
-            "required": ["main", "region"]
-          },
-          {
-            "properties": {
-              "mode": {"const": "main"}
-            },
-            "required": ["main"]
-          },
-          {
-            "properties": {
-              "mode": {"const": "region"}
-            },
-            "required": ["region"]
-          }
-        ]
+    "region": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "configs": {
+          "type": "object"
+        }
       }
     }
-
+  },
+  "required": [
+    "mode",
+    "groups"
+  ],
+  "dependencies": {
+    "mode": {
+      "oneOf": [
+        {
+          "properties": {
+            "mode": {
+              "const": "combined"
+            }
+          },
+          "required": [
+            "main",
+            "region"
+          ]
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "main"
+            }
+          },
+          "required": [
+            "main"
+          ]
+        },
+        {
+          "properties": {
+            "mode": {
+              "const": "region"
+            }
+          },
+          "required": [
+            "region"
+          ]
+        }
+      ]
+    }
+  }
 }
