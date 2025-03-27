@@ -7,7 +7,7 @@ from typing import Literal
 import os
 from functools import wraps
 from datetime import timedelta
-
+import logging
 from types import ModuleType
 
 app = Flask(__name__)
@@ -169,6 +169,7 @@ def run_script():
         try:
             results[region] = func(group_config, *params)
         except ValueError as exc:
-            return jsonify({"error": str(exc)}), 400
+            logging.error("Error occurred while executing function %s: %s", function, exc)
+            return jsonify({"error": "An internal error has occurred!"}), 400
 
     return jsonify(results)
