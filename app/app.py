@@ -1,174 +1,116 @@
-from flask import Flask, send_from_directory, request, jsonify
+from flask import Flask, send_from_directory, request, jsonify, Response
 import functools
-import importlib
-import inspect
-import yaml
-from typing import Literal
 import os
+from typing import Any, Dict, List, Tuple, Union
 from functools import wraps
 from datetime import timedelta
 
-from types import ModuleType
-
-app = Flask(__name__)
-
-
-def cache_static_files(f):
-    @wraps(f)
-    def add_cache_headers(*args, **kwargs):
-        res = f(*args, **kwargs)
-        res.headers['Cache-Control'] = 'public, max-age=3600'
-        return res
-    return add_cache_headers
+from script_runner.config import Config
+from script_runner.module_loader import (
+    get_group_info,
+    validate_function_signatures,
+    execute_function,
+)
 
 
-def get_module_exports(module: ModuleType) -> list[str]:
-    exports = module.__all__ if hasattr(module, "__all__") else dir(module)
-    return [
-        name
-        for name in exports
-        if not name.startswith("_") and callable(getattr(module, name, None))
-    ]
-
-
-@functools.lru_cache(maxsize=1)
-def load_config_file():
+def create_app(config_path: str = None) -> Flask:
     """
-    Loads and validates configuration
+    Create and configure the Flask application.
     """
-    config_file_path = os.getenv("CONFIG_FILE_PATH")
+    app = Flask(__name__)
 
-    with open(config_file_path, "r") as file:
-        config = yaml.safe_load(file)
+    # Initialize config
+    config = Config(config_path)
 
-    module_name = config["python_scripts_module_name"]
+    def cache_static_files(f):
+        @wraps(f)
+        def add_cache_headers(*args, **kwargs):
+            res = f(*args, **kwargs)
+            res.headers["Cache-Control"] = "public, max-age=3600"
+            return res
 
-    # TODO: json validation
+        return add_cache_headers
 
-    assert set(config["regions"]) == set(config["region_configs"].keys()), "Invalid region config"
+    @app.route("/")
+    @cache_static_files
+    def home() -> Response:
+        """
+        Serve the main HTML page.
+        """
+        return send_from_directory("frontend/dist", "index.html")
 
-    # Ensure all functions have valid signatures
-    for group in config["groups"]:
-        module = importlib.import_module(f"{module_name}.{group}")
-        for f in get_module_exports(module):
-            sig = inspect.signature(getattr(module, f, None))
-            parameters = [p for p in sig.parameters]
-            assert parameters[0] == "config", f"First parameter of {f} must be 'config'"
+    @app.route("/health")
+    def health() -> Tuple[Dict[str, str], int]:
+        """
+        Health check endpoint.
+        """
+        return jsonify({"status": "ok"}), 200
 
-    return config
+    @app.route("/jq.wasm")
+    @cache_static_files
+    def jq_wasm() -> Response:
+        """
+        Serve the jq.wasm file.
+        """
+        return send_from_directory("frontend/dist", "jq.wasm")
 
+    @app.route("/config")
+    def get_config() -> Dict[str, Any]:
+        """
+        Get configuration and available functions.
+        """
+        cfg = config.load()
+        module_name = cfg["python_scripts_module_name"]
+        groups = cfg["groups"]
 
-def get_enum_values(annotation: type):
-    """
-    Return allowed values or None
-    """
+        # Validate function signatures
+        validate_function_signatures(module_name, groups)
 
-    if getattr(annotation, "__origin__", None) is Literal:
-        return [arg for arg in annotation.__args__]
+        # Get group info
+        group_data = [get_group_info(module_name, group) for group in groups]
 
-    return None
+        return {
+            "regions": cfg["regions"],
+            "groups": group_data,
+            "executableGroups": config.get_executable_groups(),
+        }
 
+    @app.route("/assets/<filename>")
+    @cache_static_files
+    def static_file(filename: str) -> Response:
+        """
+        Serve static assets.
+        """
+        return send_from_directory("frontend/dist/assets", filename)
 
-@functools.lru_cache(maxsize=1)
-def get_functions():
-    config = load_config_file()
+    @app.route("/run", methods=["POST"])
+    def run_script() -> Union[Dict[str, Any], Tuple[Dict[str, str], int]]:
+        """
+        Run a script with the given parameters.
+        """
+        cfg = config.load()
+        module_name = cfg["python_scripts_module_name"]
 
-    regions = config["regions"]
-    groups = config["groups"]
+        data = request.get_json()
 
-    group_data = []
+        results = {}
 
-    module_name = config["python_scripts_module_name"]
+        group = data["group"]
+        function = data["function"]
+        params = data["parameters"]
 
-    for group in groups:
-        try:
-            module = importlib.import_module(f"{module_name}.{group}")
-            module_exports = get_module_exports(module)
+        for region in data["regions"]:
+            group_config = config.get_region_config(region, group)
+            try:
+                results[region] = execute_function(
+                    module_name, group, function, group_config, params
+                )
+            except ValueError as exc:
+                return jsonify({"error": str(exc)}), 400
 
-            functions = [
-                {
-                    "name": f,
-                    "source": inspect.getsource(getattr(module, f, None)),
-                    "docstring": getattr(module, f, None).__doc__ or "",
-                    "parameters": [
-                        {
-                            "name": k,
-                            "default": (
-                                str(v.default) if v.default is not inspect.Parameter.empty else None
-                            ),
-                            "enumValues": get_enum_values(v.annotation),
-                        }
-                        for (k, v) in inspect.signature(getattr(module, f, None)).parameters.items()
-                        if k != "config"
-                    ],
-                }
-                for f in module_exports
-            ]
+        return jsonify(results)
 
-        except ModuleNotFoundError:
-            functions = []
-
-        group_data.append({"group": group, "functions": functions})
-
-    return {
-        "regions": regions,
-        "groups": group_data,
-    }
-
-
-@app.route("/")
-@cache_static_files
-def home():
-    return send_from_directory("frontend/dist", "index.html")
-
-@app.route("/health")
-def health():
-    return jsonify({"status": "ok"}), 200
-
-
-
-@app.route("/jq.wasm")
-@cache_static_files
-def jq_wasm():
-    return send_from_directory("frontend/dist", "jq.wasm")
-
-
-@app.route("/config")
-def functions():
-    res = get_functions()
-
-    # TODO: properly filter based on user access
-    res["executableGroups"] = ["example", "kafka", "access_logs"]
-
-    return res
+    return app
 
 
-@app.route("/assets/<filename>")
-@cache_static_files
-def static_file(filename: str):
-    return send_from_directory("frontend/dist/assets", filename)
-
-
-@app.route("/run", methods=["POST"])
-def run_script():
-    config = load_config_file()
-    module_name = config["python_scripts_module_name"]
-
-    data = request.get_json()
-
-    results = {}
-
-    group = data["group"]
-    function = data["function"]
-    params = data["parameters"]
-    module = importlib.import_module(f"{module_name}.{group}")
-
-    for region in data["regions"]:
-        func = getattr(module, function)
-        group_config = config["region_configs"][region].get(group, None)
-        try:
-            results[region] = func(group_config, *params)
-        except ValueError as exc:
-            return jsonify({"error": str(exc)}), 400
-
-    return jsonify(results)
+app = create_app()

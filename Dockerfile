@@ -2,28 +2,43 @@
 FROM node:22 AS frontend-build
 WORKDIR /frontend
 
-COPY app/frontend/ /frontend/
+COPY frontend/ /frontend/
 RUN npm install
 RUN npm run build
 
-# Stage 2 - copy files, build and serve python app
+# Stage 2 - build and package Python app
+FROM python:3.11.7-slim AS build
+WORKDIR /app
+
+# Copy and install requirements
+COPY pyproject.toml /app/
+COPY src/ /app/src/
+
+# Copy frontend build
+COPY --from=frontend-build /frontend/dist /app/src/script_runner/frontend/dist
+
+# Build the wheel
+RUN pip install build
+RUN python -m build --wheel
+
+# Stage 3 - create slim final image
 FROM python:3.11.7-slim
 WORKDIR /app
-COPY --from=frontend-build /frontend/dist /app/app/frontend/dist
 
-COPY app/requirements.txt /app/app/
-COPY app/*.py /app/app/
-COPY example_config.yaml /app/
+# Copy the wheel from the build stage
+COPY --from=build /app/dist/*.whl /app/
 
-COPY examples/scripts/ /app/examples/scripts/
-COPY examples/requirements.txt /app/examples/
+# Install the wheel
+RUN pip install /app/*.whl
 
-RUN pip install -r app/requirements.txt
-RUN pip install -r examples/requirements.txt
+# Clean up
+RUN rm -rf /app/*.whl
 
 EXPOSE 5000
 
-ENV FLASK_ENV=production
-ENV CONFIG_FILE_PATH=/app/example_config.yaml
+# Default config for examples
+COPY examples/config.yaml /app/config.yaml
+ENV CONFIG_FILE_PATH=/app/config.yaml
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "app.app:app"]
+# Run using the entry point
+CMD ["script-runner", "--host", "0.0.0.0", "--port", "5000"]

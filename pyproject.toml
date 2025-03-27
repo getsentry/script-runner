@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "script-runner"
+version = "0.1.0"
+description = "A web application for running Python scripts. Built with flask and vite."
+requires-python = ">=3.11"
+dependencies = ["flask>=2.0.0", "gunicorn>=20.1.0", "pyyaml>=6.0"]
+
+[project.scripts]
+script-runner = "script_runner.cli:main"
