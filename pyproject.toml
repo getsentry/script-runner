@@ -18,4 +18,3 @@ dependencies = ["flask>=2.0.0", "gunicorn>=20.1.0", "pyyaml>=6.0"]
 
 [project.scripts]
 script-runner = "script_runner.cli:main"
-
