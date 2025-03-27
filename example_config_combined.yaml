@@ -1,0 +1,34 @@
+mode: combined
+groups:
+  kafka:
+    python_module: examples.scripts.kafka
+  access_logs:
+    python_module: examples.scripts.access_logs
+  example:
+    python_module: examples.scripts.example
+authentication:
+  method: google_iap
+  google_iap:
+    iap_principals:
+      kafka:
+        - team-ops@sentry.io
+        - team-streaming-platform@sentry.io
+      access_logs:
+        - team-ops@sentry.io
+main:
+  regions:
+    - name: s4s
+      url: localhost:5000
+region:
+  name: s4s
+  configs:
+    kafka:
+      clusters:
+        - name: local
+          brokers:
+            - localhost:9092
+    access_logs:
+      host: localhost
+      port: 9000
+      database: clicktail
+      table_name: access_log_local

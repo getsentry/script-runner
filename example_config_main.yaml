@@ -1,0 +1,14 @@
+mode: main
+groups:
+  kafka:
+    python_module: examples.scripts.kafka
+  access_logs:
+    python_module: examples.scripts.access_logs
+  example:
+    python_module: examples.scripts.example
+main:
+  regions:
+    - name: s4s
+      url: localhost:5002
+authentication:
+  method: no_auth

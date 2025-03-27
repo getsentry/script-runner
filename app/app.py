@@ -1,117 +1,182 @@
-from flask import Flask, send_from_directory, request, jsonify, Response
 import functools
-import os
-from typing import Any, Dict, List, Tuple, Union
+import importlib
 from functools import wraps
-from datetime import timedelta
+from typing import Any, Callable
 
-from script_runner.config import Config
-from script_runner.module_loader import (
-    get_group_info,
-    validate_function_signatures,
-    execute_function,
-)
+import requests
+from flask import Flask, Response, jsonify, request, send_from_directory
+
+from app.auth import UnauthorizedUser
+from app.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
 
-def create_app(config_path: str = None) -> Flask:
-    """
-    Create and configure the Flask application.
-    """
-    app = Flask(__name__)
+config = load_config()
 
-    # Initialize config
-    config = Config(config_path)
 
-    def cache_static_files(f):
-        @wraps(f)
-        def add_cache_headers(*args, **kwargs):
-            res = f(*args, **kwargs)
-            res.headers["Cache-Control"] = "public, max-age=3600"
-            return res
+def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
+    @wraps(f)
+    def authenticate(*args: Any, **kwargs: Any) -> Response:
+        try:
+            config.auth.authenticate_request(request)
+        except UnauthorizedUser:
+            err_response = jsonify({"error": "Unauthorized"})
+            err_response.status_code = 401
+            return err_response
+        res = f(*args, **kwargs)
+        return res
 
-        return add_cache_headers
+    return authenticate
+
+
+def cache_static_files(f: Callable[..., Response]) -> Callable[..., Response]:
+    @wraps(f)
+    def add_cache_headers(*args: Any, **kwargs: Any) -> Response:
+        res = f(*args, **kwargs)
+        res.headers["Cache-Control"] = "public, max-age=3600"
+        return res
+
+    return add_cache_headers
+
+
+@functools.lru_cache(maxsize=1)
+def get_config() -> dict[str, Any]:
+    assert isinstance(config, (MainConfig, CombinedConfig))
+
+    regions = config.main.regions
+    groups = config.groups
+
+    group_data = [
+        {
+            "group": g,
+            "functions": [
+                {
+                    "name": f.name,
+                    "docstring": f.docstring,
+                    "source": f.source,
+                    "parameters": [
+                        {
+                            "name": p.name,
+                            "default": p.default,
+                            "enumValues": p.enumValues,
+                        }
+                        for p in f.parameters
+                    ],
+                }
+                for f in function_group.functions
+            ],
+        }
+        for (g, function_group) in groups.items()
+    ]
+
+    return {
+        "regions": [r.name for r in regions],
+        "groups": group_data,
+    }
+
+
+@app.route("/health")
+def health() -> Response:
+    return jsonify({"status": "ok"})
+
+
+if not isinstance(config, RegionConfig):
 
     @app.route("/")
     @cache_static_files
     def home() -> Response:
-        """
-        Serve the main HTML page.
-        """
         return send_from_directory("frontend/dist", "index.html")
-
-    @app.route("/health")
-    def health() -> Tuple[Dict[str, str], int]:
-        """
-        Health check endpoint.
-        """
-        return jsonify({"status": "ok"}), 200
 
     @app.route("/jq.wasm")
     @cache_static_files
     def jq_wasm() -> Response:
-        """
-        Serve the jq.wasm file.
-        """
         return send_from_directory("frontend/dist", "jq.wasm")
-
-    @app.route("/config")
-    def get_config() -> Dict[str, Any]:
-        """
-        Get configuration and available functions.
-        """
-        cfg = config.load()
-        module_name = cfg["python_scripts_module_name"]
-        groups = cfg["groups"]
-
-        # Validate function signatures
-        validate_function_signatures(module_name, groups)
-
-        # Get group info
-        group_data = [get_group_info(module_name, group) for group in groups]
-
-        return {
-            "regions": cfg["regions"],
-            "groups": group_data,
-            "executableGroups": config.get_executable_groups(),
-        }
 
     @app.route("/assets/<filename>")
     @cache_static_files
     def static_file(filename: str) -> Response:
-        """
-        Serve static assets.
-        """
         return send_from_directory("frontend/dist/assets", filename)
 
     @app.route("/run", methods=["POST"])
-    def run_script() -> Union[Dict[str, Any], Tuple[Dict[str, str], int]]:
+    @authenticate_request
+    def run_all() -> Response:
         """
-        Run a script with the given parameters.
+        Run a script for all regions
         """
-        cfg = config.load()
-        module_name = cfg["python_scripts_module_name"]
-
+        assert not isinstance(config, RegionConfig)
         data = request.get_json()
 
         results = {}
 
-        group = data["group"]
-        function = data["function"]
+        group_name = data["group"]
+        group = config.groups[group_name]
+        requested_function = data["function"]
+        function = next(
+            (f for f in group.functions if f.name == requested_function), None
+        )
+        assert function is not None, "Invalid function"
         params = data["parameters"]
 
-        for region in data["regions"]:
-            group_config = config.get_region_config(region, group)
-            try:
-                results[region] = execute_function(
-                    module_name, group, function, group_config, params
-                )
-            except ValueError as exc:
-                app.logger.error(f"Error executing function: {exc}")
-                return jsonify({"error": "An internal error has occurred."}), 400
+        for requested_region in data["regions"]:
+            region = next(
+                (r for r in config.main.regions if r.name == requested_region), None
+            )
+            if region is None:
+                err_response = jsonify({"error": "Invalid region"})
+                err_response.status_code = 400
+                return err_response
+            res = requests.post(
+                f"{request.scheme}://{region.url}/run_region",
+                json={
+                    "group": group_name,
+                    "function": function.name,
+                    "function_checksum": function.checksum,
+                    "parameters": params,
+                    "region": region.name,
+                },
+            )
+
+            # TODO: handle errors properly
+            assert res.status_code == 200
+            results[region.name] = res.json()
 
         return jsonify(results)
 
-    return app
+    @app.route("/config")
+    def fetch_config() -> Response:
+        res = get_config()
+
+        # TODO: properly filter based on user access
+        res["executableGroups"] = ["example", "kafka", "access_logs"]
+
+        return jsonify(res)
 
 
-app = create_app()
+if not isinstance(config, MainConfig):
+
+    @app.route("/run_region", methods=["POST"])
+    @authenticate_request
+    def run_one_region() -> Response:
+        """
+        Run a script for a specific region. Called from the `/run` endpoint.
+        """
+        assert isinstance(config, (RegionConfig, CombinedConfig))
+
+        data = request.get_json()
+        group_name = data["group"]
+        group = config.groups[group_name]
+        requested_function = data["function"]
+
+        function = next(
+            (f for f in group.functions if f.name == requested_function), None
+        )
+        assert function is not None
+
+        # Do not run the function if it doesn't appear to be the same
+        if function.checksum != data["function_checksum"]:
+            raise ValueError("Function mismatch")
+
+        params = data["parameters"]
+        module = importlib.import_module(group.module)
+        func = getattr(module, requested_function)
+        group_config = config.region.configs.get(group_name, None)
+        return jsonify(func(group_config, *params))

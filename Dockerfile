@@ -7,7 +7,7 @@ RUN npm install
 RUN npm run build
 
 # Stage 2 - build and package Python app
-FROM python:3.11.7-slim AS build
+FROM python:3.13.2-slim AS build
 WORKDIR /app
 
 # Copy and install requirements
@@ -22,23 +22,29 @@ RUN pip install build
 RUN python -m build --wheel
 
 # Stage 3 - create slim final image
-FROM python:3.11.7-slim
+FROM python:3.13.2-slim
 WORKDIR /app
 
 # Copy the wheel from the build stage
 COPY --from=build /app/dist/*.whl /app/
 
-# Install the wheel
+# Install system dependencies (for clickhouse-driver)
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends build-essential
+
+# Install the wheel and additional requirements
 RUN pip install /app/*.whl
+RUN pip install -r app/requirements.txt
+RUN pip install -r examples/requirements.txt
 
 # Clean up
 RUN rm -rf /app/*.whl
 
 EXPOSE 5000
 
-# Default config for examples
-COPY examples/config.yaml /app/config.yaml
-ENV CONFIG_FILE_PATH=/app/config.yaml
+# Configuration
+COPY example_config_combined.yaml /app/
+ENV FLASK_ENV=production
+ENV CONFIG_FILE_PATH=/app/example_config_combined.yaml
 
 # Run using the entry point
 CMD ["script-runner", "--host", "0.0.0.0", "--port", "5000"]

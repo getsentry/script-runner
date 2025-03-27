@@ -1,16 +1,17 @@
+import functools
+from typing import Any, TypedDict
+
 from confluent_kafka import (
-    TopicCollection,
-    KafkaException,
-    KafkaError,
     ConsumerGroupTopicPartitions,
+    KafkaError,
+    KafkaException,
+    TopicCollection,
     TopicPartition,
 )
-from confluent_kafka.admin import AdminClient, OffsetSpec, ConfigResource
+from confluent_kafka.admin import AdminClient, ConfigResource, OffsetSpec
 
-from typing import Any, TypedDict
-import functools
+KAFKA_TIMEOUT = 5
 
-KAFKA_TIMEOUT = 20
 
 class KafkaCluster(TypedDict):
     name: str
@@ -65,13 +66,12 @@ def describe_cluster(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
             "port": node.port,
             "rack": node.rack,
             "isController": node.id == controller.id,
-
         }
         for node in res.nodes
     ]
 
 
-def describe_broker_configs(config: KafkaConfig, cluster: str) -> Any:
+def describe_broker_configs(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     """
     Returns configuration for all brokers in a cluster.
     """
@@ -84,14 +84,17 @@ def describe_broker_configs(config: KafkaConfig, cluster: str) -> Any:
     all_configs = []
 
     for broker_resource in broker_resources:
-        configs = {k: v.result(KAFKA_TIMEOUT) for (k, v) in client.describe_configs([broker_resource]).items()}[broker_resource]
-        for (k, v) in configs.items():
+        configs = {
+            k: v.result(KAFKA_TIMEOUT)
+            for (k, v) in client.describe_configs([broker_resource]).items()
+        }[broker_resource]
+        for k, v in configs.items():
             config_item = {
                 "config": k,
                 "value": v.value,
                 "isDefault": v.is_default,
                 "isReadOnly": v.is_read_only,
-                "broker": broker_resource.name
+                "broker": broker_resource.name,
             }
             all_configs.append(config_item)
 
@@ -106,10 +109,12 @@ def list_topics(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
 
     topics = client.list_topics().topics
 
-    return [{"name": t, "partitions": len(meta.partitions)} for (t, meta) in topics.items()]
+    return [
+        {"name": t, "partitions": len(meta.partitions)} for (t, meta) in topics.items()
+    ]
 
 
-def list_offsets(config: KafkaConfig, cluster: str, topic: str):
+def list_offsets(config: KafkaConfig, cluster: str, topic: str) -> list[dict[str, Any]]:
     """
     Returns the earliest and latest stored offsets for every partition of a topic.
     """
@@ -118,11 +123,16 @@ def list_offsets(config: KafkaConfig, cluster: str, topic: str):
 
     topics = client.describe_topics(TopicCollection([topic]))
     topic_partitions = [
-        TopicPartition(topic, p.id) for p in topics[topic].result(KAFKA_TIMEOUT).partitions
+        TopicPartition(topic, p.id)
+        for p in topics[topic].result(KAFKA_TIMEOUT).partitions
     ]
 
-    earliest_offsets = client.list_offsets({tp: OffsetSpec.earliest() for tp in topic_partitions})
-    latest_offsets = client.list_offsets({tp: OffsetSpec.latest() for tp in topic_partitions})
+    earliest_offsets = client.list_offsets(
+        {tp: OffsetSpec.earliest() for tp in topic_partitions}
+    )
+    latest_offsets = client.list_offsets(
+        {tp: OffsetSpec.latest() for tp in topic_partitions}
+    )
 
     return [
         {
@@ -168,7 +178,7 @@ def describe_topic_partitions(
     ]
 
 
-def list_consumer_groups(config: dict[str, Any], cluster: str):
+def list_consumer_groups(config: dict[str, Any], cluster: str) -> list[dict[str, Any]]:
     """
     List the consumer groups of the specified cluster.
     """
@@ -190,7 +200,9 @@ def list_consumer_group_offsets(config: KafkaConfig, cluster: str, consumer_grou
     Returns the offsets for each topic partition of a consumer group.
     """
     client = get_admin_client(config, cluster)
-    offsets = client.list_consumer_group_offsets([ConsumerGroupTopicPartitions(consumer_group)])
+    offsets = client.list_consumer_group_offsets(
+        [ConsumerGroupTopicPartitions(consumer_group)]
+    )
 
     group_offsets = offsets[consumer_group].result(KAFKA_TIMEOUT)
 
