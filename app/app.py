@@ -9,7 +9,7 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 from app.auth import UnauthorizedUser
 from app.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
-
+app = Flask(__name__)
 config = load_config()
 
 
