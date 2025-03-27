@@ -106,7 +106,8 @@ def create_app(config_path: str = None) -> Flask:
                     module_name, group, function, group_config, params
                 )
             except ValueError as exc:
-                return jsonify({"error": str(exc)}), 400
+                app.logger.error(f"Error executing function: {exc}")
+                return jsonify({"error": "An internal error has occurred."}), 400
 
         return jsonify(results)
 
