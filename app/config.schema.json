@@ -38,6 +38,10 @@
         "google_iap": {
           "type": "object",
           "properties": {
+            "audience_code": {
+              "type": "string",
+              "description": "JWT audience code"
+            },
             "iap_principals": {
               "type": "object",
               "additionalProperties": {

@@ -81,7 +81,9 @@ class CommonFields:
 
         if auth_method == "google_iap":
             iap_principals = auth_data["google_iap"]["iap_principals"]
-            auth = GoogleAuth("TODO: audience code", iap_principals)
+            audience_code = auth_data["google_iap"]["audience_code"]
+
+            auth = GoogleAuth(audience_code, iap_principals)
         elif auth_method == "no_auth":
             auth = NoAuth()
         else:

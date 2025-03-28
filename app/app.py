@@ -19,12 +19,12 @@ def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
     def authenticate(*args: Any, **kwargs: Any) -> Response:
         try:
             config.auth.authenticate_request(request)
+            res = f(*args, **kwargs)
+            return res
         except UnauthorizedUser:
             err_response = jsonify({"error": "Unauthorized"})
             err_response.status_code = 401
             return err_response
-        res = f(*args, **kwargs)
-        return res
 
     return authenticate
 
@@ -146,8 +146,13 @@ if not isinstance(config, RegionConfig):
     def fetch_config() -> Response:
         res = get_config()
 
-        # TODO: properly filter based on user access
-        res["executableGroups"] = ["example", "kafka", "access_logs"]
+        executable_groups = []
+
+        for group in config.groups:
+            if config.auth.has_group_access(request, group):
+                executable_groups.append(group)
+
+        res["executableGroups"] = executable_groups
 
         return jsonify(res)
 
