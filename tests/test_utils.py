@@ -18,7 +18,10 @@ def test_common_fields() -> None:
             "groups": {"example": {"python_module": "tests.example"}},
             "authentication": {
                 "method": "google_iap",
-                "google_iap": {"iap_principals": {"example": ["test@test.com"]}},
+                "google_iap": {
+                    "iap_principals": {"example": ["test@test.com"]},
+                    "audience_code": "/projects/xxx/global/backendServices/xxx",
+                },
             },
         }
     )

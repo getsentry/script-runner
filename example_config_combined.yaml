@@ -9,6 +9,7 @@ groups:
 authentication:
   method: google_iap
   google_iap:
+    audience_code: TODO
     iap_principals:
       kafka:
         - team-ops@sentry.io
