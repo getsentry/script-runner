@@ -14,11 +14,7 @@ name = "script-runner"
 version = "0.1.0"
 description = "A web application for running Python scripts."
 readme = "README.md"
-license = { text = "MIT" }
-authors = [
-    { name = "Lyn Nagara", email = "lyn@sentry.io" },
-    { name = "Neo Huang", email = "neo.huang@sentry.io" },
-]
+license = { text = "apache2" }
 requires-python = ">=3.12"
 dependencies = [
     "flask>=2.0.0",
@@ -36,4 +32,4 @@ classifiers = [
 ]
 
 [project.scripts]
-script-runner = "script_runner.cli:main"
+script-runner = "app.cli:main"
