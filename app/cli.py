@@ -3,8 +3,8 @@
 Command-line interface for running the Script Runner web application.
 """
 
-import os
 import click
+import os
 
 
 @click.command()
@@ -26,7 +26,7 @@ import click
     help="Port to bind to.",
     type=int,
 )
-def main(config, host, port, debug):
+def main(config: str, host: str, port: int, debug: bool = False) -> None:
     """Run the Script Runner web application."""
     os.environ["CONFIG_FILE_PATH"] = config
 
