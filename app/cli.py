@@ -1,39 +1,39 @@
-import argparse
+#!/usr/bin/env python3
+"""
+Command-line interface for running the Script Runner web application.
+"""
+
 import os
-import sys
-from app import create_app
+import click
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Run the Script Runner web application."
-    )
-    parser.add_argument(
-        "--config",
-        dest="config_path",
-        help="Path to the configuration file.",
-        default=os.getenv("CONFIG_FILE_PATH"),
-    )
-    parser.add_argument(
-        "--host", dest="host", help="Host to bind to.", default="127.0.0.1"
-    )
-    parser.add_argument(
-        "--port", dest="port", help="Port to bind to.", default=5000, type=int
-    )
-    parser.add_argument(
-        "--debug", dest="debug", help="Run in debug mode.", action="store_true"
-    )
+@click.command()
+@click.option(
+    "--config",
+    envvar="CONFIG_FILE_PATH",
+    help="Path to the configuration file.",
+    required=True,
+    type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True),
+)
+@click.option(
+    "--host",
+    required=True,
+    help="Host to bind to.",
+)
+@click.option(
+    "--port",
+    required=True,
+    help="Port to bind to.",
+    type=int,
+)
+def main(config, host, port, debug):
+    """Run the Script Runner web application."""
+    os.environ["CONFIG_FILE_PATH"] = config
 
-    args = parser.parse_args()
+    from app.app import app
 
-    if not args.config_path:
-        print(
-            "Error: Config file path not specified. Use --config or set CONFIG_FILE_PATH environment variable."
-        )
-        sys.exit(1)
-
-    app = create_app(args.config_path)
-    app.run(host=args.host, port=args.port, debug=args.debug)
+    click.echo(f"Starting Script Runner on {host}:{port} with config {config}")
+    app.run(host=host, port=port, debug=debug)
 
 
 if __name__ == "__main__":

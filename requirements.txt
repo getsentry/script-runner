@@ -4,3 +4,4 @@ gunicorn==23.0.0
 requests==2.32.3
 jsonschema==4.23.0
 google-auth==2.38.0
+click==8.1.7
