@@ -37,7 +37,3 @@ def main(config: str, host: str, port: int, debug: bool = False) -> None:
 
     click.echo(f"Starting Script Runner on {host}:{port} with config {config}")
     app.run(host=host, port=port, debug=debug)
-
-
-if __name__ == "__main__":
-    main()
