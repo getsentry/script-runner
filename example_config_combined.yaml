@@ -7,15 +7,15 @@ groups:
   example:
     python_module: examples.scripts.example
 authentication:
-  method: google_iap
-  google_iap:
-    audience_code: TODO
-    iap_principals:
-      kafka:
-        - team-ops@sentry.io
-        - team-streaming-platform@sentry.io
-      access_logs:
-        - team-ops@sentry.io
+  method: no_auth
+  # google_iap:
+  #   audience_code: TODO
+  #   iap_principals:
+  #     kafka:
+  #       - team-ops@sentry.io
+  #       - team-streaming-platform@sentry.io
+  #     access_logs:
+  #       - team-ops@sentry.io
 main:
   regions:
     - name: s4s

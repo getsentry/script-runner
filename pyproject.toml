@@ -15,10 +15,13 @@ version = "0.1.0"
 description = "A web application for running Python scripts."
 readme = "README.md"
 license = { text = "apache2" }
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dynamic = ["dependencies"]
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.package-data]
+app = ["config.schema.json", "frontend/dist/**/*"]
 
 [project.scripts]
 script-runner = "app.cli:main"

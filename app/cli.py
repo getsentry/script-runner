@@ -19,14 +19,21 @@ import click
 )
 @click.option(
     "--host",
-    required=True,
     help="Host to bind to.",
+    default="127.0.0.1",
+    type=str,
 )
 @click.option(
     "--port",
-    required=True,
     help="Port to bind to.",
+    default=5000,
     type=int,
+)
+@click.option(
+    "--debug",
+    help="Enable debug mode.",
+    is_flag=True,
+    default=False,
 )
 def main(config: str, host: str, port: int, debug: bool = False) -> None:
     """Run the Script Runner web application."""
