@@ -1,14 +1,14 @@
 devserver:
 	pip install -r requirements.txt
 	pip install -r examples/requirements.txt
-	cd app/frontend && npm run build
+	cd script_runner/frontend && npm run build
 	FLASK_APP=app.app FLASK_ENV=development CONFIG_FILE_PATH=example_config_combined.yaml PYTHONPATH=$PYTHONPATH:../examples flask run
 
 .PHONY: devserver
 
 devserver-main:
 	pip install -r requirements.txt
-	cd app/frontend && npm run build
+	cd script_runner/frontend && npm run build
 	FLASK_APP=app.app FLASK_ENV=development CONFIG_FILE_PATH=example_config_main.yaml PYTHONPATH=$PYTHONPATH:../examples flask run --port 5001
 
 .PHONY: devserver-main
