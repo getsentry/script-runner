@@ -13,12 +13,12 @@ from typing import Any, Literal
 import jsonschema
 import yaml
 
-from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
 from script_runner.audit_log import (
     AuditLogger,
-    StandardOutputLogger,
     DatadogEventLogger,
+    StandardOutputLogger,
 )
+from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
 
 
 class ConfigError(Exception):

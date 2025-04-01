@@ -1,7 +1,7 @@
-from abc import ABC, abstractmethod
 import logging
-from infra_event_notifier import datadog_notifier
+from abc import ABC, abstractmethod
 
+from infra_event_notifier import datadog_notifier
 
 # TODO: move this to the CLI once it exists and allow user to configure the level
 logging.basicConfig(level=logging.INFO)
