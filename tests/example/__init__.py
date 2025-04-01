@@ -24,14 +24,9 @@ def some_write_function(config: Any) -> None:
     pass
 
 
-def no_decorator(config: Any) -> None:
-    pass
-
-
 __all__ = [
     "hello",
     "hello_with_enum",
     "no_decorator",
     "some_write_function",
-    "no_decorator",
 ]
