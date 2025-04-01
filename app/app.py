@@ -125,8 +125,11 @@ if not isinstance(config, RegionConfig):
                 err_response = jsonify({"error": "Invalid region"})
                 err_response.status_code = 400
                 return err_response
+
+            scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
+
             res = requests.post(
-                f"http://{region.url}/run_region",
+                f"{scheme}://{region.url}/run_region",
                 json={
                     "group": group_name,
                     "function": function.name,
