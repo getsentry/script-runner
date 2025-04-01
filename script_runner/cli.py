@@ -39,7 +39,7 @@ def main(config: str, host: str, port: int, debug: bool = False) -> None:
     """Run the Script Runner web application."""
 
     # todo: Add functionality to run it with gunicorn?
-    from app.app import app
+    from script_runner.app import app
 
     os.environ["CONFIG_FILE_PATH"] = config
 
