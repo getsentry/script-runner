@@ -7,15 +7,7 @@ groups:
   example:
     python_module: examples.scripts.example
 authentication:
-  method: google_iap
-  google_iap:
-    audience_code: TODO
-    iap_principals:
-      kafka:
-        - team-ops@sentry.io
-        - team-streaming-platform@sentry.io
-      access_logs:
-        - team-ops@sentry.io
+  method: no_auth
 main:
   regions:
     - name: s4s
@@ -33,3 +25,7 @@ region:
       port: 9000
       database: clicktail
       table_name: access_log_local
+audit_logs:
+  console:
+  # datadog:
+  #   api_key: TODO

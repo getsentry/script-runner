@@ -12,3 +12,5 @@ main:
       url: localhost:5002
 authentication:
   method: no_auth
+audit_logs:
+  console:

@@ -14,6 +14,11 @@ import jsonschema
 import yaml
 
 from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
+from script_runner.audit_log import (
+    AuditLogger,
+    StandardOutputLogger,
+    DatadogEventLogger,
+)
 
 
 class ConfigError(Exception):
@@ -54,6 +59,7 @@ class Function:
     source: str
     docstring: str
     parameters: list[FunctionParameter]
+    is_readonly: bool
 
     @functools.cached_property
     def checksum(self) -> str:
@@ -70,6 +76,7 @@ class FunctionGroup:
 @dataclass(frozen=True)
 class CommonFields:
     auth: AuthMethod
+    audit_loggers: list[AuditLogger]
     groups: dict[str, FunctionGroup]
 
     @classmethod
@@ -94,7 +101,18 @@ class CommonFields:
             for (g, val) in data["groups"].items()
         }
 
-        return cls(auth=auth, groups=groups)
+        audit_loggers: list[AuditLogger] = []
+
+        audit_log_data = data["audit_logs"]
+        if "console" in audit_log_data:
+            audit_loggers.append(StandardOutputLogger())
+
+        if "datadog" in audit_log_data:
+            audit_loggers.append(
+                DatadogEventLogger(api_key=audit_log_data["datadog"]["api_key"])
+            )
+
+        return cls(auth=auth, audit_loggers=audit_loggers, groups=groups)
 
 
 @dataclass(frozen=True)
@@ -128,6 +146,7 @@ class RegionConfig(CommonFields):
 
         return cls(
             auth=common.auth,
+            audit_loggers=common.audit_loggers,
             groups=common.groups,
             region=RegionFields.from_dict(data["region"]),
         )
@@ -143,6 +162,7 @@ class MainConfig(CommonFields):
 
         return cls(
             auth=common.auth,
+            audit_loggers=common.audit_loggers,
             groups=common.groups,
             main=MainFields.from_dict(data["main"]),
         )
@@ -159,6 +179,7 @@ class CombinedConfig(CommonFields):
 
         return cls(
             auth=common.auth,
+            audit_loggers=common.audit_loggers,
             groups=common.groups,
             main=MainFields.from_dict(data["main"]),
             region=RegionFields.from_dict(data["region"]),
@@ -182,6 +203,11 @@ def validate_function(func: str, module: ModuleType) -> None:
     """
     function = getattr(module, func, None)
     assert function is not None
+
+    assert (
+        getattr(function, "_readonly", None) is not None
+    ), f"{func} must be marked @read or @write"
+
     sig = inspect.signature(function)
     parameters = [p for p in sig.parameters]
     assert parameters[0] == "config", f"First parameter of {func} must be 'config'"
@@ -219,6 +245,7 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
                     for (k, v) in sig.parameters.items()
                     if k != "config"
                 ],
+                is_readonly=function._readonly,
             )
         )
 

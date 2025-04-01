@@ -126,6 +126,14 @@ if not isinstance(config, RegionConfig):
                 err_response.status_code = 400
                 return err_response
 
+            for audit_logger in config.audit_loggers:
+                audit_logger.log(
+                    user=config.auth.get_user_email(request) or "unknown",
+                    group=group_name,
+                    function=requested_function,
+                    region=region.name,
+                )
+
             scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
 
             res = requests.post(
