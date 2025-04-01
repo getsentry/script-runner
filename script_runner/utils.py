@@ -13,7 +13,7 @@ from typing import Any, Literal
 import jsonschema
 import yaml
 
-from app.auth import AuthMethod, GoogleAuth, NoAuth
+from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
 
 
 class ConfigError(Exception):

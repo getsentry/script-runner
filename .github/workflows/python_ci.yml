@@ -10,9 +10,9 @@ jobs:
       - uses: ./.github/actions/install-python-deps
       - name: Run linters
         run: |
-          flake8 app tests
-          black app tests --check
-          isort app tests --check-only
+          flake8 script_runner tests
+          black script_runner tests --check
+          isort script_runner tests --check-only
   test:
     runs-on: ubuntu-latest
     steps:
@@ -30,4 +30,4 @@ jobs:
       - uses: ./.github/actions/install-python-deps
       - name: Run type checker
         run: |
-          mypy app tests
+          mypy script_runner tests
