@@ -8,7 +8,7 @@ from distutils.command.build import build
 
 
 project_root = Path(__file__).parent.resolve()
-frontend_dir = project_root / "app" / "frontend"
+frontend_dir = project_root / "script_runner" / "frontend"
 
 
 class FrontendBuild(build):

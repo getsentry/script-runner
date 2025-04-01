@@ -14,7 +14,7 @@ name = "script-runner"
 version = "0.1.0"
 description = "A web application for running Python scripts."
 readme = "README.md"
-license = { text = "apache2" }
+license = "Apache-2.0"
 requires-python = ">=3.12"
 dynamic = ["dependencies"]
 [tool.setuptools.dynamic]
