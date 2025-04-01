@@ -11,7 +11,7 @@ jobs:
         uses: actions/setup-node@v3
       - name: Install dependencies
         run: npm install
-        working-directory: ./app/frontend
+        working-directory: ./script_runner/frontend
       - name: Run ESLint
         run: npm run lint
-        working-directory: ./app/frontend
+        working-directory: ./script_runner/frontend
