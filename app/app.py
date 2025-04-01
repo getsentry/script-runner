@@ -126,7 +126,7 @@ if not isinstance(config, RegionConfig):
                 err_response.status_code = 400
                 return err_response
             res = requests.post(
-                f"{request.scheme}://{region.url}/run_region",
+                f"http://{region.url}/run_region",
                 json={
                     "group": group_name,
                     "function": function.name,
