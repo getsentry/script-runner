@@ -21,12 +21,12 @@ COPY examples/requirements.txt /app/examples/
 # For clickhouse-driver, remove once scripts are split into separate repo
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends build-essential
 
-RUN pip install -r app/requirements.txt
+RUN pip install -r script_runner/requirements.txt
 RUN pip install -r examples/requirements.txt
 
 EXPOSE 5000
 
 ENV FLASK_ENV=production
-ENV CONFIG_FILE_PATH=/app/example_config_combined.yaml
+ENV CONFIG_FILE_PATH=/script_runner/example_config_combined.yaml
 
 CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "script_runner.app:app"]
