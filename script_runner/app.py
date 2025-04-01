@@ -6,8 +6,8 @@ from typing import Any, Callable
 import requests
 from flask import Flask, Response, jsonify, request, send_from_directory
 
-from app.auth import UnauthorizedUser
-from app.utils import CombinedConfig, MainConfig, RegionConfig, load_config
+from script_runner.auth import UnauthorizedUser
+from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
 app = Flask(__name__)
 config = load_config()
@@ -124,8 +124,11 @@ if not isinstance(config, RegionConfig):
                 err_response = jsonify({"error": "Invalid region"})
                 err_response.status_code = 400
                 return err_response
+
+            scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
+
             res = requests.post(
-                f"{request.scheme}://{region.url}/run_region",
+                f"{scheme}://{region.url}/run_region",
                 json={
                     "group": group_name,
                     "function": function.name,
