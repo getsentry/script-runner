@@ -112,7 +112,9 @@ class CommonFields:
 
         sentry_dsn = data.get("sentry_dsn")
 
-        return cls(auth=auth, audit_loggers=audit_loggers, groups=groups, sentry_dsn=sentry_dsn)
+        return cls(
+            auth=auth, audit_loggers=audit_loggers, groups=groups, sentry_dsn=sentry_dsn
+        )
 
 
 @dataclass(frozen=True)
