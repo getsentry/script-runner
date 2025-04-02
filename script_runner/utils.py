@@ -28,7 +28,7 @@ class ConfigError(Exception):
 
 def get_module_exports(module: ModuleType) -> list[str]:
     assert hasattr(module, "__all__")
-    return module.__all__
+    return [f for f in module.__all__]
 
 
 class Mode(Enum):
