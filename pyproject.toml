@@ -27,7 +27,7 @@ include-package-data = true
 app = ["config.schema.json", "frontend/dist/**/*"]
 
 [project.scripts]
-script-runner = "app.cli:main"
+script-runner = "script_runner.cli:main"
 
 [[tool.mypy.overrides]]
 module = "infra_event_notifier"
