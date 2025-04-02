@@ -92,6 +92,10 @@
         }
       }
     },
+    "sentry_dsn": {
+      "type": "string",
+      "description": "Sentry DSN for error tracking"
+    },
     "main": {
       "type": "object",
       "properties": {
@@ -165,5 +169,6 @@
         }
       ]
     }
-  }
+  },
+  "additionalProperties": false
 }

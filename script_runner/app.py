@@ -9,10 +9,18 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
+import sentry_sdk
 
-app = Flask(__name__)
 
 config = load_config()
+
+if config.sentry_dsn:
+    sentry_sdk.init(
+        dsn=config.sentry_dsn,
+    )
+
+
+app = Flask(__name__)
 
 
 def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:

@@ -75,6 +75,7 @@ class CommonFields:
     auth: AuthMethod
     audit_loggers: list[AuditLogger]
     groups: dict[str, FunctionGroup]
+    sentry_dsn: str | None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "CommonFields":
@@ -109,7 +110,9 @@ class CommonFields:
                 DatadogEventLogger(api_key=audit_log_data["datadog"]["api_key"])
             )
 
-        return cls(auth=auth, audit_loggers=audit_loggers, groups=groups)
+        sentry_dsn = data.get("sentry_dsn")
+
+        return cls(auth=auth, audit_loggers=audit_loggers, groups=groups, sentry_dsn=sentry_dsn)
 
 
 @dataclass(frozen=True)
@@ -145,6 +148,7 @@ class RegionConfig(CommonFields):
             auth=common.auth,
             audit_loggers=common.audit_loggers,
             groups=common.groups,
+            sentry_dsn=common.sentry_dsn,
             region=RegionFields.from_dict(data["region"]),
         )
 
@@ -161,6 +165,7 @@ class MainConfig(CommonFields):
             auth=common.auth,
             audit_loggers=common.audit_loggers,
             groups=common.groups,
+            sentry_dsn=common.sentry_dsn,
             main=MainFields.from_dict(data["main"]),
         )
 
@@ -178,6 +183,7 @@ class CombinedConfig(CommonFields):
             auth=common.auth,
             audit_loggers=common.audit_loggers,
             groups=common.groups,
+            sentry_dsn=common.sentry_dsn,
             main=MainFields.from_dict(data["main"]),
             region=RegionFields.from_dict(data["region"]),
         )
