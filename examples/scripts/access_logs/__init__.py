@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from clickhouse_driver import Client
+from script_runner import read
 
 
 def get_date_n_days_ago(n: int) -> str:
@@ -15,6 +16,7 @@ def get_date_n_days_ago(n: int) -> str:
     return n_days_ago.strftime("%Y-%m-%d")
 
 
+@read
 def response_code_by_time(
     config: Any,
     request_uri_path: str = "/api/0/organizations/sentry/events/",

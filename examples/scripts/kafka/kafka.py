@@ -9,6 +9,7 @@ from confluent_kafka import (
     TopicPartition,
 )
 from confluent_kafka.admin import AdminClient, ConfigResource, OffsetSpec
+from script_runner import read
 
 KAFKA_TIMEOUT = 5
 
@@ -46,10 +47,12 @@ def get_config(config: KafkaConfig, cluster: str) -> dict[str, str]:
     return {"bootstrap.servers": ",".join(cluster_spec["brokers"])}
 
 
+@read
 def list_clusters(config: KafkaConfig) -> list[str]:
     return [c for c in config["clusters"]]
 
 
+@read
 def describe_cluster(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     """
     Returns the list of nodes in a cluster.
@@ -71,6 +74,7 @@ def describe_cluster(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     ]
 
 
+@read
 def describe_broker_configs(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     """
     Returns configuration for all brokers in a cluster.
@@ -101,6 +105,7 @@ def describe_broker_configs(config: KafkaConfig, cluster: str) -> list[dict[str,
     return all_configs
 
 
+@read
 def list_topics(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     """
     Returns the list of topics in a cluster.
@@ -114,6 +119,7 @@ def list_topics(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
     ]
 
 
+@read
 def list_offsets(config: KafkaConfig, cluster: str, topic: str) -> list[dict[str, Any]]:
     """
     Returns the earliest and latest stored offsets for every partition of a topic.
@@ -145,6 +151,7 @@ def list_offsets(config: KafkaConfig, cluster: str, topic: str) -> list[dict[str
     ]
 
 
+@read
 def describe_topic_partitions(
     config: KafkaConfig,
     cluster: str,
@@ -178,6 +185,7 @@ def describe_topic_partitions(
     ]
 
 
+@read
 def list_consumer_groups(config: dict[str, Any], cluster: str) -> list[dict[str, Any]]:
     """
     List the consumer groups of the specified cluster.
@@ -195,6 +203,7 @@ def list_consumer_groups(config: dict[str, Any], cluster: str) -> list[dict[str,
     ]
 
 
+@read
 def list_consumer_group_offsets(config: KafkaConfig, cluster: str, consumer_group: str):
     """
     Returns the offsets for each topic partition of a consumer group.

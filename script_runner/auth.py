@@ -7,9 +7,6 @@ from flask import Request
 from google.auth import jwt
 from google.auth.exceptions import GoogleAuthError
 
-USER_HEADER_KEY = "X-Goog-Authenticated-User-Email"
-JWT_HEADER_KEY = "X-Goog-Iap-Jwt-Assertion"
-
 
 class UnauthorizedUser(Exception):
     pass
@@ -20,6 +17,13 @@ class AuthMethod(ABC):
     def authenticate_request(self, request: Request) -> None:
         """
         Raise UnauthorizedUser exception if the request cannot be authenticated.
+        """
+        raise NotImplementedError
+
+    @abstractmethod
+    def get_user_email(self, request: Request) -> str | None:
+        """
+        Returns the email of the authenticated user.
         """
         raise NotImplementedError
 
@@ -34,6 +38,11 @@ class GoogleAuth(AuthMethod):
     def __init__(self, audience: str, iap_principals: dict[str, list[str]]):
         self.audience = audience
         self.iap_principals: dict[str, list[str]] = iap_principals
+        self.USER_HEADER_KEY = "X-Goog-Authenticated-User-Email"
+        self.JWT_HEADER_KEY = "X-Goog-Iap-Jwt-Assertion"
+
+    def get_user_email(self, request: Request) -> str:
+        return request.headers[self.USER_HEADER_KEY]
 
     @functools.lru_cache(maxsize=1)
     def __get_google_certs(self) -> Any:
@@ -47,8 +56,8 @@ class GoogleAuth(AuthMethod):
         return True
 
     def authenticate_request(self, request: Request) -> None:
-        user_email = request.headers[USER_HEADER_KEY]
-        jwt_assertion = request.headers[JWT_HEADER_KEY]
+        user_email = request.headers[self.USER_HEADER_KEY]
+        jwt_assertion = request.headers[self.JWT_HEADER_KEY]
 
         data = request.get_json()
         # Authentication applies on the /run and /run_region endpoints where there is always a group
@@ -74,10 +83,8 @@ class GoogleAuth(AuthMethod):
         raise UnauthorizedUser("User is not in group")
 
     def has_group_access(self, request: Request, group: str) -> bool:
-        user_email = request.headers[USER_HEADER_KEY]
-
         for i in self.iap_principals[group]:
-            if self.__is_user_in_google_group(user_email, i):
+            if self.__is_user_in_google_group(self.get_user_email(request), i):
                 return True
         return False
 
@@ -86,6 +93,9 @@ class NoAuth(AuthMethod):
     def authenticate_request(self, request: Request) -> None:
         # No authentication required
         pass
+
+    def get_user_email(self, request: Request) -> None:
+        return None
 
     def has_group_access(self, request: Request, group: str) -> bool:
         return True

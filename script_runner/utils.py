@@ -13,7 +13,13 @@ from typing import Any, Literal
 import jsonschema
 import yaml
 
+from script_runner.audit_log import (
+    AuditLogger,
+    DatadogEventLogger,
+    StandardOutputLogger,
+)
 from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
+from script_runner.function import WrappedFunction
 
 
 class ConfigError(Exception):
@@ -21,12 +27,8 @@ class ConfigError(Exception):
 
 
 def get_module_exports(module: ModuleType) -> list[str]:
-    exports = module.__all__ if hasattr(module, "__all__") else dir(module)
-    return [
-        name
-        for name in exports
-        if not name.startswith("_") and callable(getattr(module, name, None))
-    ]
+    assert hasattr(module, "__all__")
+    return [f for f in module.__all__]
 
 
 class Mode(Enum):
@@ -54,6 +56,7 @@ class Function:
     source: str
     docstring: str
     parameters: list[FunctionParameter]
+    is_readonly: bool
 
     @functools.cached_property
     def checksum(self) -> str:
@@ -70,7 +73,9 @@ class FunctionGroup:
 @dataclass(frozen=True)
 class CommonFields:
     auth: AuthMethod
+    audit_loggers: list[AuditLogger]
     groups: dict[str, FunctionGroup]
+    sentry_dsn: str | None
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "CommonFields":
@@ -94,7 +99,22 @@ class CommonFields:
             for (g, val) in data["groups"].items()
         }
 
-        return cls(auth=auth, groups=groups)
+        audit_loggers: list[AuditLogger] = []
+
+        audit_log_data = data["audit_logs"]
+        if "console" in audit_log_data:
+            audit_loggers.append(StandardOutputLogger())
+
+        if "datadog" in audit_log_data:
+            audit_loggers.append(
+                DatadogEventLogger(api_key=audit_log_data["datadog"]["api_key"])
+            )
+
+        sentry_dsn = data.get("sentry_dsn")
+
+        return cls(
+            auth=auth, audit_loggers=audit_loggers, groups=groups, sentry_dsn=sentry_dsn
+        )
 
 
 @dataclass(frozen=True)
@@ -128,7 +148,9 @@ class RegionConfig(CommonFields):
 
         return cls(
             auth=common.auth,
+            audit_loggers=common.audit_loggers,
             groups=common.groups,
+            sentry_dsn=common.sentry_dsn,
             region=RegionFields.from_dict(data["region"]),
         )
 
@@ -143,7 +165,9 @@ class MainConfig(CommonFields):
 
         return cls(
             auth=common.auth,
+            audit_loggers=common.audit_loggers,
             groups=common.groups,
+            sentry_dsn=common.sentry_dsn,
             main=MainFields.from_dict(data["main"]),
         )
 
@@ -159,7 +183,9 @@ class CombinedConfig(CommonFields):
 
         return cls(
             auth=common.auth,
+            audit_loggers=common.audit_loggers,
             groups=common.groups,
+            sentry_dsn=common.sentry_dsn,
             main=MainFields.from_dict(data["main"]),
             region=RegionFields.from_dict(data["region"]),
         )
@@ -176,30 +202,21 @@ def get_enum_values(annotation: type) -> list[str] | None:
     return None
 
 
-def validate_function(func: str, module: ModuleType) -> None:
-    """
-    Validate that the function has a valid signature.
-    """
-    function = getattr(module, func, None)
-    assert function is not None
-    sig = inspect.signature(function)
-    parameters = [p for p in sig.parameters]
-    assert parameters[0] == "config", f"First parameter of {func} must be 'config'"
-
-
 def load_group(module_name: str, group: str) -> FunctionGroup:
     module = importlib.import_module(module_name)
     module_exports = get_module_exports(module)
 
-    for f in module_exports:
-        validate_function(f, module)
-
     functions = []
     for f in module_exports:
         function = getattr(module, f, None)
-        assert function is not None
-        source = inspect.getsource(function)
-        sig = inspect.signature(function)
+        assert isinstance(
+            function, WrappedFunction
+        ), f"{f} must be marked @read or @write"
+
+        source = inspect.getsource(function.func)
+        sig = inspect.signature(function.func)
+        parameters = [p for p in sig.parameters]
+        assert parameters[0] == "config", f"First parameter of {f} must be 'config'"
 
         functions.append(
             Function(
@@ -219,6 +236,7 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
                     for (k, v) in sig.parameters.items()
                     if k != "config"
                 ],
+                is_readonly=function.is_readonly,
             )
         )
 

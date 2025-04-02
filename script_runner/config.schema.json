@@ -24,6 +24,26 @@
         ]
       }
     },
+    "audit_logs": {
+      "type": "object",
+      "properties": {
+        "console": {},
+        "datadog": {
+          "type": "object",
+          "properties": {
+            "api_key": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "api_key"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
     "authentication": {
       "type": "object",
       "properties": {
@@ -72,6 +92,10 @@
         }
       }
     },
+    "sentry_dsn": {
+      "type": "string",
+      "description": "Sentry DSN for error tracking"
+    },
     "main": {
       "type": "object",
       "properties": {
@@ -105,7 +129,9 @@
   },
   "required": [
     "mode",
-    "groups"
+    "groups",
+    "audit_logs",
+    "authentication"
   ],
   "dependencies": {
     "mode": {
@@ -143,5 +169,6 @@
         }
       ]
     }
-  }
+  },
+  "additionalProperties": false
 }
