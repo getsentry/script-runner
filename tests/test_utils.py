@@ -1,3 +1,5 @@
+import pytest
+
 from script_runner.auth import GoogleAuth, NoAuth
 from script_runner.utils import CommonFields, FunctionParameter, load_group
 
@@ -9,6 +11,7 @@ def test_common_fields() -> None:
             "authentication": {
                 "method": "no_auth",
             },
+            "audit_logs": {"console": {}},
         }
     )
     assert isinstance(no_auth.auth, NoAuth)
@@ -23,6 +26,7 @@ def test_common_fields() -> None:
                     "audience_code": "/projects/xxx/global/backendServices/xxx",
                 },
             },
+            "audit_logs": {"console": {}},
         }
     )
     assert isinstance(google_auth.auth, GoogleAuth)
@@ -37,8 +41,21 @@ def test_validate_config_functions() -> None:
 
     group = load_group(module, group_name)
     assert group.module == module
-    assert [f.name for f in group.functions] == ["hello", "hello_with_enum"]
+    assert [f.name for f in group.functions] == [
+        "hello",
+        "hello_with_enum",
+        "some_write_function",
+    ]
     assert [f.parameters for f in group.functions] == [
         [FunctionParameter(name="to", default="world", enumValues=None)],
         [FunctionParameter(name="to", default="foo", enumValues=["foo", "bar"])],
+        [],
     ]
+
+
+def test_invalid_config() -> None:
+    module = "tests.invalid_example"
+    group_name = "invalid_example"
+
+    with pytest.raises(AssertionError):
+        load_group(module, group_name)

@@ -21,3 +21,5 @@ region:
       table_name: access_log_local
 authentication:
   method: no_auth
+audit_logs:
+  console:

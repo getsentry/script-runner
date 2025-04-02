@@ -7,6 +7,7 @@ import requests
 from flask import Flask, Response, jsonify, request, send_from_directory
 
 from script_runner.auth import UnauthorizedUser
+from script_runner.function import WrappedFunction
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
 app = Flask(__name__)
@@ -126,6 +127,14 @@ if not isinstance(config, RegionConfig):
                 err_response.status_code = 400
                 return err_response
 
+            for audit_logger in config.audit_loggers:
+                audit_logger.log(
+                    user=config.auth.get_user_email(request) or "unknown",
+                    group=group_name,
+                    function=requested_function,
+                    region=region.name,
+                )
+
             scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
 
             res = requests.post(
@@ -187,5 +196,6 @@ if not isinstance(config, MainConfig):
         params = data["parameters"]
         module = importlib.import_module(group.module)
         func = getattr(module, requested_function)
+        assert isinstance(func, WrappedFunction)
         group_config = config.region.configs.get(group_name, None)
-        return jsonify(func(group_config, *params))
+        return jsonify(func.func(group_config, *params))

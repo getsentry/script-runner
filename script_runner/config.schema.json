@@ -24,6 +24,26 @@
         ]
       }
     },
+    "audit_logs": {
+      "type": "object",
+      "properties": {
+        "console": {},
+        "datadog": {
+          "type": "object",
+          "properties": {
+            "api_key": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "api_key"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
     "authentication": {
       "type": "object",
       "properties": {
@@ -105,7 +125,9 @@
   },
   "required": [
     "mode",
-    "groups"
+    "groups",
+    "audit_logs",
+    "authentication"
   ],
   "dependencies": {
     "mode": {
