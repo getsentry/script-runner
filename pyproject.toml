@@ -10,7 +10,7 @@ profile = "black"
 strict = true
 
 [project]
-name = "script-runner"
+name = "sentry-script-runner"
 version = "0.1.0"
 description = "A web application for running Python scripts."
 readme = "README.md"
@@ -29,4 +29,3 @@ script-runner = "app.cli:main"
 [[tool.mypy.overrides]]
 module = "infra_event_notifier"
 ignore_missing_imports = true
-
