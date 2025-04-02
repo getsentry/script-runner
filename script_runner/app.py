@@ -7,8 +7,8 @@ import requests
 from flask import Flask, Response, jsonify, request, send_from_directory
 
 from script_runner.auth import UnauthorizedUser
-from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 from script_runner.function import WrappedFunction
+from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
 app = Flask(__name__)
 
