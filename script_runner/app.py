@@ -11,7 +11,6 @@ from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
-
 app = Flask(__name__)
 config = load_config()
 
