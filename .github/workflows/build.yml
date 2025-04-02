@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - release/**
+      - testing-build
 
 jobs:
   dist:
@@ -15,9 +16,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
       - run: |
-          pip install build
-          python -m build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ github.sha }}
-          path: dist/*
+          python setup.py build
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ github.sha }}
+      #     path: dist/*
