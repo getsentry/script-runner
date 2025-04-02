@@ -1,0 +1,5 @@
+graft app/frontend
+
+prune app/frontend/node_modules
+prune app/frontend/dist
+
