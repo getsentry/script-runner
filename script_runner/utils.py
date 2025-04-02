@@ -27,12 +27,8 @@ class ConfigError(Exception):
 
 
 def get_module_exports(module: ModuleType) -> list[str]:
-    exports = module.__all__ if hasattr(module, "__all__") else dir(module)
-    return [
-        name
-        for name in exports
-        if isinstance(getattr(module, name, None), WrappedFunction)
-    ]
+    assert hasattr(module, "__all__")
+    return module.__all__
 
 
 class Mode(Enum):
