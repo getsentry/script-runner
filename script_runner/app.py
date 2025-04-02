@@ -8,6 +8,7 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 
 from script_runner.auth import UnauthorizedUser
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
+from script_runner.function import WrappedFunction
 
 app = Flask(__name__)
 
@@ -195,5 +196,6 @@ if not isinstance(config, MainConfig):
         params = data["parameters"]
         module = importlib.import_module(group.module)
         func = getattr(module, requested_function)
+        assert isinstance(func, WrappedFunction)
         group_config = config.region.configs.get(group_name, None)
-        return jsonify(func(group_config, *params))
+        return jsonify(func.func(group_config, *params))

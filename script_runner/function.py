@@ -1,23 +1,29 @@
-from typing import Any, Protocol
+from typing import Any, Callable
 
 
-class Function(Protocol):
-    def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        pass
+RawFunction = Callable[..., Any]
 
 
-def read(func: Function) -> Function:
+class WrappedFunction:
+    def __init__(self, func: RawFunction, readonly: bool) -> None:
+        self.func = func
+        self._readonly = readonly
+
+    @property
+    def is_readonly(self) -> bool:
+        return self._readonly
+
+
+def read(func: RawFunction) -> WrappedFunction:
     """
     Decorator to mark a function as read-only.
     """
-    setattr(func, "_readonly", True)
-    return func
+    return WrappedFunction(func, readonly=True)
 
 
-def write(func: Function) -> Function:
+def write(func: RawFunction) -> WrappedFunction:
     """
     Decorator to mark a function that does more than just read.
     Executing a write function will be logged in the system.
     """
-    setattr(func, "_readonly", False)
-    return func
+    return WrappedFunction(func, readonly=False)

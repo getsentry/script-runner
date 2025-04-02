@@ -19,6 +19,7 @@ from script_runner.audit_log import (
     StandardOutputLogger,
 )
 from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
+from script_runner.function import WrappedFunction
 
 
 class ConfigError(Exception):
@@ -30,7 +31,7 @@ def get_module_exports(module: ModuleType) -> list[str]:
     return [
         name
         for name in exports
-        if not name.startswith("_") and callable(getattr(module, name, None))
+        if isinstance(getattr(module, name, None), WrappedFunction)
     ]
 
 
@@ -197,35 +198,21 @@ def get_enum_values(annotation: type) -> list[str] | None:
     return None
 
 
-def validate_function(func: str, module: ModuleType) -> None:
-    """
-    Validate that the function has a valid signature.
-    """
-    function = getattr(module, func, None)
-    assert function is not None
-
-    assert (
-        getattr(function, "_readonly", None) is not None
-    ), f"{func} must be marked @read or @write"
-
-    sig = inspect.signature(function)
-    parameters = [p for p in sig.parameters]
-    assert parameters[0] == "config", f"First parameter of {func} must be 'config'"
-
-
 def load_group(module_name: str, group: str) -> FunctionGroup:
     module = importlib.import_module(module_name)
     module_exports = get_module_exports(module)
 
-    for f in module_exports:
-        validate_function(f, module)
-
     functions = []
     for f in module_exports:
         function = getattr(module, f, None)
-        assert function is not None
-        source = inspect.getsource(function)
-        sig = inspect.signature(function)
+        assert isinstance(
+            function, WrappedFunction
+        ), f"{f} must be marked @read or @write"
+
+        source = inspect.getsource(function.func)
+        sig = inspect.signature(function.func)
+        parameters = [p for p in sig.parameters]
+        assert parameters[0] == "config", f"First parameter of {f} must be 'config'"
 
         functions.append(
             Function(
@@ -245,7 +232,7 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
                     for (k, v) in sig.parameters.items()
                     if k != "config"
                 ],
-                is_readonly=function._readonly,
+                is_readonly=function.is_readonly,
             )
         )
 
