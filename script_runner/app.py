@@ -4,15 +4,22 @@ from functools import wraps
 from typing import Any, Callable
 
 import requests
+import sentry_sdk
 from flask import Flask, Response, jsonify, request, send_from_directory
 
 from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
-app = Flask(__name__)
-
 config = load_config()
+
+if config.sentry_dsn:
+    sentry_sdk.init(
+        dsn=config.sentry_dsn,
+    )
+
+
+app = Flask(__name__)
 
 
 def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
