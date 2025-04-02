@@ -25,7 +25,7 @@ class FrontendBuild(build):
                 file=sys.stderr,
             )
             print(
-                "Please ensure the 'app/frontend' directory exists relative to your project root.",
+                "Please ensure the 'script_runner/frontend' directory exists relative to your project root.",
                 file=sys.stderr,
             )
             raise RuntimeError("Frontend directory not found.")
