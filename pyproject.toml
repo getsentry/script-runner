@@ -21,7 +21,7 @@ dynamic = ["dependencies"]
 dependencies = { file = ["requirements.txt"] }
 
 [tool.setuptools.package-data]
-app = ["config.schema.json", "frontend/dist/**/*"]
+script_runner = ["config.schema.json", "frontend/dist/**/*"]
 
 [project.scripts]
 script-runner = "app.cli:main"
