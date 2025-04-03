@@ -10,6 +10,7 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
+import logging
 
 app = Flask(__name__)
 config = load_config()
@@ -30,7 +31,8 @@ def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
             config.auth.authenticate_request(request)
             res = f(*args, **kwargs)
             return res
-        except UnauthorizedUser:
+        except UnauthorizedUser as e:
+            logging.error(e)
             err_response = jsonify({"error": "Unauthorized"})
             err_response.status_code = 401
             return err_response

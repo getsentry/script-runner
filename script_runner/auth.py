@@ -62,7 +62,6 @@ class GoogleAuth(AuthMethod):
         data = request.get_json()
         # Authentication applies on the /run and /run_region endpoints where there is always a group
         group = data["group"]
-        principals = self.iap_principals[group]
 
         try:
             decoded_token = jwt.decode(
@@ -76,7 +75,7 @@ class GoogleAuth(AuthMethod):
         except (GoogleAuthError, KeyError) as e:
             raise UnauthorizedUser from e
 
-        for principal in principals:
+        for principal in self.iap_principals[group]:
             if self.__is_user_in_google_group(user_email, principal):
                 return None
 
