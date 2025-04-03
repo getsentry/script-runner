@@ -1,5 +1,6 @@
 import functools
 import importlib
+import logging
 from functools import wraps
 from typing import Any, Callable
 
@@ -10,7 +11,6 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
-import logging
 
 app = Flask(__name__)
 config = load_config()
