@@ -20,11 +20,14 @@ dynamic = ["dependencies"]
 [tool.setuptools.dynamic]
 dependencies = { file = ["requirements.txt"] }
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.package-data]
 script_runner = ["config.schema.json", "frontend/dist/**/*"]
 
 [project.scripts]
-script-runner = "app.cli:main"
+script-runner = "script_runner.cli:main"
 
 [[tool.mypy.overrides]]
 module = "infra_event_notifier"
