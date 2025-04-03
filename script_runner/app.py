@@ -1,5 +1,6 @@
 import functools
 import importlib
+import logging
 from functools import wraps
 from typing import Any, Callable
 
@@ -30,7 +31,8 @@ def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
             config.auth.authenticate_request(request)
             res = f(*args, **kwargs)
             return res
-        except UnauthorizedUser:
+        except UnauthorizedUser as e:
+            logging.error(e)
             err_response = jsonify({"error": "Unauthorized"})
             err_response.status_code = 401
             return err_response

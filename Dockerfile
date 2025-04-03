@@ -29,4 +29,4 @@ EXPOSE 5000
 ENV FLASK_ENV=production
 ENV CONFIG_FILE_PATH=/script_runner/example_config_combined.yaml
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "script_runner.app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--log-level", "info", "script_runner.app:app"]
