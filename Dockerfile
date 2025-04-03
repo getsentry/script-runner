@@ -23,6 +23,7 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 
 RUN pip install -r script_runner/requirements.txt
 RUN pip install -r examples/requirements.txt
+RUN pip install gunicorn==23.0.0
 
 EXPOSE 5000
 
