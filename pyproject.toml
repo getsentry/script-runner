@@ -24,7 +24,7 @@ dependencies = { file = ["requirements.txt"] }
 include-package-data = true
 
 [tool.setuptools.package-data]
-app = ["config.schema.json", "frontend/dist/**/*"]
+script_runner = ["config.schema.json", "frontend/dist/**/*"]
 
 [project.scripts]
 script-runner = "script_runner.cli:main"
