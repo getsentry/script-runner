@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
+from functools import cached_property
 from typing import Any
 
 import requests
 from flask import Request
-from google.auth import jwt, default
+from google.auth import default, jwt
 from google.auth.exceptions import GoogleAuthError
-from googleapiclient.discovery import build, Resource
-from functools import cached_property
+from googleapiclient.discovery import Resource, build
 
 
 class UnauthorizedUser(Exception):
