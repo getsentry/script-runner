@@ -1,3 +1,5 @@
+# TODO: This file is temporary. Remove once scripts are moved to sentry-scripts
+
 # Stage 1 - build frontend
 FROM node:22 AS frontend-build
 WORKDIR /frontend
