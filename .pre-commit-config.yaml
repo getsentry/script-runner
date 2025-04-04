@@ -26,3 +26,8 @@ repos:
   hooks:
     - id: flake8
       files: ^(script_runner/|tests/).*\.py$
+
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 1.15.0
+    hooks:
+    -   id: mypy
