@@ -1,5 +1,3 @@
-# TODO: This file is temporary. Remove once scripts are moved to sentry-scripts
-
 # Stage 1 - build frontend
 FROM node:22 AS frontend-build
 WORKDIR /frontend
@@ -25,11 +23,11 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 
 RUN pip install -r script_runner/requirements.txt
 RUN pip install -r examples/requirements.txt
-RUN pip install pyuwsgi
+RUN pip install gunicorn==23.0.0
 
 EXPOSE 5000
 
 ENV FLASK_ENV=production
 ENV CONFIG_FILE_PATH=/script_runner/example_config_combined.yaml
 
-CMD ["uwsgi", "--http", "0.0.0.0:5000", "--module", "script_runner.app:app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--log-level", "info", "script_runner.app:app"]
