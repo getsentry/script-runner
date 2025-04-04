@@ -23,11 +23,11 @@ RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-reco
 
 RUN pip install -r script_runner/requirements.txt
 RUN pip install -r examples/requirements.txt
-RUN pip install gunicorn==23.0.0
+RUN pip install pyuwsgi
 
 EXPOSE 5000
 
 ENV FLASK_ENV=production
 ENV CONFIG_FILE_PATH=/script_runner/example_config_combined.yaml
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "--log-level", "info", "script_runner.app:app"]
+CMD ["uwsgi", "--http", "0.0.0.0:5000", "--module", "script_runner.app:app"]
