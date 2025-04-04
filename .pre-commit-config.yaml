@@ -1,0 +1,33 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: check-yaml
+      - id: end-of-file-fixer
+
+- repo: https://github.com/psf/black
+  rev: 25.1.0
+  hooks:
+    - id: black
+      files: ^(script_runner/|tests/).*\.py$
+      language_version: python3
+
+- repo: https://github.com/PyCQA/isort
+  rev: 6.0.1
+  hooks:
+    - id: isort
+      name: isort (python)
+      files: ^(script_runner/|tests/).*\.py$
+      args: ["--profile", "black"]
+
+- repo: https://github.com/PyCQA/flake8
+  rev: 7.1.2
+  hooks:
+    - id: flake8
+      files: ^(script_runner/|tests/).*\.py$
+
+-   repo: https://github.com/pre-commit/mirrors-mypy
+    rev: 1.15.0
+    hooks:
+    -   id: mypy
