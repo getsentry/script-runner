@@ -61,7 +61,7 @@ class GoogleAuth(AuthMethod):
     @cached_property
     def __service(self) -> Resource:
         credentials, _proj = default()  # type: ignore
-        return build("directory_v1", "v1", credentials=credentials)
+        return build("directory", "v1", credentials=credentials)
 
     def __is_user_in_google_group(self, user_email: str, group_email: str) -> bool:
         members = self.__service.members().list(groupKey=group_email).execute()
