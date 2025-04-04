@@ -32,3 +32,7 @@ script-runner = "script_runner.cli:main"
 [[tool.mypy.overrides]]
 module = "infra_event_notifier"
 ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "googleapiclient.discovery"
+ignore_missing_imports = true
