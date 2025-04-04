@@ -65,7 +65,10 @@ class GoogleAuth(AuthMethod):
 
         try:
             decoded_token = jwt.decode(
-                jwt_assertion, certs=self.__get_google_certs(), audience=self.audience
+                jwt_assertion,
+                certs=self.__get_google_certs(),
+                audience=self.audience,
+                clock_skew_in_seconds=30,
             )  # type: ignore
 
             print("decoded token", decoded_token)
