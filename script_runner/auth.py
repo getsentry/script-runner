@@ -71,11 +71,9 @@ class GoogleAuth(AuthMethod):
                 clock_skew_in_seconds=30,
             )  # type: ignore
 
-            print("decoded token", decoded_token)
+            assert user_email == f"accounts.google.com:{decoded_token["email"]}"
 
-            assert user_email == decoded_token["email"]
-
-        except (GoogleAuthError, KeyError) as e:
+        except (GoogleAuthError, KeyError, AssertionError) as e:
             raise UnauthorizedUser from e
 
         for principal in self.iap_principals[group]:
