@@ -2,7 +2,7 @@ Flask==3.1.0
 pyyaml==6.0.2
 requests==2.32.3
 jsonschema==4.23.0
-google-auth==2.38.0
+google-auth[pyopenssl]==2.38.0
 click==8.1.7
 setuptools==78.1.0
 sentry-infra-event-notifier==0.0.10
