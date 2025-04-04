@@ -1,11 +1,12 @@
-import functools
 from abc import ABC, abstractmethod
+from functools import cached_property
 from typing import Any
 
 import requests
 from flask import Request
-from google.auth import jwt
+from google.auth import default, jwt
 from google.auth.exceptions import GoogleAuthError
+from googleapiclient.discovery import Resource, build
 
 
 class UnauthorizedUser(Exception):
@@ -42,21 +43,35 @@ class GoogleAuth(AuthMethod):
         self.JWT_HEADER_KEY = "X-Goog-Iap-Jwt-Assertion"
 
     def get_user_email(self, request: Request) -> str:
-        return request.headers[self.USER_HEADER_KEY]
+        user_header = request.headers[self.USER_HEADER_KEY]
+        prefix = "accounts.google.com:"
+        if user_header.startswith(prefix):
+            prefix_len = len(prefix)
+            return user_header[prefix_len:]
+        else:
+            raise UnauthorizedUser(f"Invalid user header format: {user_header}")
 
-    @functools.lru_cache(maxsize=1)
-    def __get_google_certs(self) -> Any:
+    @cached_property
+    def __google_certs(self) -> Any:
         """
         Returns a dictionary of Google's public certificates.
         """
         return requests.get("https://www.gstatic.com/iap/verify/public_key").json()
 
+    @cached_property
+    def __service(self) -> Resource:
+        credentials, _proj = default()  # type: ignore
+        return build("directory_v1", "v1", credentials=credentials)
+
     def __is_user_in_google_group(self, user_email: str, group_email: str) -> bool:
-        # TODO: Implement this function
-        return True
+        members = self.__service.members().list(groupKey=group_email).execute()
+        for member in members["members"]:
+            if member["email"] == user_email:
+                return True
+        return False
 
     def authenticate_request(self, request: Request) -> None:
-        user_email = request.headers[self.USER_HEADER_KEY]
+        user_email = self.get_user_email(request)
         jwt_assertion = request.headers[self.JWT_HEADER_KEY]
 
         data = request.get_json()
@@ -66,12 +81,12 @@ class GoogleAuth(AuthMethod):
         try:
             decoded_token = jwt.decode(
                 jwt_assertion,
-                certs=self.__get_google_certs(),
+                certs=self.__google_certs,
                 audience=self.audience,
                 clock_skew_in_seconds=30,
             )  # type: ignore
 
-            assert user_email == f"accounts.google.com:{decoded_token["email"]}"
+            assert user_email == decoded_token["email"]
 
         except (GoogleAuthError, KeyError, AssertionError) as e:
             raise UnauthorizedUser from e
@@ -83,8 +98,13 @@ class GoogleAuth(AuthMethod):
         raise UnauthorizedUser("User is not in group")
 
     def has_group_access(self, request: Request, group: str) -> bool:
+        try:
+            user_email = self.get_user_email(request)
+        except UnauthorizedUser:
+            return False
+
         for i in self.iap_principals[group]:
-            if self.__is_user_in_google_group(self.get_user_email(request), i):
+            if self.__is_user_in_google_group(user_email, i):
                 return True
         return False
 
