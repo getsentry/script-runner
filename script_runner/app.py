@@ -32,7 +32,7 @@ def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
             res = f(*args, **kwargs)
             return res
         except UnauthorizedUser as e:
-            logging.error(e)
+            logging.error(e, exc_info=True)
             err_response = jsonify({"error": "Unauthorized"})
             err_response.status_code = 401
             return err_response
