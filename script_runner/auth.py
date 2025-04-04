@@ -61,13 +61,19 @@ class GoogleAuth(AuthMethod):
     @cached_property
     def __service(self) -> Resource:
         credentials, _proj = default()  # type: ignore
-        return build("directory", "v1", credentials=credentials)
+        return build("cloudidentity", "v1", credentials=credentials)
 
     def __is_user_in_google_group(self, user_email: str, group_email: str) -> bool:
-        members = self.__service.members().list(groupKey=group_email).execute()
-        for member in members["members"]:
-            if member["email"] == user_email:
-                return True
+        group = self.__service.groups().lookup(groupKey_id=group_email).execute()
+        member = (
+            self.__service.groups()
+            .memberships()
+            .lookup(parent=group["name"], memberKey_id=user_email)
+            .execute()
+        )
+
+        if member["email"] == user_email:
+            return True
         return False
 
     def authenticate_request(self, request: Request) -> None:
