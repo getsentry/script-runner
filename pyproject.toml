@@ -1,5 +1,4 @@
 [build-system]
-
 requires = ["setuptools>=78.1.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
@@ -21,7 +20,8 @@ dynamic = ["dependencies"]
 dependencies = { file = ["requirements.txt"] }
 
 [tool.setuptools]
-include-package-data = true
+include-package-data = false
+packages = ["script_runner"]
 
 [tool.setuptools.package-data]
 script_runner = ["config.schema.json", "frontend/dist/**/*"]
