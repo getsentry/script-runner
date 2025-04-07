@@ -1,7 +1,4 @@
-from typing import Any
-
-
-def no_decorator(config: Any) -> None:
+def no_decorator() -> None:
     pass
 
 
