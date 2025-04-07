@@ -1,3 +1,5 @@
 graft script_runner/frontend
 
 prune script_runner/frontend/node_modules
+
+include py.typed
