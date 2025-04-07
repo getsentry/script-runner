@@ -9,7 +9,7 @@ from confluent_kafka import (
     TopicPartition,
 )
 from confluent_kafka.admin import AdminClient, ConfigResource, OffsetSpec
-from script_runner import read
+from script_runner import read, get_function_context
 
 KAFKA_TIMEOUT = 5
 
@@ -48,15 +48,18 @@ def get_config(config: KafkaConfig, cluster: str) -> dict[str, str]:
 
 
 @read
-def list_clusters(config: KafkaConfig) -> list[str]:
+def list_clusters() -> list[str]:
+    config: KafkaConfig = get_function_context().group_config
     return [c for c in config["clusters"]]
 
 
 @read
-def describe_cluster(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
+def describe_cluster(cluster: str) -> list[dict[str, Any]]:
     """
     Returns the list of nodes in a cluster.
     """
+    config: KafkaConfig = get_function_context().group_config
+
     client = get_admin_client(config, cluster)
     res = client.describe_cluster().result(KAFKA_TIMEOUT)
 
@@ -75,10 +78,11 @@ def describe_cluster(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
 
 
 @read
-def describe_broker_configs(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
+def describe_broker_configs(cluster: str) -> list[dict[str, Any]]:
     """
     Returns configuration for all brokers in a cluster.
     """
+    config: KafkaConfig = get_function_context().group_config
     client = get_admin_client(config, cluster)
     broker_resources = [
         ConfigResource(ConfigResource.Type.BROKER, f"{id}")
@@ -106,10 +110,11 @@ def describe_broker_configs(config: KafkaConfig, cluster: str) -> list[dict[str,
 
 
 @read
-def list_topics(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
+def list_topics(cluster: str) -> list[dict[str, Any]]:
     """
     Returns the list of topics in a cluster.
     """
+    config: KafkaConfig = get_function_context().group_config
     client = get_admin_client(config, cluster)
 
     topics = client.list_topics().topics
@@ -120,11 +125,11 @@ def list_topics(config: KafkaConfig, cluster: str) -> list[dict[str, Any]]:
 
 
 @read
-def list_offsets(config: KafkaConfig, cluster: str, topic: str) -> list[dict[str, Any]]:
+def list_offsets(cluster: str, topic: str) -> list[dict[str, Any]]:
     """
     Returns the earliest and latest stored offsets for every partition of a topic.
     """
-
+    config: KafkaConfig = get_function_context().group_config
     client = get_admin_client(config, cluster)
 
     topics = client.describe_topics(TopicCollection([topic]))
@@ -153,7 +158,6 @@ def list_offsets(config: KafkaConfig, cluster: str, topic: str) -> list[dict[str
 
 @read
 def describe_topic_partitions(
-    config: KafkaConfig,
     cluster: str,
     topic: str,
 ) -> list[dict[str, Any]]:
@@ -161,6 +165,7 @@ def describe_topic_partitions(
     Returns the id, leader, replica assignments, and insync replicas
     for each partition of a topic.
     """
+    config: KafkaConfig = get_function_context().group_config
     client = get_admin_client(config, cluster)
 
     topics = client.describe_topics(TopicCollection([topic]))
@@ -186,10 +191,11 @@ def describe_topic_partitions(
 
 
 @read
-def list_consumer_groups(config: dict[str, Any], cluster: str) -> list[dict[str, Any]]:
+def list_consumer_groups(cluster: str) -> list[dict[str, Any]]:
     """
     List the consumer groups of the specified cluster.
     """
+    config: KafkaConfig = get_function_context().group_config
     client = get_admin_client(config, cluster)
     consumer_groups = client.list_consumer_groups().result(KAFKA_TIMEOUT).valid
 
@@ -204,10 +210,11 @@ def list_consumer_groups(config: dict[str, Any], cluster: str) -> list[dict[str,
 
 
 @read
-def list_consumer_group_offsets(config: KafkaConfig, cluster: str, consumer_group: str):
+def list_consumer_group_offsets(cluster: str, consumer_group: str):
     """
     Returns the offsets for each topic partition of a consumer group.
     """
+    config: KafkaConfig = get_function_context().group_config
     client = get_admin_client(config, cluster)
     offsets = client.list_consumer_group_offsets(
         [ConsumerGroupTopicPartitions(consumer_group)]

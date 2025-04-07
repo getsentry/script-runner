@@ -9,17 +9,17 @@ import sentry_sdk
 from flask import Flask, Response, jsonify, request, send_from_directory
 
 from script_runner.auth import UnauthorizedUser
+from script_runner.context import function_context_thread_local
 from script_runner.function import WrappedFunction
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
-app = Flask(__name__)
+
 config = load_config()
 
 if config.sentry_dsn:
     sentry_sdk.init(
         dsn=config.sentry_dsn,
     )
-
 
 app = Flask(__name__)
 
@@ -208,4 +208,6 @@ if not isinstance(config, MainConfig):
         func = getattr(module, requested_function)
         assert isinstance(func, WrappedFunction)
         group_config = config.region.configs.get(group_name, None)
-        return jsonify(func.func(group_config, *params))
+        function_context_thread_local.region = data["region"]
+        function_context_thread_local.group_config = group_config
+        return jsonify(func.func(*params))
