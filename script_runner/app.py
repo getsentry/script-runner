@@ -13,7 +13,6 @@ from script_runner.context import function_context_thread_local
 from script_runner.function import WrappedFunction
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
-
 config = load_config()
 
 if config.sentry_dsn:
