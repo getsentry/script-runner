@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Generic, TypeVar
-from flask import g
 
+from flask import g
 
 T = TypeVar("T")
 
