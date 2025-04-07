@@ -1,8 +1,6 @@
-import threading
 from dataclasses import dataclass
 from typing import Generic, TypeVar
-
-function_context_thread_local = threading.local()
+from flask import g
 
 
 T = TypeVar("T")
@@ -20,6 +18,6 @@ def get_function_context() -> FunctionContext[T]:
     This is used to access the region and group config.
     """
     return FunctionContext(
-        region=function_context_thread_local.region,
-        group_config=function_context_thread_local.group_config,
+        region=g.region,
+        group_config=g.group_config,
     )

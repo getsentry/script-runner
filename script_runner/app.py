@@ -6,10 +6,9 @@ from typing import Any, Callable
 
 import requests
 import sentry_sdk
-from flask import Flask, Response, jsonify, request, send_from_directory
+from flask import Flask, Response, jsonify, request, send_from_directory, g
 
 from script_runner.auth import UnauthorizedUser
-from script_runner.context import function_context_thread_local
 from script_runner.function import WrappedFunction
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
@@ -207,6 +206,6 @@ if not isinstance(config, MainConfig):
         func = getattr(module, requested_function)
         assert isinstance(func, WrappedFunction)
         group_config = config.region.configs.get(group_name, None)
-        function_context_thread_local.region = data["region"]
-        function_context_thread_local.group_config = group_config
+        g.region = data["region"]
+        g.group_config = group_config
         return jsonify(func.func(*params))
