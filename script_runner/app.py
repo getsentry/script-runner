@@ -1,4 +1,5 @@
 from flask import Flask
+
 from script_runner.app_blueprint import app_blueprint
 
 app = Flask(__name__)

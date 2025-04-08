@@ -6,7 +6,7 @@ from typing import Any, Callable
 
 import requests
 import sentry_sdk
-from flask import Response, jsonify, request, send_from_directory, Blueprint
+from flask import Blueprint, Response, jsonify, request, send_from_directory
 
 from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
