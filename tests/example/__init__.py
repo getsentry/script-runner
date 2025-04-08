@@ -1,10 +1,10 @@
-from typing import Any, Literal
+from typing import Literal
 
 from script_runner import read, write
 
 
 @read
-def hello(config: Any, to: str = "world") -> str:
+def hello(to: str = "world") -> str:
     """
     This function says hello to someone
     """
@@ -12,7 +12,7 @@ def hello(config: Any, to: str = "world") -> str:
 
 
 @read
-def hello_with_enum(config: Any, to: Literal["foo", "bar"] = "foo") -> str:
+def hello_with_enum(to: Literal["foo", "bar"] = "foo") -> str:
     """
     Demo of literal type + default value
     """
@@ -20,7 +20,7 @@ def hello_with_enum(config: Any, to: Literal["foo", "bar"] = "foo") -> str:
 
 
 @write
-def some_write_function(config: Any) -> None:
+def some_write_function() -> None:
     pass
 
 

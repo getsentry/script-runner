@@ -215,8 +215,6 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
 
         source = inspect.getsource(function.func)
         sig = inspect.signature(function.func)
-        parameters = [p for p in sig.parameters]
-        assert parameters[0] == "config", f"First parameter of {f} must be 'config'"
 
         functions.append(
             Function(
@@ -234,17 +232,12 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
                         enumValues=get_enum_values(v.annotation),
                     )
                     for (k, v) in sig.parameters.items()
-                    if k != "config"
                 ],
                 is_readonly=function.is_readonly,
             )
         )
 
-    return FunctionGroup(
-        group=group,
-        module=module_name,
-        functions=functions,
-    )
+    return FunctionGroup(group=group, module=module_name, functions=functions)
 
 
 @functools.lru_cache(maxsize=1)
