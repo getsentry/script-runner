@@ -6,6 +6,8 @@ groups:
     python_module: examples.scripts.access_logs
   example:
     python_module: examples.scripts.example
+  meta:
+    python_module: examples.scripts.meta
 authentication:
   method: no_auth
 main:
