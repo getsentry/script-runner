@@ -138,7 +138,7 @@ function App() {
         return <NotFound />
       }
 
-      return <Script regions={route.regions} group={route.group} function={functionDef} execute={execute} canExecute={config.executableGroups.includes(route.group)} />
+      return <Script regions={route.regions} group={route.group} function={functionDef} execute={execute} />
     }
 
     if ("group" in route) {
@@ -166,7 +166,7 @@ function App() {
       <div className="page-container">
         <Nav navigate={navigate} groups={config.groups} route={route} />
         <div className="content">
-          {config.groups.length && getActiveComponent()}
+          {config.groups.length > 0 ? getActiveComponent() : <>nothing to see here</>}
         </div>
       </div>
     </>
