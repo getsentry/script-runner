@@ -3,7 +3,7 @@ github:
   owner: getsentry
   repo: script-runner
 changelogPolicy: auto
-preReleaseCommand: bash ./scripts/bump-version.sh
+preReleaseCommand: bash ./bin/bump-version.sh
 releaseBranchPrefix: release
 targets:
   - name: pypi
