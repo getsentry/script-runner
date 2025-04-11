@@ -6,6 +6,7 @@ changelogPolicy: auto
 preReleaseCommand: bash ./bin/bump-version.sh
 releaseBranchPrefix: release
 targets:
+  - name: github
   - name: pypi
   - name: sentry-pypi
     internalPypiRepo: getsentry/pypi
