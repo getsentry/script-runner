@@ -1,3 +1,7 @@
+"""
+The hello world example
+"""
+
 from typing import Literal
 from script_runner import read, write
 

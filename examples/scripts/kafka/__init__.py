@@ -1,3 +1,7 @@
+"""
+This module currently provides read-only functionality for Kafka broker
+"""
+
 from .kafka import (
     describe_broker_configs,
     describe_cluster,

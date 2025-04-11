@@ -1,3 +1,7 @@
+"""
+Testing group-level access
+"""
+
 from script_runner import read
 
 

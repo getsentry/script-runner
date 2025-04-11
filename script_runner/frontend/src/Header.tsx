@@ -4,6 +4,7 @@ import { ChevronDownIcon } from '@heroicons/react/24/solid'
 
 
 interface Props {
+  title: string,
   regions: string[],
   route: Route,
   navigate: (to: Route) => void,
@@ -58,7 +59,7 @@ function Header(props: Props) {
     <div className="header">
       <div>
         <a className="header-title" onClick={() => props.navigate({ regions: props.route.regions })}>
-          ⚡️ ops script runner ⚡ ️
+          ⚡️ {props.title || "script-runner"} ⚡ ️
         </a>
       </div>
       <div className="header-right">

@@ -12,9 +12,11 @@ export interface ConfigFunction {
 export interface ConfigGroup {
   group: string;
   functions: ConfigFunction[];
+  docstring: string;
 }
 
 export interface Config {
+  title: string,
   regions: string[],
   groups: ConfigGroup[],
   executableGroups: string[],

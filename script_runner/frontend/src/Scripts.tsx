@@ -1,4 +1,4 @@
-import {ConfigGroup, Route} from './types.tsx'
+import { ConfigGroup, Route } from './types.tsx'
 
 interface Props {
   regions: string[],
@@ -10,18 +10,19 @@ function Scripts(props: Props) {
   return (
     <div className="functions">
       <div className="functions-header">{props.group.group}</div>
+      <p>{props.group.docstring}</p>
       {
         props.group.functions.length > 0 && (
           <div>
             <p>this module contains the following functions</p>
             <ul>
-            {
-              props.group.functions.map((f) => (
-                <li className="functions-function">
-                  <a onClick={() => props.navigate({regions: props.regions, group: props.group.group, function: f.name})}>{f.name}</a>
-                </li>
-              ))
-            }
+              {
+                props.group.functions.map((f) => (
+                  <li className="functions-function">
+                    <a onClick={() => props.navigate({ regions: props.regions, group: props.group.group, function: f.name })}>{f.name}</a>
+                  </li>
+                ))
+              }
             </ul>
           </div>
         )

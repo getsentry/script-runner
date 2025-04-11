@@ -1,3 +1,8 @@
+"""
+this example should fail
+"""
+
+
 def no_decorator() -> None:
     pass
 

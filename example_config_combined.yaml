@@ -11,6 +11,7 @@ groups:
 authentication:
   method: no_auth
 main:
+  title: sentry script runner
   regions:
     - name: s4s
       url: localhost:5000

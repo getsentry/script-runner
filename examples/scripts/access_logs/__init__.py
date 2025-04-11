@@ -1,3 +1,7 @@
+"""
+Supports read queries on the acccess logs table
+"""
+
 from datetime import datetime, timedelta
 from typing import Any
 

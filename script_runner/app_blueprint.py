@@ -6,7 +6,7 @@ from typing import Any, Callable
 
 import requests
 import sentry_sdk
-from flask import Blueprint, Response, jsonify, request, send_from_directory
+from flask import Blueprint, Response, g, jsonify, request, send_from_directory
 
 from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
@@ -79,6 +79,7 @@ def get_config() -> dict[str, Any]:
     ]
 
     return {
+        "title": config.main.title,
         "regions": [r.name for r in regions],
         "groups": group_data,
     }
@@ -206,4 +207,6 @@ if not isinstance(config, MainConfig):
         func = getattr(module, requested_function)
         assert isinstance(func, WrappedFunction)
         group_config = config.region.configs.get(group_name, None)
-        return jsonify(func.func(group_config, *params))
+        g.region = data["region"]
+        g.group_config = group_config
+        return jsonify(func.func(*params))
