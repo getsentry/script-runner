@@ -129,11 +129,13 @@ class RegionFields:
 
 @dataclass(frozen=True)
 class MainFields:
+    title: str | None
     regions: list[Region]
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "MainFields":
         return cls(
+            title=data.get("title"),
             regions=[Region(name=r["name"], url=r["url"]) for r in data["regions"]],
         )
 

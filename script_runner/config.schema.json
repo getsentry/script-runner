@@ -99,6 +99,10 @@
     "main": {
       "type": "object",
       "properties": {
+        "title": {
+          "type": "string",
+          "description": "Page title for UI"
+        },
         "regions": {
           "type": "array",
           "items": {
@@ -113,7 +117,8 @@
             }
           }
         }
-      }
+      },
+      "additionalProperties": false
     },
     "region": {
       "type": "object",
