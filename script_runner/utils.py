@@ -68,6 +68,7 @@ class FunctionGroup:
     group: str
     module: str
     functions: list[Function]
+    docstring: str
 
 
 @dataclass(frozen=True)
@@ -207,6 +208,8 @@ def get_enum_values(annotation: type) -> list[str] | None:
 def load_group(module_name: str, group: str) -> FunctionGroup:
     module = importlib.import_module(module_name)
     module_exports = get_module_exports(module)
+    module_doc = module.__doc__
+    assert module_doc is not None, f"Missing module documentation: {module_name}"
 
     functions = []
     for f in module_exports:
@@ -239,7 +242,9 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
             )
         )
 
-    return FunctionGroup(group=group, module=module_name, functions=functions)
+    return FunctionGroup(
+        group=group, module=module_name, functions=functions, docstring=module_doc
+    )
 
 
 @functools.lru_cache(maxsize=1)

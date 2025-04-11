@@ -12,6 +12,7 @@ export interface ConfigFunction {
 export interface ConfigGroup {
   group: string;
   functions: ConfigFunction[];
+  docstring: string;
 }
 
 export interface Config {
