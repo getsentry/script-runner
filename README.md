@@ -15,4 +15,3 @@ For multi-region mode, set `mode: region` for region, and `mode: main` for the m
 Runs in `combined`, `main` and `region` mode. Combined is mostly for dev and testing.
 
 check `config.schema.json`
-

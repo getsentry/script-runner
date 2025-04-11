@@ -42,7 +42,7 @@ class GoogleAuth(AuthMethod):
         self.USER_HEADER_KEY = "X-Goog-Authenticated-User-Email"
         self.JWT_HEADER_KEY = "X-Goog-Iap-Jwt-Assertion"
 
-    def get_user_email(self, request: Request) -> str:
+    def get_user_email(self, request: Request) -> Any:
         user_header = request.headers[self.USER_HEADER_KEY]
         prefix = "accounts.google.com:"
         if user_header.startswith(prefix):
@@ -60,7 +60,7 @@ class GoogleAuth(AuthMethod):
 
     @cached_property
     def __service(self) -> Resource:
-        credentials, _proj = default()  # type: ignore
+        credentials, _proj = default()
         return build("cloudidentity", "v1", credentials=credentials)
 
     def __is_user_in_google_group(self, user_email: str, group_email: str) -> bool:
@@ -90,7 +90,7 @@ class GoogleAuth(AuthMethod):
                 certs=self.__google_certs,
                 audience=self.audience,
                 clock_skew_in_seconds=30,
-            )  # type: ignore
+            )
 
             assert user_email == decoded_token["email"]
 
