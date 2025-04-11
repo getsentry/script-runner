@@ -60,7 +60,7 @@ class GoogleAuth(AuthMethod):
 
     @cached_property
     def __service(self) -> Resource:
-        credentials, _proj = default()
+        credentials, _proj = default()  # type: ignore[no-untyped-call]
         return build("cloudidentity", "v1", credentials=credentials)
 
     def __is_user_in_google_group(self, user_email: str, group_email: str) -> bool:
@@ -90,7 +90,7 @@ class GoogleAuth(AuthMethod):
                 certs=self.__google_certs,
                 audience=self.audience,
                 clock_skew_in_seconds=30,
-            )
+            )  # type: ignore[no-untyped-call]
 
             assert user_email == decoded_token["email"]
 
