@@ -10,7 +10,7 @@ strict = true
 
 [project]
 name = "sentry-script-runner"
-version = "0.1.6"
+version = "0.1.7"
 description = "A web application for running Python scripts."
 readme = "README.md"
 license = "Apache-2.0"
