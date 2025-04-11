@@ -1,3 +1,7 @@
+"""
+example for tests
+"""
+
 from typing import Literal
 
 from script_runner import read, write
