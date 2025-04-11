@@ -1,4 +1,4 @@
-def generate():
+def generate() -> None:
     print("TODO")
 
 

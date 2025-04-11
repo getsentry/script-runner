@@ -1,3 +1,4 @@
+from collections import UserDict
 import functools
 from typing import Any, TypedDict
 
@@ -23,8 +24,8 @@ class KafkaConfig(TypedDict):
     clusters: list[KafkaCluster]
 
 
-class HashableConfig(dict[str, str]):
-    def __hash__(self):
+class HashableConfig(UserDict[str, str]):
+    def __hash__(self) -> int:
         return hash(tuple(sorted(self.items())))
 
 
@@ -48,7 +49,7 @@ def get_config(config: KafkaConfig, cluster: str) -> dict[str, str]:
 
 
 @read
-def list_clusters() -> list[str]:
+def list_clusters() -> list[Any]:
     config: KafkaConfig = get_function_context().group_config
     return [c for c in config["clusters"]]
 
@@ -210,7 +211,9 @@ def list_consumer_groups(cluster: str) -> list[dict[str, Any]]:
 
 
 @read
-def list_consumer_group_offsets(cluster: str, consumer_group: str):
+def list_consumer_group_offsets(
+    cluster: str, consumer_group: str
+) -> list[dict[str, Any]]:
     """
     Returns the offsets for each topic partition of a consumer group.
     """

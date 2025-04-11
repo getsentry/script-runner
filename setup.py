@@ -1,20 +1,19 @@
-import os
 import subprocess
 import sys
 from pathlib import Path
 
 from setuptools import setup
-from distutils.command.build import build
+from setuptools.command.build_py import build_py as _build
 
 
 project_root = Path(__file__).parent.resolve()
 frontend_dir = project_root / "script_runner" / "frontend"
 
 
-class FrontendBuild(build):
+class FrontendBuild(_build):
     """Custom build command to build the frontend assets."""
 
-    def run(self):
+    def run(self) -> None:
         # Build the frontend assets using npm
         print(f"Project Root: {project_root}")
         print(f"Target Frontend Directory: {frontend_dir}")
@@ -42,7 +41,6 @@ class FrontendBuild(build):
         super().run()
 
 
-if __name__ == "__main__":
-    setup(
-        cmdclass={"build": FrontendBuild},
-    )
+setup(
+    cmdclass={"build_py": FrontendBuild},
+)
