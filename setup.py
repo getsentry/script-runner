@@ -3,14 +3,14 @@ import sys
 from pathlib import Path
 
 from setuptools import setup
-from setuptools.command.build_py import build_py as build
+from setuptools.command.build_py import build_py as _build
 
 
 project_root = Path(__file__).parent.resolve()
 frontend_dir = project_root / "script_runner" / "frontend"
 
 
-class FrontendBuild(build):
+class FrontendBuild(_build):
     """Custom build command to build the frontend assets."""
 
     def run(self) -> None:
