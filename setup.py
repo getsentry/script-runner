@@ -41,7 +41,6 @@ class FrontendBuild(_build):
         super().run()
 
 
-if __name__ == "__main__":
-    setup(
-        cmdclass={"build": FrontendBuild},
-    )
+setup(
+    cmdclass={"build_py": FrontendBuild},
+)
