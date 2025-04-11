@@ -8,7 +8,6 @@ interface Props {
   regions: string[],
   group: string,
   function: ConfigFunction,
-  canExecute: boolean,
   execute: (regions: string[], group: string, func: string, args: string[]) => Promise<RunResult>,
 }
 
@@ -30,7 +29,7 @@ function Script(props: Props) {
     setHasResult(false);
     setCodeCollapsed(false);
     setError(null);
-  }, [parameters, props.group, props.function, props.canExecute, props.execute]);
+  }, [parameters, props.group, props.function, props.execute]);
 
   function handleInputChange(idx: number, value: string) {
     setParams(prev => {
@@ -66,8 +65,8 @@ function Script(props: Props) {
       })
   }
 
-  const disabled = isRunning || hasResult || props.regions.length === 0 || !props.canExecute;
-  const inputDisabled = isRunning || hasResult || !props.canExecute;
+  const disabled = isRunning || hasResult || props.regions.length === 0;
+  const inputDisabled = isRunning || hasResult;
 
   return (
     <div className="function-main">
@@ -110,12 +109,10 @@ function Script(props: Props) {
               </div>
             )}
             <div className="function-hint">
-              {props.canExecute && <>
-                {props.regions.length > 0 ?
-                  <>This will run on: {props.regions.join(", ")}</> :
-                  <em>Select a region to run this function</em>
-                }
-              </>}
+              {props.regions.length > 0 ?
+                <>This will run on: {props.regions.join(", ")}</> :
+                <em>Select a region to run this function</em>
+              }
             </div>
             <button disabled={disabled}>execute function</button>
           </form>

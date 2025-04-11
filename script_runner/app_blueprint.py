@@ -167,13 +167,14 @@ if not isinstance(config, RegionConfig):
     def fetch_config() -> Response:
         res = get_config()
 
-        executable_groups = []
-
+        # Filter out groups user doesn't have access to
+        user_groups = set()
         for group in config.groups:
             if config.auth.has_group_access(request, group):
-                executable_groups.append(group)
+                user_groups.add(group)
 
-        res["executableGroups"] = executable_groups
+        filtered_groups = [g for g in res["groups"] if g["group"] in user_groups]
+        res["groups"] = filtered_groups
 
         return jsonify(res)
 
