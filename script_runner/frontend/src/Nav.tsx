@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import './App.css'
-import {ConfigGroup, Route} from './types.tsx'
+import { ConfigGroup, Route } from './types.tsx'
 import { FolderPlusIcon, FolderMinusIcon } from '@heroicons/react/24/outline'
 
 interface Props {
@@ -15,7 +15,7 @@ function Nav(props: Props) {
   const activeFunction = "function" in props.route ? props.route.function : null;
 
   const [expanded, setExpanded] = useState<boolean[]>(
-    props.groups.map(g => g.group === activeGroup)
+    props.groups.map(g => g.group === activeGroup || props.groups.length <= 2)
   );
 
   function toggle(idx: number) {
@@ -48,7 +48,7 @@ function Nav(props: Props) {
                   </a>
                   <a className="group-text" onClick={() => {
                     expand(groupIdx);
-                    props.navigate({regions: props.route.regions, group: group.group});
+                    props.navigate({ regions: props.route.regions, group: group.group });
                   }}>{group.group}</a>
                 </div>
                 {isExpanded && <div>
@@ -56,7 +56,7 @@ function Nav(props: Props) {
                     <a
                       title={f.name}
                       className={`nav-function ${(f.name === activeFunction && group.group === activeGroup) ? 'active' : ''}`}
-                      onClick={() => props.navigate({regions: props.route.regions, group: group.group, function: f.name})}>
+                      onClick={() => props.navigate({ regions: props.route.regions, group: group.group, function: f.name })}>
                       {f.name}
                     </a>
                   ))}
