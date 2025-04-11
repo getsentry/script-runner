@@ -162,7 +162,7 @@ function App() {
 
   return (
     <>
-      <Header regions={config.regions} route={route} navigate={navigate} />
+      <Header regions={config.regions} route={route} navigate={navigate} title={config.title} />
       <div className="page-container">
         <Nav navigate={navigate} groups={config.groups} route={route} />
         <div className="content">

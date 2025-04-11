@@ -15,6 +15,7 @@ export interface ConfigGroup {
 }
 
 export interface Config {
+  title: string,
   regions: string[],
   groups: ConfigGroup[],
   executableGroups: string[],

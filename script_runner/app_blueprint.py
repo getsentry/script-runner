@@ -79,6 +79,7 @@ def get_config() -> dict[str, Any]:
     ]
 
     return {
+        "title": config.main.title,
         "regions": [r.name for r in regions],
         "groups": group_data,
     }
