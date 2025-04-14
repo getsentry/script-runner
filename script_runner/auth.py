@@ -104,7 +104,7 @@ class GoogleAuth(AuthMethod):
         """
         epoch_day = int(time.time()) // 86400  # 1 day = 86400 seconds
 
-        members = self.__get_group_membership(user_email, group_email, epoch_day)
+        members = self.__get_group_membership(group_email, epoch_day)
 
         if user_email in members:
             return True
