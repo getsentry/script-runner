@@ -87,7 +87,7 @@ class GoogleAuth(AuthMethod):
             .memberships()
             .searchTransitiveMemberships(parent=group["name"])
         )
-        members_request + "&" + query_params
+        members_request.uri += "&" + query_params
         response = members_request.execute()
 
         user_members = [
