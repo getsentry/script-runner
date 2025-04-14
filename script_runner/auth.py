@@ -1,12 +1,14 @@
 from abc import ABC, abstractmethod
-from functools import cached_property
-from typing import Any
+from functools import cached_property, lru_cache
+from typing import Any, cast
+import time
 
 import requests
 from flask import Request
 from google.auth import default, jwt
 from google.auth.exceptions import GoogleAuthError
 from googleapiclient.discovery import Resource, build
+from urllib.parse import urlencode
 
 
 class UnauthorizedUser(Exception):
@@ -63,16 +65,48 @@ class GoogleAuth(AuthMethod):
         credentials, _proj = default()  # type: ignore[no-untyped-call]
         return build("cloudidentity", "v1", credentials=credentials)
 
-    def __is_user_in_google_group(self, user_email: str, group_email: str) -> bool:
+    @lru_cache(maxsize=20)
+    def __get_group_membership(
+        self,
+        group_email: str,
+        _epoch_day: int,  # epoch_day is only used by the lru cache
+    ) -> list[str]:
+        """
+        Returns the list of member emails in the group
+        Based on https://cloud.google.com/identity/docs/how-to/query-memberships#search-transitive-membership-python
+        Note: pagination not currently handled, supports groups with up to 1000 members.
+        """
         group = self.__service.groups().lookup(groupKey_id=group_email).execute()
-        member = (
+        query_params = urlencode(
+            {
+                "page_size": 1000,
+            }
+        )
+        members_request = (
             self.__service.groups()
             .memberships()
-            .lookup(parent=group["name"], memberKey_id=user_email)
-            .execute()
+            .searchTransitiveMemberships(parent=group["name"])
         )
+        members_request + "&" + query_params
+        response = members_request.execute()
 
-        if member["email"] == user_email:
+        user_members = [
+            m["preferredMemberKey"][0]["id"]
+            for m in response["memberships"]
+            if m["member"].startswith("users/")
+        ]
+
+        return cast(list[str], user_members)
+
+    def __is_user_in_google_group(self, user_email: str, group_email: str) -> bool:
+        """
+        We cache the user's membership status for up to a day.
+        """
+        epoch_day = int(time.time()) // 86400  # 1 day = 86400 seconds
+
+        members = self.__get_group_membership(user_email, group_email, epoch_day)
+
+        if user_email in members:
             return True
         return False
 
