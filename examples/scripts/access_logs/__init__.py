@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from clickhouse_driver import Client
+
 from script_runner import read
 
 
