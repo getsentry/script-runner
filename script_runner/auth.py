@@ -1,14 +1,14 @@
+import time
 from abc import ABC, abstractmethod
 from functools import cached_property, lru_cache
 from typing import Any, cast
-import time
+from urllib.parse import urlencode
 
 import requests
 from flask import Request
 from google.auth import default, jwt
 from google.auth.exceptions import GoogleAuthError
 from googleapiclient.discovery import Resource, build
-from urllib.parse import urlencode
 
 
 class UnauthorizedUser(Exception):
@@ -72,8 +72,8 @@ class GoogleAuth(AuthMethod):
         _epoch_day: int,  # epoch_day is only used by the lru cache
     ) -> list[str]:
         """
-        Returns the list of member emails in the group
-        Based on https://cloud.google.com/identity/docs/how-to/query-memberships#search-transitive-membership-python
+        Returns the list of member emails in the group. Based on
+        https://cloud.google.com/identity/docs/how-to/query-memberships#search-transitive-membership-python
         Note: pagination not currently handled, supports groups with up to 1000 members.
         """
         group = self.__service.groups().lookup(groupKey_id=group_email).execute()
