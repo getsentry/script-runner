@@ -1,5 +1,5 @@
-from collections import UserDict
 import functools
+from collections import UserDict
 from typing import Any, TypedDict
 
 from confluent_kafka import (
@@ -10,7 +10,8 @@ from confluent_kafka import (
     TopicPartition,
 )
 from confluent_kafka.admin import AdminClient, ConfigResource, OffsetSpec
-from script_runner import read, get_function_context
+
+from script_runner import get_function_context, read
 
 KAFKA_TIMEOUT = 5
 
