@@ -1,3 +1,34 @@
+## 0.1.8
+
+### Various fixes & improvements
+
+- add testing utility (#59) by @lynnagara
+- google iap: check transitive membership (#58) by @lynnagara
+- minor ui tweaks (#56) by @lynnagara
+- fix typing (#57) by @kneeyo1
+- add github as release target (#55) by @lynnagara
+- release: 0.1.7 (c48c02e0) by @getsentry-bot
+- rename scripts -> bin (#54) by @lynnagara
+- add more documentation to the groups (#53) by @lynnagara
+- ops script runner is probably not a good name anymore (#52) by @lynnagara
+- fix bad merge which broke the app (#51) by @lynnagara
+- fix formatting for pre commit (#50) by @kneeyo1
+- add sentry-kube example (#46) by @lynnagara
+- fix codeowners (#49) by @lynnagara
+- release: 0.1.6 (c2aa5680) by @getsentry-bot
+- fix broken build (#48) by @lynnagara
+- use flask blueprint (#45) by @lynnagara
+- adjust the files in the package (#47) by @lynnagara
+- a better function api (#43) by @lynnagara
+- export py.typed markers (#44) by @lynnagara
+- release: 0.1.5 (f11ea206) by @getsentry-bot
+- google-api-client: use a version already in the internal pypi (#42) by @lynnagara
+- release: 0.1.4 (1ad3772a) by @getsentry-bot
+- fixing group membership (#41) by @lynnagara
+- fix reference to directory v1 (#40) by @lynnagara
+
+_Plus 17 more_
+
 ## 0.1.7
 
 ### Various fixes & improvements
