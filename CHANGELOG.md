@@ -1,3 +1,11 @@
+## 0.1.9
+
+### Various fixes & improvements
+
+- fix kafka module: confluent kafka requires this to be a dict (#62) by @lynnagara
+- more fixes for checking google group membership (#61) by @lynnagara
+- pass the right args to get_group_membership (#60) by @lynnagara
+
 ## 0.1.8
 
 ### Various fixes & improvements
