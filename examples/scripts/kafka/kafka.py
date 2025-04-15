@@ -25,7 +25,7 @@ class KafkaConfig(TypedDict):
     clusters: list[KafkaCluster]
 
 
-class HashableConfig(UserDict[str, str]):
+class HashableConfig(dict[str, str]):
     def __hash__(self) -> int:
         return hash(tuple(sorted(self.items())))
 
