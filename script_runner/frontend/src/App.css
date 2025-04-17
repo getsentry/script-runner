@@ -227,6 +227,9 @@ li.home-search-result:hover {
 .function-header {
   padding: 10px;
   font-weight: bold;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .function-execute {
