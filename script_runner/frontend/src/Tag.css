@@ -1,0 +1,28 @@
+/* Base styles for the tag */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 5px;
+  border-radius: 9px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 6px;
+  height: 8px;
+}
+
+/* Styles for the 'read' variant */
+.tag-read {
+  /* Using CSS variables with fallbacks for themeability */
+  background-color: var(--read-bg, #d1ecdf); /* Lighter green background */
+  color: var(--read-text, #0f5132); /* Darker green text */
+  border: 1px solid var(--read-border, #a3cfbb); /* Subtle border */
+}
+
+/* Styles for the 'write' variant */
+.tag-write {
+  background-color: var(--write-bg, #f8d7da); /* Lighter red background */
+  color: var(--write-text, #842029); /* Darker red text */
+  border: 1px solid var(--write-border, #f1aeb5); /* Subtle border */
+}

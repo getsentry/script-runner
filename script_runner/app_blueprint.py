@@ -71,6 +71,7 @@ def get_config() -> dict[str, Any]:
                         }
                         for p in f.parameters
                     ],
+                    "type": "read" if f.is_readonly else "write",
                 }
                 for f in function_group.functions
             ],
