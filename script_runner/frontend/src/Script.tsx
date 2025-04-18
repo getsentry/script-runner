@@ -130,7 +130,7 @@ function Script(props: Props) {
           />
         )}
       </div>
-      <CodeViewer functionName={functionName} source={source} />
+      <CodeViewer functionName={functionName} source={source} type={type} />
     </div>
   );
 }

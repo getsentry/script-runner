@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import Button from "../Button/Button"; // Adjust path as needed
+import Tag from "../Tag/Tag"; // Import Tag component
 import "./CodeViewer.css";
 
 interface CodeViewerProps {
   functionName: string;
   source: string;
+  type: "read" | "write"; // Add type prop
 }
 
-function CodeViewer({ functionName, source }: CodeViewerProps) {
+function CodeViewer({ functionName, source, type }: CodeViewerProps) {
   const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
 
   if (isCollapsed) {
@@ -29,7 +31,10 @@ function CodeViewer({ functionName, source }: CodeViewerProps) {
   return (
     <div className="code-viewer-expanded">
       <div className="code-viewer-header">
-        <span>✨ {functionName} source ✨</span>
+        <div className="code-viewer-title-group">
+          <Tag variant={type} />
+          <span>✨ {functionName} source ✨</span>
+        </div>
         <Button
           variant="secondary"
           size="sm"

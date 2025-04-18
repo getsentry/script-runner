@@ -14,13 +14,20 @@
 /* Header section within the expanded view */
 .code-viewer-header {
   display: flex;
-  justify-content: space-between; /* Push title and button apart */
+  justify-content: space-between; /* Push title group and button apart */
   align-items: center;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border, #ccc);
   font-size: 0.9em;
   font-weight: 500;
   flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+/* Style for the group containing tag and title */
+.code-viewer-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Add space between tag and title */
 }
 
 /* Content area for the syntax highlighter */
