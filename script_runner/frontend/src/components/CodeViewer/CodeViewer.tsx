@@ -16,6 +16,7 @@ function CodeViewer({ functionName, source }: CodeViewerProps) {
       <div className="code-viewer-collapsed">
         <Button
           variant="secondary"
+          size="sm"
           onClick={() => setIsCollapsed(false)}
           aria-label="Show code"
         >
@@ -31,6 +32,7 @@ function CodeViewer({ functionName, source }: CodeViewerProps) {
         <span>✨ {functionName} source ✨</span>
         <Button
           variant="secondary"
+          size="sm"
           onClick={() => setIsCollapsed(true)}
           aria-label="Hide code"
         >

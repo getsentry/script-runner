@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { coy } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { AgGridReact } from "ag-grid-react";
@@ -184,7 +184,6 @@ function getChartData(data: unknown, regions: string[]) {
 
 function ScriptResult(props: Props) {
   const [displayType, setDisplayType] = useState<string>("json");
-
   const [filteredData, setFilteredData] = useState(props.data);
   const [displayOptions, setDisplayOptions] = useState<{
     [k: string]: boolean;
@@ -223,15 +222,25 @@ function ScriptResult(props: Props) {
   }
 
   useEffect(() => {
-    const gridData = getGridData(filteredData, props.regions);
-    const chartData = getChartData(filteredData, props.regions);
+    const gridData = getGridData(props.data, props.regions);
+    const chartData = getChartData(props.data, props.regions);
+
+    const options = {
+      json: true,
+      grid: !!gridData,
+      chart: !!chartData,
+      download: true,
+    };
+
+    setDisplayOptions(options);
+    setFilteredData(props.data);
 
     if (gridData) {
-      setColumnDefs(gridData.columns.map((f) => ({ field: f })));
+      setDisplayType("grid");
       setRowData(gridData.data);
+      setColumnDefs(gridData.columns.map((field) => ({ field })));
     } else {
-      setColumnDefs(null);
-      setRowData(null);
+      setDisplayType("json");
     }
 
     if (chartData) {
@@ -239,32 +248,32 @@ function ScriptResult(props: Props) {
     } else {
       setChartOptions(null);
     }
-
-    setDisplayOptions((prev) => {
-      prev["grid"] = gridData !== null;
-      prev["chart"] = chartData !== null;
-      return prev;
-    });
-
-    if (displayOptions[displayType] === false) {
-      setDisplayType("json");
-    }
-  }, [filteredData, props.regions, displayOptions, displayType]);
+  }, [props.data, props.regions]);
 
   return (
-    <div className="function-result">
+    <div className="script-result">
       <div className="function-result-header">
         {Object.entries(displayOptions)
-          .filter(([, active]) => active)
-          .map(([opt]) => (
+          .filter(([key, value]) => value && key !== "download")
+          .map(([key]) => (
             <div
-              className={`function-result-header-item${
-                displayType === opt ? " active" : ""
+              key={key}
+              className={`function-result-display ${
+                key === displayType ? "active" : ""
               }`}
+              onClick={() => setDisplayType(key)}
             >
-              <a onClick={() => setDisplayType(opt)}>{opt}</a>
+              {key}
             </div>
           ))}
+        <div className="function-result-actions">
+          <Button variant="secondary" size="sm" onClick={download}>
+            download json
+          </Button>
+          <Button variant="secondary" size="sm" onClick={copy}>
+            copy to clipboard
+          </Button>
+        </div>
       </div>
       <div className="function-result-filter">
         <input
@@ -273,50 +282,35 @@ function ScriptResult(props: Props) {
           onChange={(e) => applyJqFilter(props.data, e.target.value)}
         />
       </div>
-      {displayType === "json" && (
-        <div className="json-viewer">
-          <SyntaxHighlighter
-            language="json"
-            style={coy}
-            customStyle={{ fontSize: 12, width: "100%" }}
-            wrapLines={true}
-            lineProps={{ style: { whiteSpace: "pre-wrap" } }}
-          >
-            {JSON.stringify(filteredData)}
-          </SyntaxHighlighter>
-        </div>
-      )}
-      {displayType === "grid" && (
-        <div className="function-result-grid">
-          <AgGridReact
-            rowData={rowData}
-            columnDefs={colDefs}
-            defaultColDef={{ sortable: true }}
-          />
-        </div>
-      )}
-      {displayType === "chart" && chartOptions && (
-        <div className="function-result-chart">
-          <AgCharts options={chartOptions} />
-        </div>
-      )}
-
-      {displayType === "download" && (
-        <div>
-          <div className="function-result-download">
-            <div>
-              <Button variant="secondary" onClick={download}>
-                download json
-              </Button>
-            </div>
-            <div>
-              <Button variant="secondary" onClick={copy}>
-                copy to clipboard
-              </Button>
-            </div>
+      <div className="script-result-content">
+        {displayType === "json" && (
+          <div className="json-viewer">
+            <SyntaxHighlighter
+              language="json"
+              style={coy}
+              customStyle={{ fontSize: 12, width: "100%" }}
+              wrapLines={true}
+              lineProps={{ style: { whiteSpace: "pre-wrap" } }}
+            >
+              {JSON.stringify(filteredData)}
+            </SyntaxHighlighter>
           </div>
-        </div>
-      )}
+        )}
+        {displayType === "grid" && rowData && colDefs && (
+          <div className="function-result-grid">
+            <AgGridReact
+              rowData={rowData}
+              columnDefs={colDefs}
+              defaultColDef={{ sortable: true }}
+            />
+          </div>
+        )}
+        {displayType === "chart" && chartOptions && (
+          <div className="function-result-chart">
+            <AgCharts options={chartOptions} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 /* Styles for the expanded code viewer container */
 .code-viewer-expanded {
   display: flex;
+  flex: 1; /* Make it take available horizontal space */
   flex-direction: column;
   height: 100%; /* Occupy available height */
   border-left: 1px solid var(--border, #ccc); /* Add a separator line */
@@ -31,17 +32,10 @@
 /* Styles for the collapsed state placeholder */
 .code-viewer-collapsed {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start; /* Align button to the top */
+  justify-content: flex-start; /* Align button to the left */
   height: 100%;
   border-left: 1px solid var(--border, #ccc);
   background-color: var(--bg-light, #f8f9fa);
   padding: 10px;
-}
-
-/* Make the hide/show buttons slightly smaller */
-.code-viewer-header .button,
-.code-viewer-collapsed .button {
-  padding: 4px 8px;
-  font-size: 12px;
 }
