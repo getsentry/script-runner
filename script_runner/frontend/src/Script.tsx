@@ -3,6 +3,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ScriptResult from "./ScriptResult.tsx";
 import { RunResult, ConfigFunction } from "./types.tsx";
 import Tag from "./components/Tag/Tag";
+import Button from "./components/Button/Button";
 
 interface Props {
   regions: string[];
@@ -136,7 +137,9 @@ function Script(props: Props) {
                 <em>Select a region to run this function</em>
               )}
             </div>
-            <button disabled={disabled}>execute function</button>
+            <Button type="submit" disabled={disabled}>
+              execute function
+            </Button>
           </form>
         </div>
         {error && (
@@ -157,9 +160,13 @@ function Script(props: Props) {
       {}
       {codeCollapsed ? (
         <div className="function-right-button">
-          <button onClick={() => setCodeCollapsed(false)} aria-label="open">
+          <Button
+            variant="secondary"
+            onClick={() => setCodeCollapsed(false)}
+            aria-label="open"
+          >
             open
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="function-right">
@@ -174,12 +181,13 @@ function Script(props: Props) {
             {source}
           </SyntaxHighlighter>
           <div className="function-right-button">
-            <button
+            <Button
+              variant="secondary"
               onClick={() => setCodeCollapsed(true)}
               aria-label="collapse"
             >
               Collapse
-            </button>
+            </Button>
           </div>
         </div>
       )}
