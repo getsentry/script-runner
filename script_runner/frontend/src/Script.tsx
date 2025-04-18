@@ -4,6 +4,7 @@ import ScriptResult from "./ScriptResult.tsx";
 import { RunResult, ConfigFunction } from "./types.tsx";
 import Tag from "./components/Tag/Tag";
 import Button from "./components/Button/Button";
+import Input from "./components/Input/Input";
 
 interface Props {
   regions: string[];
@@ -83,51 +84,26 @@ function Script(props: Props) {
           <span>{functionName}</span>
         </div>
         <div className="function-execute">
-          <form action={executeFunction}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              executeFunction();
+            }}
+          >
             {parameters.length > 0 && (
               <div>
                 <div>
                   To execute this function, provide the following parameters:
                 </div>
-                {parameters.map((arg, idx) => {
-                  return (
-                    <div className="input-group">
-                      <div>
-                        <label htmlFor={arg.name}>{arg.name}</label>
-                      </div>
-                      <div>
-                        {arg.enumValues && (
-                          <select
-                            id={arg.name}
-                            required
-                            disabled={inputDisabled}
-                            value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                          >
-                            <option value="">Select...</option>
-                            {arg.enumValues.map((v) => (
-                              <option value={v}>{v}</option>
-                            ))}
-                          </select>
-                        )}
-                        {!arg.enumValues && (
-                          <input
-                            type="text"
-                            id={arg.name}
-                            value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                            required
-                            disabled={inputDisabled}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                {parameters.map((arg, idx) => (
+                  <Input
+                    key={arg.name}
+                    parameter={arg}
+                    value={params[idx]}
+                    isDisabled={inputDisabled}
+                    onChange={(value) => handleInputChange(idx, value)}
+                  />
+                ))}
               </div>
             )}
             <div className="function-hint">
