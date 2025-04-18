@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ScriptResult from "./ScriptResult.tsx";
 import { RunResult, ConfigFunction } from "./types.tsx";
-import Tag from "./Tag";
+import Tag from "./components/Tag/Tag";
 
 interface Props {
   regions: string[];
