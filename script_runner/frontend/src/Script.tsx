@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ScriptResult from "./ScriptResult.tsx";
 import { RunResult, ConfigFunction } from "./types.tsx";
-import Tag from "./Tag";
+import Tag from "./components/Tag/Tag";
+import Button from "./components/Button/Button";
+import Input from "./components/Input/Input";
+import CodeViewer from "./components/CodeViewer/CodeViewer";
 
 interface Props {
   regions: string[];
@@ -22,18 +24,15 @@ function Script(props: Props) {
     parameters.map((a) => a.default)
   );
   const [result, setResult] = useState<RunResult | null>(null);
-  // we keep another piece of state because the result value might itself be null
   const [hasResult, setHasResult] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [codeCollapsed, setCodeCollapsed] = useState<boolean>(false);
 
   // If the selected function changes, reset all state
   useEffect(() => {
     setParams(parameters.map((a) => a.default));
     setResult(null);
     setHasResult(false);
-    setCodeCollapsed(false);
     setError(null);
   }, [parameters, props.group, props.function, props.execute]);
 
@@ -82,51 +81,26 @@ function Script(props: Props) {
           <span>{functionName}</span>
         </div>
         <div className="function-execute">
-          <form action={executeFunction}>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              executeFunction();
+            }}
+          >
             {parameters.length > 0 && (
               <div>
                 <div>
                   To execute this function, provide the following parameters:
                 </div>
-                {parameters.map((arg, idx) => {
-                  return (
-                    <div className="input-group">
-                      <div>
-                        <label htmlFor={arg.name}>{arg.name}</label>
-                      </div>
-                      <div>
-                        {arg.enumValues && (
-                          <select
-                            id={arg.name}
-                            required
-                            disabled={inputDisabled}
-                            value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                          >
-                            <option value="">Select...</option>
-                            {arg.enumValues.map((v) => (
-                              <option value={v}>{v}</option>
-                            ))}
-                          </select>
-                        )}
-                        {!arg.enumValues && (
-                          <input
-                            type="text"
-                            id={arg.name}
-                            value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                            required
-                            disabled={inputDisabled}
-                          />
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                {parameters.map((arg, idx) => (
+                  <Input
+                    key={arg.name}
+                    parameter={arg}
+                    value={params[idx]}
+                    isDisabled={inputDisabled}
+                    onChange={(value) => handleInputChange(idx, value)}
+                  />
+                ))}
               </div>
             )}
             <div className="function-hint">
@@ -136,7 +110,9 @@ function Script(props: Props) {
                 <em>Select a region to run this function</em>
               )}
             </div>
-            <button disabled={disabled}>execute function</button>
+            <Button type="submit" disabled={disabled}>
+              execute function
+            </Button>
           </form>
         </div>
         {error && (
@@ -154,35 +130,7 @@ function Script(props: Props) {
           />
         )}
       </div>
-      {}
-      {codeCollapsed ? (
-        <div className="function-right-button">
-          <button onClick={() => setCodeCollapsed(false)} aria-label="open">
-            open
-          </button>
-        </div>
-      ) : (
-        <div className="function-right">
-          <div className="function-right-description">
-            ✨ This is the <strong>{functionName}</strong> function definition
-            ✨
-          </div>
-          <SyntaxHighlighter
-            language="python"
-            customStyle={{ fontSize: 12, width: 500 }}
-          >
-            {source}
-          </SyntaxHighlighter>
-          <div className="function-right-button">
-            <button
-              onClick={() => setCodeCollapsed(true)}
-              aria-label="collapse"
-            >
-              Collapse
-            </button>
-          </div>
-        </div>
-      )}
+      <CodeViewer functionName={functionName} source={source} type={type} />
     </div>
   );
 }

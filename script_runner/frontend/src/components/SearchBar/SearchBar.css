@@ -1,0 +1,77 @@
+/* Container for the search bar */
+.search-bar-container {
+  width: 100%; /* Take full width of its parent */
+  max-width: 600px; /* Max width for better readability */
+  position: relative; /* Needed for absolute positioning of results */
+  margin: 0 auto; /* Center it if parent allows */
+}
+
+/* Input field styles */
+.search-bar-input input {
+  width: 100%;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 4px;
+  padding: 10px 15px;
+  font-size: 14px;
+  box-sizing: border-box; /* Include padding and border in width */
+}
+
+.search-bar-input input:focus {
+  outline: none;
+  border-color: var(--highlight-border, #0d6efd);
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25); /* Subtle focus ring */
+}
+
+/* Results dropdown styles */
+.search-bar-results {
+  position: absolute;
+  top: 100%; /* Position below the input */
+  left: 0;
+  right: 0;
+  background-color: var(--bg-primary, white);
+  border: 1px solid var(--border, #ccc);
+  border-top: none; /* Avoid double border with input */
+  border-radius: 0 0 4px 4px;
+  z-index: 10; /* Ensure it appears above other content */
+  max-height: 300px; /* Limit height and allow scrolling */
+  overflow-y: auto;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar-results ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.search-bar-results li {
+  padding: 0;
+  margin: 0;
+}
+
+.search-bar-results li a {
+  display: block;
+  padding: 8px 15px;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-primary, #212529);
+}
+
+.search-bar-results li a:hover {
+  background-color: var(--bg-hover, #f8f9fa);
+}
+
+.result-group {
+  color: var(--text-secondary, #6c757d);
+  font-size: 0.9em;
+}
+
+.result-function {
+  /* Add specific styles if needed */
+}
+
+.search-bar-no-result {
+  padding: 8px 15px;
+  color: var(--text-secondary, #6c757d);
+  font-style: italic;
+}

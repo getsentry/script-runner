@@ -1,0 +1,45 @@
+/* Styles for the input group */
+.input-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-label {
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+/* Common styles for input and select controls */
+.input-control input[type="text"],
+.input-control select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border, #ccc);
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.input-control input[type="text"]:focus,
+.input-control select:focus {
+  outline: none;
+  border-color: var(--highlight-border, #0d6efd);
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
+}
+
+.input-control input[type="text"]:disabled,
+.input-control select:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Specific classes if needed, otherwise handled by selectors above */
+.input-select {
+  /* Add specific select styles here if different from text input */
+}
+
+.input-text {
+  /* Add specific text input styles here if different */
+}

@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import { ConfigGroup, Route } from "./types.tsx";
 import { FolderPlusIcon, FolderMinusIcon } from "@heroicons/react/24/outline";
-import Tag from "./Tag";
+import Tag from "./components/Tag/Tag";
 
 interface Props {
   route: Route;
