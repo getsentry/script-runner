@@ -1,0 +1,47 @@
+/* Styles for the expanded code viewer container */
+.code-viewer-expanded {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Occupy available height */
+  border-left: 1px solid var(--border, #ccc); /* Add a separator line */
+  background-color: var(
+    --bg-light,
+    #f8f9fa
+  ); /* Slightly different background */
+}
+
+/* Header section within the expanded view */
+.code-viewer-header {
+  display: flex;
+  justify-content: space-between; /* Push title and button apart */
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border, #ccc);
+  font-size: 0.9em;
+  font-weight: 500;
+  flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+/* Content area for the syntax highlighter */
+.code-viewer-content {
+  flex-grow: 1; /* Allow content to fill remaining space */
+  overflow: hidden; /* Prevent parent overflow, rely on SyntaxHighlighter scroll */
+}
+
+/* Styles for the collapsed state placeholder */
+.code-viewer-collapsed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-left: 1px solid var(--border, #ccc);
+  background-color: var(--bg-light, #f8f9fa);
+  padding: 10px;
+}
+
+/* Make the hide/show buttons slightly smaller */
+.code-viewer-header .button,
+.code-viewer-collapsed .button {
+  padding: 4px 8px;
+  font-size: 12px;
+}

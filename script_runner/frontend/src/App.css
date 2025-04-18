@@ -216,29 +216,10 @@ a.group-text {
   height: 100%;
 }
 
-.function-left,
-.function-right {
+.function-left {
   flex: 1;
   height: calc(100vh - 70px);
   overflow-y: scroll;
-}
-
-.function-left {
-  display: flex;
-  flex-direction: column;
-}
-
-.function-right {
-  background-color: var(--bg-light);
-}
-
-.function-right-button {
-  padding: 10px;
-}
-
-.function-right-description {
-  padding: 10px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .function-result {
