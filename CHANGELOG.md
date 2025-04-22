@@ -1,3 +1,9 @@
+## 0.2.0
+
+### Various fixes & improvements
+
+- Adding in a status tag to highlight read/write functionality  (#63) by @jmanhart
+
 ## 0.1.9
 
 ### Various fixes & improvements
