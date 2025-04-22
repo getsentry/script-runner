@@ -188,14 +188,14 @@ if not isinstance(config, MainConfig):
         """
         Run a script for a specific region. Called from the `/run` endpoint.
         """
-        print("run_one_region A")
+
         assert isinstance(config, (RegionConfig, CombinedConfig))
 
         data = request.get_json()
         group_name = data["group"]
         group = config.groups[group_name]
         requested_function = data["function"]
-        print("run_one_region B")
+
         function = next(
             (f for f in group.functions if f.name == requested_function), None
         )
@@ -204,12 +204,12 @@ if not isinstance(config, MainConfig):
         # Do not run the function if it doesn't appear to be the same
         if function.checksum != data["function_checksum"]:
             raise ValueError("Function mismatch")
-        print("run_one_region C")
+
         params = data["parameters"]
         module = importlib.import_module(group.module)
         func = getattr(module, requested_function)
         assert isinstance(func, WrappedFunction)
-        print("run_one_region D")
+
         group_config = config.region.configs.get(group_name, None)
         g.region = data["region"]
         g.group_config = group_config

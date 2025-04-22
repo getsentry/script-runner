@@ -10,6 +10,7 @@
   letter-spacing: 0.5px;
   margin-right: 6px;
   height: 8px;
+  min-width: 40px;
 }
 
 /* Styles for the 'read' variant */
