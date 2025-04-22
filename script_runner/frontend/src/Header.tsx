@@ -10,7 +10,6 @@ interface Props {
 }
 
 function Header(props: Props) {
-  console.log("Header props during HMR:", props);
   const [selected, setSelected] = useState<string[]>(props.route.regions);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);

@@ -78,7 +78,7 @@ function Nav(props: Props) {
                         })
                       }
                     >
-                      <Tag variant={f.type} />
+                      <Tag isReadonly={f.isReadonly} />
                       {f.name}
                     </a>
                   ))}

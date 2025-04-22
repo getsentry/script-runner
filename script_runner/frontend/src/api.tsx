@@ -3,8 +3,6 @@ import { Config, RunResult } from "./types.tsx";
 class Api {
   private getJson(endpoint: string) {
     return fetch(endpoint).then((response) => {
-      console.log("[getJson] Raw Response Status:", response.status);
-      console.log("[getJson] Raw Response Headers:", response.headers);
       // Clone the response to log the body, as it can only be read once
       return response
         .clone()

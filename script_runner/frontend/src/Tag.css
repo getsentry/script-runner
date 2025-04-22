@@ -14,10 +14,9 @@
 
 /* Styles for the 'read' variant */
 .tag-read {
-  /* Using CSS variables with fallbacks for themeability */
-  background-color: var(--read-bg, #d1ecdf); /* Lighter green background */
-  color: var(--read-text, #0f5132); /* Darker green text */
-  border: 1px solid var(--read-border, #a3cfbb); /* Subtle border */
+  background-color: var(--read-bg, #d1ecdf);
+  color: var(--read-text, #0f5132);
+  border: 1px solid var(--read-border, #a3cfbb);
 }
 
 /* Styles for the 'write' variant */
