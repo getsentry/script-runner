@@ -2,6 +2,7 @@
 .tag {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   padding: 2px 5px;
   border-radius: 9px;
   font-size: 11px;
@@ -22,7 +23,7 @@
 
 /* Styles for the 'write' variant */
 .tag-write {
-  background-color: var(--write-bg, #f8d7da); /* Lighter red background */
-  color: var(--write-text, #842029); /* Darker red text */
-  border: 1px solid var(--write-border, #f1aeb5); /* Subtle border */
+  background-color: var(--write-bg, #f8d7da);
+  color: var(--write-text, #842029);
+  border: 1px solid var(--write-border, #f1aeb5);
 }

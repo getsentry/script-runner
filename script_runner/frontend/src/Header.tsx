@@ -73,7 +73,7 @@ function Header(props: Props) {
           className="header-title"
           onClick={() => props.navigate({ regions: props.route.regions })}
         >
-          ⚡️ {props.title || "script-runner"}
+          ⚡️ {props.title || "script-runner"} ⚡️
         </a>
       </div>
       <div className="header-right">
