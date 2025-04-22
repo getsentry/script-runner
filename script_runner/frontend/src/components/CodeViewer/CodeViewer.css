@@ -1,0 +1,48 @@
+/* Styles for the expanded code viewer container */
+.code-viewer-expanded {
+  display: flex;
+  flex: 1; /* Make it take available horizontal space */
+  flex-direction: column;
+  height: 100%; /* Occupy available height */
+  border-left: 1px solid var(--border, #ccc); /* Add a separator line */
+  background-color: var(
+    --bg-light,
+    #f8f9fa
+  ); /* Slightly different background */
+}
+
+/* Header section within the expanded view */
+.code-viewer-header {
+  display: flex;
+  justify-content: space-between; /* Push title group and button apart */
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border, #ccc);
+  font-size: 0.9em;
+  font-weight: 500;
+  flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+/* Style for the group containing tag and title */
+.code-viewer-title-group {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* Add space between tag and title */
+}
+
+/* Content area for the syntax highlighter */
+.code-viewer-content {
+  flex-grow: 1; /* Allow content to fill remaining space */
+  overflow: hidden; /* Prevent parent overflow, rely on SyntaxHighlighter scroll */
+}
+
+/* Styles for the collapsed state placeholder */
+.code-viewer-collapsed {
+  display: flex;
+  align-items: flex-start; /* Align button to the top */
+  justify-content: flex-start; /* Align button to the left */
+  height: 100%;
+  border-left: 1px solid var(--border, #ccc);
+  background-color: var(--bg-light, #f8f9fa);
+  padding: 10px;
+}
