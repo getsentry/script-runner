@@ -17,4 +17,4 @@ def execute_with_context(
         g.region = mock_context.region
         g.group_config = mock_context.group_config
 
-        return func.func(*args)
+        return func(*args)

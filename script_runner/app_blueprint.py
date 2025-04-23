@@ -213,4 +213,4 @@ if not isinstance(config, MainConfig):
         group_config = config.region.configs.get(group_name, None)
         g.region = data["region"]
         g.group_config = group_config
-        return jsonify(func.func(*params))
+        return jsonify(func(*params))

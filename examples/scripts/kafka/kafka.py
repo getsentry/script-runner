@@ -1,5 +1,4 @@
 import functools
-from collections import UserDict
 from typing import Any, TypedDict
 
 from confluent_kafka import (

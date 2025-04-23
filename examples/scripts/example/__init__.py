@@ -1,5 +1,5 @@
 """
-The hello world example
+Script runner demos
 """
 
 from typing import Literal
@@ -25,6 +25,10 @@ def hello_with_enum(to: Literal["foo", "bar"] = "foo") -> str:
 
 @write
 def writes_to_file(content: str) -> None:
+    """
+    Testing a write action
+    """
+
     with open("example.txt", "w") as file:
         file.write(content)
 
