@@ -28,6 +28,9 @@ function Script(props: Props) {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [codeCollapsed, setCodeCollapsed] = useState<boolean>(false);
 
+  // the user has to confirm a write function
+  const [confirmWrite, setConfirmWrite] = useState<boolean>(false);
+
   // If the selected function changes, reset all state
   useEffect(() => {
     setParams(parameters.map((a) => a.default));
@@ -35,6 +38,7 @@ function Script(props: Props) {
     setHasResult(false);
     setCodeCollapsed(false);
     setError(null);
+    setConfirmWrite(false);
   }, [parameters, props.group, props.function, props.execute]);
 
   function handleInputChange(idx: number, value: string) {
@@ -56,6 +60,11 @@ function Script(props: Props) {
       return;
     }
 
+    if (!isReadonly && !confirmWrite) {
+      setError("Confirm dangerous function");
+      return;
+    }
+
     setIsRunning(true);
 
     props
@@ -72,7 +81,6 @@ function Script(props: Props) {
   }
 
   const disabled = isRunning || hasResult || props.regions.length === 0;
-  const inputDisabled = isRunning || hasResult;
 
   return (
     <div className="function-main">
@@ -90,7 +98,7 @@ function Script(props: Props) {
                 </div>
                 {parameters.map((arg, idx) => {
                   return (
-                    <div className="input-group">
+                    <div className="input-group arg">
                       <div>
                         <label htmlFor={arg.name}>{arg.name}</label>
                       </div>
@@ -99,7 +107,7 @@ function Script(props: Props) {
                           <select
                             id={arg.name}
                             required
-                            disabled={inputDisabled}
+                            disabled={disabled}
                             value={params[idx] || ""}
                             onChange={(e) =>
                               handleInputChange(idx, e.target.value)
@@ -120,7 +128,7 @@ function Script(props: Props) {
                               handleInputChange(idx, e.target.value)
                             }
                             required
-                            disabled={inputDisabled}
+                            disabled={disabled}
                           />
                         )}
                       </div>
@@ -129,6 +137,11 @@ function Script(props: Props) {
                 })}
               </div>
             )}
+            {!isReadonly && <div className="input-group confirm">
+              <input type="checkbox" id="confirm-write" checked={confirmWrite} disabled={disabled} onChange={e => setConfirmWrite(e.target.checked)} />
+              <label htmlFor="confirm-write">I accept this function may be dangerous -- let's do it.</label>
+            </div>}
+            <button className="execute" disabled={disabled}>execute function</button>
             <div className="function-hint">
               {props.regions.length > 0 ? (
                 <>This will run on: {props.regions.join(", ")}</>
@@ -136,7 +149,6 @@ function Script(props: Props) {
                 <em>Select a region to run this function</em>
               )}
             </div>
-            <button disabled={disabled}>execute function</button>
           </form>
         </div>
         {error && (
@@ -154,7 +166,6 @@ function Script(props: Props) {
           />
         )}
       </div>
-      {}
       {codeCollapsed ? (
         <div className="function-right-button">
           <button onClick={() => setCodeCollapsed(false)} aria-label="open">

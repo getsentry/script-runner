@@ -236,6 +236,10 @@ li.home-search-result:hover {
   padding: 10px;
 }
 
+.function-execute button {
+  padding: 4px 8px;
+}
+
 .function-error {
   padding: 10px;
   margin: 10px;
@@ -244,8 +248,8 @@ li.home-search-result:hover {
   background-color: var(--error-bg);
 }
 
-.function-execute label,
-.function-execute input {
+.function-execute .arg label,
+.function-execute .arg input {
   font-family: var(--font-mono);
 }
 
@@ -253,9 +257,13 @@ li.home-search-result:hover {
   margin-bottom: 10px;
 }
 
+.funciton-execute .confirm input {
+  margin: 0 0 5px 0;
+}
+
 .function-hint {
   font-size: 12px;
-  margin-bottom: 8px;
+  margin-top: 8px;
 }
 
 .function-main {
@@ -320,6 +328,7 @@ li.home-search-result:hover {
   color: var(--highlight-text);
   border-bottom: 2px solid var(--highlight-text);
 }
+
 .function-result-header-item.active a:hover {
   color: var(--highlight-text);
 }
@@ -330,10 +339,14 @@ li.home-search-result:hover {
 }
 
 .json-viewer pre {
-  white-space: pre-wrap; /* Allow wrapping of long lines */
-  word-wrap: break-word; /* Break words if necessary */
-  overflow-wrap: break-word; /* Ensure word break in longer lines */
-  max-width: 100%; /* Ensure it doesn't overflow the container */
+  white-space: pre-wrap;
+  /* Allow wrapping of long lines */
+  word-wrap: break-word;
+  /* Break words if necessary */
+  overflow-wrap: break-word;
+  /* Ensure word break in longer lines */
+  max-width: 100%;
+  /* Ensure it doesn't overflow the container */
 }
 
 .function-result-download {
