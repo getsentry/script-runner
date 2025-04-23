@@ -1,3 +1,10 @@
+## 0.2.1
+
+### Various fixes & improvements
+
+- add confirmation step for write actions (#66) by @lynnagara
+- Style Cleanup (#65) by @jmanhart
+
 ## 0.2.0
 
 ### Various fixes & improvements
