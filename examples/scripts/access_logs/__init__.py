@@ -7,7 +7,8 @@ from typing import Any, TypedDict
 
 from clickhouse_driver import Client
 
-from script_runner import read, get_function_context
+from script_runner import get_function_context, read
+
 
 class AccessLogsConfig(TypedDict):
     host: str

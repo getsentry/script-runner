@@ -1,5 +1,5 @@
-from typing import Any, Callable, Literal
 import inspect
+from typing import Any, Callable, Literal
 
 RawFunction = Callable[..., Any]
 
