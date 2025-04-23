@@ -3,11 +3,17 @@ Supports read queries on the acccess logs table
 """
 
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, TypedDict
 
 from clickhouse_driver import Client
 
-from script_runner import read
+from script_runner import read, get_function_context
+
+class AccessLogsConfig(TypedDict):
+    host: str
+    port: int
+    database: str
+    table_name: str
 
 
 def get_date_n_days_ago(n: int) -> str:
@@ -23,7 +29,6 @@ def get_date_n_days_ago(n: int) -> str:
 
 @read
 def response_code_by_time(
-    config: Any,
     request_uri_path: str = "/api/0/organizations/sentry/events/",
     status_code: str = "400",
     num_days: str = "7",
@@ -32,6 +37,9 @@ def response_code_by_time(
     Returns the breakdown of response codes by time.
     `status_code` must be a valid integer
     """
+
+    config: AccessLogsConfig = get_function_context().group_config
+
     status_code_int = int(status_code)
     num_days_int = int(num_days)
 

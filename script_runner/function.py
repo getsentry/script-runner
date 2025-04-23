@@ -1,4 +1,5 @@
-from typing import Any, Callable
+from typing import Any, Callable, Literal
+import inspect
 
 RawFunction = Callable[..., Any]
 
@@ -8,9 +9,23 @@ class WrappedFunction:
         self.func = func
         self._readonly = readonly
 
+        # Validate raw function
+        for param in inspect.signature(func).parameters.values():
+            if param.annotation is str:
+                continue
+            elif param.annotation.__origin__ == Literal and all(
+                [isinstance(a, str) for a in param.annotation.__args__]
+            ):
+                continue
+            raise TypeError(f"{func} has non-string argument {param.name}")
+
+
     @property
     def is_readonly(self) -> bool:
         return self._readonly
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        return self.func(*args, **kwargs)
 
 
 def read(func: RawFunction) -> WrappedFunction:
