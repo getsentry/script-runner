@@ -71,7 +71,7 @@ def get_config() -> dict[str, Any]:
                         }
                         for p in f.parameters
                     ],
-                    "type": "read" if f.is_readonly else "write",
+                    "isReadonly": f.is_readonly,
                 }
                 for f in function_group.functions
             ],
@@ -188,6 +188,7 @@ if not isinstance(config, MainConfig):
         """
         Run a script for a specific region. Called from the `/run` endpoint.
         """
+
         assert isinstance(config, (RegionConfig, CombinedConfig))
 
         data = request.get_json()
@@ -208,6 +209,7 @@ if not isinstance(config, MainConfig):
         module = importlib.import_module(group.module)
         func = getattr(module, requested_function)
         assert isinstance(func, WrappedFunction)
+
         group_config = config.region.configs.get(group_name, None)
         g.region = data["region"]
         g.group_config = group_config

@@ -11,7 +11,7 @@ export interface ConfigFunction {
   source: string;
   docstring: string;
   parameters: ConfigParam[];
-  type: "read" | "write";
+  isReadonly: boolean;
 }
 
 export interface ConfigGroup {

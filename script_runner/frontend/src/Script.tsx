@@ -17,7 +17,7 @@ interface Props {
 }
 
 function Script(props: Props) {
-  const { name: functionName, parameters, source, type } = props.function;
+  const { name: functionName, parameters, source, isReadonly } = props.function;
   const [params, setParams] = useState<(string | null)[]>(
     parameters.map((a) => a.default)
   );
@@ -78,7 +78,7 @@ function Script(props: Props) {
     <div className="function-main">
       <div className="function-left">
         <div className="function-header">
-          <Tag variant={type} />
+          <Tag isReadonly={isReadonly} />
           <span>{functionName}</span>
         </div>
         <div className="function-execute">

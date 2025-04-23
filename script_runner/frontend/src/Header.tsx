@@ -10,7 +10,6 @@ interface Props {
 }
 
 function Header(props: Props) {
-  console.log("Header props during HMR:", props);
   const [selected, setSelected] = useState<string[]>(props.route.regions);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
@@ -74,7 +73,7 @@ function Header(props: Props) {
           className="header-title"
           onClick={() => props.navigate({ regions: props.route.regions })}
         >
-          ⚡️ {props.title || "script-runner"}
+          ⚡️ {props.title || "script-runner"} ⚡️
         </a>
       </div>
       <div className="header-right">
