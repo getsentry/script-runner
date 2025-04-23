@@ -19,7 +19,6 @@ class WrappedFunction:
                 continue
             raise TypeError(f"{func} has non-string argument {param.name}")
 
-
     @property
     def is_readonly(self) -> bool:
         return self._readonly
