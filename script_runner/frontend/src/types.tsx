@@ -42,3 +42,13 @@ interface ScriptRoute {
 }
 
 export type Route = HomeRoute | GroupRoute | ScriptRoute;
+
+
+export type RowData = {
+  [key: string]: unknown;
+}
+
+export type MergedRowData = {
+  region: string;
+  [key: string]: unknown;
+}

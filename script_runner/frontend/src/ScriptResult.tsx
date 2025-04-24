@@ -3,20 +3,12 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { AgGridReact } from 'ag-grid-react';
 import jq from 'jq-web';
-import { AgCharts } from 'ag-charts-react';
-import { RunResult } from './types';
+import { RunResult, RowData, MergedRowData } from './types';
+import Chart from './Chart';
+
 
 import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
 ModuleRegistry.registerModules([AllCommunityModule]);
-
-type RowData = {
-  [key: string]: unknown;
-}
-
-type ChartData = {
-  data: unknown[],
-  series: { xKey: string, yKey: string, yName: string }[]
-}
 
 type Props = {
   group: string,
@@ -27,7 +19,7 @@ type Props = {
 
 
 // Either return merged data or null
-function mergeRegionKeys(data: unknown, regions: string[]) {
+function mergeRegionKeys(data: unknown, regions: string[]): MergedRowData[] | null {
   try {
     if (typeof data === 'object' && data !== null) {
       const shouldMerge = Object.keys(data).every((r: string) => regions.includes(r));
@@ -67,14 +59,16 @@ function mergeRegionKeys(data: unknown, regions: string[]) {
               return acc;
             }, {});
 
-            return {
-              region,
-              ...rowData,
-            }
+            return { region, ...rowData };
+
           });
         }).flat(1);
 
-        return processed;
+        if (processed.some((el) => el === null)) {
+          return null;
+        }
+
+        return processed as { region: string, [key: string]: unknown }[];
       }
     }
   } catch {
@@ -88,8 +82,7 @@ function mergeRegionKeys(data: unknown, regions: string[]) {
 
 // returns table formatted data if data is table like
 // otherwise return null
-function getGridData(data: { [region: string]: unknown[] } | unknown, regions: string[]) {
-  const mergedData = mergeRegionKeys(data, regions) || data;
+function getGridData(mergedData: MergedRowData[] | null) {
 
   if (Array.isArray(mergedData) && mergedData.every(row => typeof row === 'object' && row !== null)) {
     if (mergedData.length === 0) {
@@ -105,70 +98,22 @@ function getGridData(data: { [region: string]: unknown[] } | unknown, regions: s
   return null;
 }
 
-const DATE_KEY = "date";
-
-// returns chart formatted data if data can be rendered as line chart
-// otherwise return null
-function getChartData(data: unknown, regions: string[]) {
-  try {
-    const merged = mergeRegionKeys(data, regions) || data;
-
-    if (merged && Array.isArray(merged)) {
-      if (DATE_KEY in merged[0]) {
-        const numericFields = Object.entries(merged[0]).filter(([, value]) => typeof value === 'number').map(([key,]) => key);
-
-        const series = regions.map(region => {
-          return numericFields.map(f => [region, f])
-        }).flat(1);
-
-        const mergedByDate: object = merged.reduce((acc: { [date: string]: { [key: string]: unknown } }, curr: { date: string, [key: string]: unknown }) => {
-          const date = curr[DATE_KEY];
-          if (!acc[date]) {
-            acc[date] = {};
-          }
-
-          numericFields.forEach(field => {
-            acc[date][`${curr["region"]}-${field}`] = curr[field];
-          });
-
-          return acc;
-        }, {});
-
-        const arr = Object.entries(mergedByDate).map(([date, obj]) => {
-          return { date, ...obj };
-        });
-
-        if (numericFields.length > 0) {
-          return {
-            data: arr,
-            series: series.map(([region, field]) => ({
-              xKey: "date",
-              yKey: `${region}-${field}`,
-              yName: `${field} (${region})`,
-            }))
-          }
-        }
-      }
-    }
-  } catch {
-    return null;
-  }
-
-  return null;
-
-}
-
 
 function ScriptResult(props: Props) {
   const [displayType, setDisplayType] = useState<string>('json');
 
   const [filteredData, setFilteredData] = useState(props.data);
+
+  // With regions merged into row objects. For passing to chart and grid components.
+  const [mergedData, setMergedData] = useState<MergedRowData[] | null>(null);
+
   const [displayOptions, setDisplayOptions] = useState<{ [k: string]: boolean }>(
     { 'json': true, 'grid': false, 'chart': false, 'download': true }
   );
+
+  // For grid display
   const [rowData, setRowData] = useState<RowData[] | null>(null);
   const [colDefs, setColumnDefs] = useState<{ field: string }[] | null>(null);
-  const [chartOptions, setChartOptions] = useState<ChartData | null>(null);
 
 
   function download() {
@@ -197,8 +142,9 @@ function ScriptResult(props: Props) {
   }
 
   useEffect(() => {
-    const gridData = getGridData(filteredData, props.regions);
-    const chartData = getChartData(filteredData, props.regions);
+    const mergedData = mergeRegionKeys(props.data, props.regions) || null;
+    setMergedData(mergedData);
+    const gridData = getGridData(mergedData);
 
 
     if (gridData) {
@@ -209,15 +155,9 @@ function ScriptResult(props: Props) {
       setRowData(null)
     }
 
-    if (chartData) {
-      setChartOptions(chartData);
-    } else {
-      setChartOptions(null);
-    }
-
     setDisplayOptions(prev => {
       prev["grid"] = gridData !== null;
-      prev["chart"] = chartData !== null;
+      prev["chart"] = gridData !== null;
       return prev;
     });
 
@@ -225,8 +165,7 @@ function ScriptResult(props: Props) {
       setDisplayType('json');
     }
 
-
-  }, [filteredData, props.regions, displayOptions, displayType]);
+  }, [props.data, filteredData, props.regions, displayOptions, displayType]);
 
   return (
     <div className="function-result">
@@ -257,11 +196,10 @@ function ScriptResult(props: Props) {
         </div>
       }
       {
-        displayType === "chart" && chartOptions && <div className="function-result-chart">
-          <AgCharts options={chartOptions} />
+        displayType === "chart" && < div className="function-result-chart">
+          <Chart data={mergedData} regions={props.regions} />
         </div>
       }
-
       {
         displayType === "download" && <div>
           <div className="function-result-download">

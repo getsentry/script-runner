@@ -2,6 +2,8 @@
 Script runner demos
 """
 
+import random
+from datetime import datetime, timedelta
 from typing import Literal
 
 from script_runner import read, write
@@ -33,4 +35,20 @@ def writes_to_file(content: str) -> None:
         file.write(content)
 
 
-__all__ = ["hello", "hello_with_enum", "writes_to_file"]
+@read
+def render_chart() -> list[dict[str, str | int]]:
+    """
+    Return some data for a timeseries chart
+    """
+    return list(
+        {
+            "day": (datetime.today() - timedelta(days=i + 1)).strftime("%Y-%m-%d"),
+            "series1": random.randint(0, 100),
+            "series2": random.randint(300, 500),
+            "series3": random.randint(1000, 5000),
+        }
+        for i in range(14)
+    )
+
+
+__all__ = ["hello", "hello_with_enum", "writes_to_file", "render_chart"]

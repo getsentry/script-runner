@@ -349,6 +349,21 @@ li.home-search-result:hover {
   /* Ensure it doesn't overflow the container */
 }
 
+.function-result-chart-controls {
+  display: flex;
+  height: 30px;
+  align-items: center;
+}
+
+.function-result-chart-controls label {
+  margin-right: 4px;
+}
+
+.function-result-chart .no-data {
+  color: var(--text-hover);
+  font-size: 13px;
+}
+
 .function-result-download {
   padding: 10px;
 }
