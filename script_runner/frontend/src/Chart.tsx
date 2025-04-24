@@ -23,7 +23,7 @@ function getChartData(mergedData: unknown, regions: string[], xAxisKey: string) 
       const mergedByDate: object = mergedData.reduce((acc: { [date: string | number]: { [key: string]: unknown } }, curr: { date: string, [key: string]: unknown }) => {
         const xValue = curr[xAxisKey] as string | number;
 
-        if (!acc.hasOwnProperty(xValue)) {
+        if (!(xValue in acc)) {
           acc[xValue] = {};
         }
 

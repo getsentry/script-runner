@@ -68,7 +68,7 @@ function mergeRegionKeys(data: unknown, regions: string[]): MergedRowData[] | nu
           return null;
         }
 
-        return processed as { region: string, [key: string]: any }[];
+        return processed as { region: string, [key: string]: unknown }[];
       }
     }
   } catch {
@@ -165,7 +165,7 @@ function ScriptResult(props: Props) {
       setDisplayType('json');
     }
 
-  }, [filteredData, props.regions, displayOptions, displayType]);
+  }, [props.data, filteredData, props.regions, displayOptions, displayType]);
 
   return (
     <div className="function-result">
