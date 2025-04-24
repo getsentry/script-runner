@@ -2,17 +2,7 @@ import { Config, RunResult } from "./types.tsx";
 
 class Api {
   private getJson(endpoint: string) {
-    return fetch(endpoint).then((response) => {
-      // Clone the response to log the body, as it can only be read once
-      return response
-        .clone()
-        .text()
-        .then((text) => {
-          console.log("[getJson] Raw Response Body Text:", text);
-          // Now call the original json() method
-          return response.json();
-        });
-    });
+    return fetch(endpoint).then(response => response.json());
   }
 
   private postJson(endpoint: string, data: unknown) {
