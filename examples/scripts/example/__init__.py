@@ -2,11 +2,11 @@
 Script runner demos
 """
 
+import random
+from datetime import datetime, timedelta
 from typing import Literal
 
-from datetime import datetime, timedelta
 from script_runner import read, write
-import random
 
 
 @read
