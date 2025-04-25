@@ -1,11 +1,10 @@
-mode: main
+mode: region
 groups:
   example:
     python_module: examples.scripts.example
-main:
-  regions:
-    - name: local
-      url: localhost:5002
+region:
+  name: local
+  configs: {}
 authentication:
   method: no_auth
 audit_logs:

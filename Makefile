@@ -1,6 +1,5 @@
 devserver:
 	pip install -r requirements.txt
-	pip install -r examples/requirements.txt
 	cd script_runner/frontend && npm install && npm run build
 	FLASK_APP=script_runner.app FLASK_ENV=development CONFIG_FILE_PATH=example_config_combined.yaml PYTHONPATH=$PYTHONPATH:../examples flask run
 
@@ -15,15 +14,8 @@ devserver-main:
 
 devserver-region:
 	pip install -r requirements.txt
-	pip install -r examples/requirements.txt
-	FLASK_APP=script_runner.app FLASK_ENV=development CONFIG_FILE_PATH=example_config_s4s.yaml PYTHONPATH=$PYTHONPATH:../examples flask run --port 5002
+	FLASK_APP=script_runner.app FLASK_ENV=development CONFIG_FILE_PATH=example_config_local.yaml PYTHONPATH=$PYTHONPATH:../examples flask run --port 5002
 .PHONY: devserver-region
-
-generate-example-data:
-	python examples/generate_data_access_log.py
-	python examples/generate_data_kafka.py
-
-.PHONY: generate-example-data
 
 serve:
 	CONFIG_FILE_PATH=example_config_combined.yaml gunicorn -b 0.0.0.0:5000 script_runner.app:app
