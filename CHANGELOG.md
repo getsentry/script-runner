@@ -1,3 +1,13 @@
+## 0.2.2
+
+### Various fixes & improvements
+
+- improve testing utilities (#71) by @lynnagara
+- remove a bunch of stuff that moved into sentry-scripts (#70) by @lynnagara
+- improve chart (#69) by @lynnagara
+- revert api changes (#68) by @lynnagara
+- validation: check all functions have string args on startup (#67) by @lynnagara
+
 ## 0.2.1
 
 ### Various fixes & improvements
