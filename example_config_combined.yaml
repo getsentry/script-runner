@@ -1,33 +1,17 @@
 mode: combined
 groups:
-  kafka:
-    python_module: examples.scripts.kafka
-  access_logs:
-    python_module: examples.scripts.access_logs
   example:
     python_module: examples.scripts.example
-  meta:
-    python_module: examples.scripts.meta
 authentication:
   method: no_auth
 main:
   title: sentry script runner
   regions:
-    - name: s4s
+    - name: local
       url: localhost:5000
 region:
-  name: s4s
-  configs:
-    kafka:
-      clusters:
-        - name: local
-          brokers:
-            - localhost:9092
-    access_logs:
-      host: localhost
-      port: 9000
-      database: clicktail
-      table_name: access_log_local
+  name: local
+  configs: {}
 audit_logs:
   console:
   # datadog:
