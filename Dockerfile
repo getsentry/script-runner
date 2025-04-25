@@ -18,7 +18,6 @@ COPY example_config_combined.yaml /app/
 COPY examples/scripts/ /app/examples/scripts/
 
 RUN pip install -r script_runner/requirements.txt
-RUN pip install -r examples/requirements.txt
 RUN pip install gunicorn==23.0.0
 
 EXPOSE 5000
