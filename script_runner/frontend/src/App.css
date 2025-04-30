@@ -218,6 +218,9 @@ li.home-search-result:hover {
   font-size: 14px;
   margin-left: 25px;
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-function.active {
