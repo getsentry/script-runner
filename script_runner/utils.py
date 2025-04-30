@@ -31,6 +31,18 @@ def get_module_exports(module: ModuleType) -> list[str]:
     return [f for f in module.__all__]
 
 
+def get_markdown_files(module: ModuleType) -> list[str]:
+    if hasattr(module, "__file__") and module.__file__ is not None:
+        module_path = os.path.dirname(os.path.abspath(module.__file__))
+        return [
+            f"{module_path}/{f}"
+            for f in os.listdir(module_path)
+            if os.path.isfile(os.path.join(module_path, f)) and f.endswith(".md")
+        ]
+    else:
+        return []
+
+
 class Mode(Enum):
     region = "region"
     main = "main"
@@ -64,11 +76,25 @@ class Function:
 
 
 @dataclass(frozen=True)
+class MarkdownFile:
+    filename: str
+    content: str
+
+    @classmethod
+    def from_path(cls, filepath: str) -> "MarkdownFile":
+        with open(filepath, "r") as file:
+            content = file.read()
+        filename = os.path.basename(filepath)
+        return cls(filename=filename, content=content)
+
+
+@dataclass(frozen=True)
 class FunctionGroup:
     group: str
     module: str
-    functions: list[Function]
     docstring: str
+    functions: list[Function]
+    markdown_files: list[MarkdownFile]
 
 
 @dataclass(frozen=True)
@@ -208,6 +234,8 @@ def get_enum_values(annotation: type) -> list[str] | None:
 def load_group(module_name: str, group: str) -> FunctionGroup:
     module = importlib.import_module(module_name)
     module_exports = get_module_exports(module)
+    markdown_files = get_markdown_files(module)
+
     module_doc = module.__doc__
     assert module_doc is not None, f"Missing module documentation: {module_name}"
 
@@ -243,7 +271,11 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
         )
 
     return FunctionGroup(
-        group=group, module=module_name, functions=functions, docstring=module_doc
+        group=group,
+        module=module_name,
+        functions=functions,
+        docstring=module_doc,
+        markdown_files=[MarkdownFile.from_path(f) for f in markdown_files],
     )
 
 

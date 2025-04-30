@@ -75,6 +75,11 @@ def get_config() -> dict[str, Any]:
                 }
                 for f in function_group.functions
             ],
+            "docstring": function_group.docstring,
+            "markdownFiles": [
+                {"name": file.filename, "content": file.content}
+                for file in function_group.markdown_files
+            ],
         }
         for (g, function_group) in groups.items()
     ]

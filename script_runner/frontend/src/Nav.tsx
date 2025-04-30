@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import { ConfigGroup, Route } from "./types.tsx";
-import { FolderPlusIcon, FolderMinusIcon } from "@heroicons/react/24/outline";
+import { FolderPlusIcon, FolderMinusIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 import Tag from "./Tag";
 
 interface Props {
@@ -61,15 +61,19 @@ function Nav(props: Props) {
               </div>
               {isExpanded && (
                 <div>
+                  {group.markdownFiles.map((file) => <a className={`nav-function ${file.name === activeFunction && group.group === activeGroup
+                    ? "active"
+                    : ""
+                    }`} onClick={() => { props.navigate({ regions: props.route.regions, group: group.group, function: file.name }) }}>
+                    <span className="nav-group-icon"><DocumentTextIcon /></span>{file.name}</a>)}
                   {group.functions.map((f) => (
                     <a
                       key={f.name}
                       title={f.name}
-                      className={`nav-function ${
-                        f.name === activeFunction && group.group === activeGroup
-                          ? "active"
-                          : ""
-                      }`}
+                      className={`nav-function ${f.name === activeFunction && group.group === activeGroup
+                        ? "active"
+                        : ""
+                        }`}
                       onClick={() =>
                         props.navigate({
                           regions: props.route.regions,

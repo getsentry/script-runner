@@ -217,7 +217,8 @@ li.home-search-result:hover {
   font-family: var(--font-mono);
   font-size: 14px;
   margin-left: 25px;
-  display: block;
+  display: flex;
+  align-items: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -225,6 +226,10 @@ li.home-search-result:hover {
 
 .nav-function.active {
   color: var(--highlight-text);
+}
+
+.document-markdown {
+  padding: 10px;
 }
 
 .function-header {

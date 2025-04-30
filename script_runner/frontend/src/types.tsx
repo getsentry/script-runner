@@ -14,10 +14,16 @@ export interface ConfigFunction {
   isReadonly: boolean;
 }
 
+export interface MarkdownFile {
+  name: string,
+  content: string;
+}
+
 export interface ConfigGroup {
   group: string;
   functions: ConfigFunction[];
   docstring: string;
+  markdownFiles: MarkdownFile[];
 }
 
 export interface Config {

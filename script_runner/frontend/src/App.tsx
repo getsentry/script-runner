@@ -9,6 +9,7 @@ import Nav from './Nav.tsx'
 import { Config, Route } from './types.tsx'
 import Header from './Header.tsx'
 import NotFound from './NotFound.tsx'
+import Document from './Document.tsx'
 import Api from './api.tsx'
 
 function App() {
@@ -135,6 +136,11 @@ function App() {
       const functionDef = group.functions.find(f => f.name == route.function);
 
       if (!functionDef) {
+        const markdownDef = group.markdownFiles.find(f => f.name == route.function);
+        if (markdownDef) {
+          return <Document name={markdownDef.name} content={markdownDef.content} />
+        }
+
         return <NotFound />
       }
 
