@@ -1,3 +1,10 @@
+## 0.2.3
+
+### Various fixes & improvements
+
+- render documentation in the UI (#74) by @lynnagara
+- fix style for long text in nav (#72) by @lynnagara
+
 ## 0.2.2
 
 ### Various fixes & improvements
