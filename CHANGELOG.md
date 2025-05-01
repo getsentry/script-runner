@@ -1,3 +1,10 @@
+## 0.2.4
+
+### Various fixes & improvements
+
+- remove weird scrolling of nav headings (#76) by @lynnagara
+- fix scrolling on docs pages (#75) by @lynnagara
+
 ## 0.2.3
 
 ### Various fixes & improvements
