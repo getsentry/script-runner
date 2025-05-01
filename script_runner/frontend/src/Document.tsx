@@ -6,13 +6,11 @@ interface Props {
 }
 
 function Document(props: Props) {
-  return <div>
-    <div
-      className="document-markdown"
-      dangerouslySetInnerHTML={{ __html: marked(props.content) }}
-    />
+  return <div
+    className="document-markdown"
+    dangerouslySetInnerHTML={{ __html: marked(props.content) }}
+  />
 
-  </div>
 
 }
 
