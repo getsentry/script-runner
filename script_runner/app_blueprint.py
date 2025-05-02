@@ -151,21 +151,38 @@ if not isinstance(config, RegionConfig):
                 )
 
             scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
-
-            res = requests.post(
-                f"{scheme}://{region.url}/run_region",
-                json={
-                    "group": group_name,
-                    "function": function.name,
-                    "function_checksum": function.checksum,
-                    "parameters": params,
-                    "region": region.name,
-                },
-            )
-
-            # TODO: handle errors properly
-            assert res.status_code == 200
-            results[region.name] = res.json()
+            try:
+                res = requests.post(
+                    f"{scheme}://{region.url}/run_region",
+                    json={
+                        "group": group_name,
+                        "function": function.name,
+                        "function_checksum": function.checksum,
+                        "parameters": params,
+                        "region": region.name,
+                    },
+                )
+                res.raise_for_status()
+                results[region.name] = res.json()
+            except requests.exceptions.RequestException as e:
+                logging.error(
+                    f"Request error for region {region.name}: {str(e)}", exc_info=True
+                )
+                results[region.name] = {
+                    "error": f"Failed to connect to region: {str(e)}"
+                }
+            except ValueError as e:
+                logging.error(
+                    f"JSON decoding error for region {region.name}: {str(e)}",
+                    exc_info=True,
+                )
+                results[region.name] = {"error": "Invalid response format"}
+            except Exception as e:
+                logging.error(
+                    f"Error for region {region.name}: {str(e)}",
+                    exc_info=True,
+                )
+                results[region.name] = {"error": "An unexpected error occurred"}
 
         return jsonify(results)
 
