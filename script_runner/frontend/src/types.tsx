@@ -3,6 +3,7 @@ export type RunResult = { [region: string]: unknown };
 export type ConfigParam = {
   name: string;
   default: string | null;
+  type: 'text' | 'textarea' | 'select' | 'number' | 'integer';
   enumValues: string[] | null;
 };
 

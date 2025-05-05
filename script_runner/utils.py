@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from types import ModuleType
-from typing import Any, Literal
+from typing import Any
 
 import jsonschema
 import yaml
@@ -20,6 +20,7 @@ from script_runner.audit_log import (
 )
 from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
 from script_runner.function import WrappedFunction
+from script_runner.function_parameter import InputType
 
 
 class ConfigError(Exception):
@@ -58,8 +59,9 @@ class Region:
 @dataclass(frozen=True)
 class FunctionParameter:
     name: str
+    type: InputType
     default: str | None
-    enumValues: list[str] | None
+    enum_values: list[str] | None  # applies only to select
 
 
 @dataclass(frozen=True)
@@ -220,17 +222,6 @@ class CombinedConfig(CommonFields):
         )
 
 
-def get_enum_values(annotation: type) -> list[str] | None:
-    """
-    Return allowed values or None
-    """
-
-    if getattr(annotation, "__origin__", None) is Literal:
-        return [arg for arg in annotation.__args__]  # type:ignore[attr-defined]
-
-    return None
-
-
 def load_group(module_name: str, group: str) -> FunctionGroup:
     module = importlib.import_module(module_name)
     module_exports = get_module_exports(module)
@@ -246,8 +237,7 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
             function, WrappedFunction
         ), f"{f} must be marked @read or @write"
 
-        source = inspect.getsource(function.func)
-        sig = inspect.signature(function.func)
+        source = inspect.getsource(function._func)
 
         functions.append(
             Function(
@@ -256,15 +246,12 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
                 docstring=function.__doc__ or "",
                 parameters=[
                     FunctionParameter(
-                        name=k,
-                        default=(
-                            str(v.default)
-                            if v.default is not inspect.Parameter.empty
-                            else None
-                        ),
-                        enumValues=get_enum_values(v.annotation),
+                        name=name,
+                        type=p.input_type(),
+                        default=p.default,
+                        enum_values=p.options,
                     )
-                    for (k, v) in sig.parameters.items()
+                    for (name, p) in function._params
                 ],
                 is_readonly=function.is_readonly,
             )
