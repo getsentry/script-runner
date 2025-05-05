@@ -1,8 +1,8 @@
 import pytest
 
 from script_runner.auth import GoogleAuth, NoAuth
-from script_runner.utils import CommonFields, FunctionParameter, load_group
 from script_runner.function_parameter import InputType
+from script_runner.utils import CommonFields, FunctionParameter, load_group
 
 
 def test_common_fields() -> None:
