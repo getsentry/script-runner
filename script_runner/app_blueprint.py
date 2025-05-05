@@ -173,14 +173,19 @@ if not isinstance(config, RegionConfig):
     def fetch_config() -> Response:
         res = get_config()
 
+        group_without_access = []
+
         # Filter out groups user doesn't have access to
         user_groups = set()
         for group in config.groups:
             if config.auth.has_group_access(request, group):
                 user_groups.add(group)
+            else:
+                group_without_access.append(group)
 
         filtered_groups = [g for g in res["groups"] if g["group"] in user_groups]
         res["groups"] = filtered_groups
+        res["groupsWithoutAccess"] = group_without_access
 
         return jsonify(res)
 
