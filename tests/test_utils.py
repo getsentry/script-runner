@@ -1,6 +1,7 @@
 import pytest
 
 from script_runner.auth import GoogleAuth, NoAuth
+from script_runner.function_parameter import InputType
 from script_runner.utils import CommonFields, FunctionParameter, load_group
 
 
@@ -47,8 +48,19 @@ def test_validate_config_functions() -> None:
         "some_write_function",
     ]
     assert [f.parameters for f in group.functions] == [
-        [FunctionParameter(name="to", default="world", enumValues=None)],
-        [FunctionParameter(name="to", default="foo", enumValues=["foo", "bar"])],
+        [
+            FunctionParameter(
+                name="to", type=InputType.TEXT, default="world", enum_values=None
+            )
+        ],
+        [
+            FunctionParameter(
+                name="to",
+                type=InputType.SELECT,
+                default="foo",
+                enum_values=["foo", "bar"],
+            )
+        ],
         [],
     ]
 

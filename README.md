@@ -1,43 +1,75 @@
 # script-runner
 
-Run Python scripts on production data.
+A tool for defining python functions, triggering their execution and displaying results via a user interface.
 
-This application can run in either combined or multi-region mode.
+Used at Sentry to allow specific users to run predefined Python scripts on production data.
 
-For multi-region mode, set `mode: region` for region, and `mode: main` for the main deployment. `mode: combined` runs both together.
+
+## Deployment modes
+
+Multi-region deployments enable aggregating results across multiple "regions" or "silos", whilst still enabling script execution to be performed in a single region.
+- set `mode: main` for the central region
+- set `mode: region` for each instance of the application deployed in each regions
+
+
+For a single deployment in one region use `mode:combined`. Currently we only use this for dev and testing.
+
+
+## Writing custom scripts
+Scripts are standard python functions organized into groups.
+
+All of the arguments to a function must be annotated with one of the supported parameter types. Currently there are 5.
+
+- Text
+- Textarea
+- Integer
+- Number
+- Select
+
+Example:
+```python
+def print_value(input: Text) -> None:
+    """
+    for short text, renders <input type="text" /> in the ui
+    """
+    print(input.value)
+
+def print_long_value(input: TextArea) -> None:
+    """
+    multiline text, renders <textarea /> in the ui
+    """
+    print(input.value)
+```
+
+The annotation controls how the element is displayed in the UI, and the Python type of the value (`str`, `int` or `float`)
+
+The return value of the function can be anything, as long as it is json serializable
+
+Any functions exported by a module via `__all__` will be picked up automatically and displayed in the UI.
+
+
+## Writing tests
+Use the `execute_with_context` helper from the testutils module to call your function with mock values.
+
+
+## Authentication
+currently google iap (and no auth) are supported
+
+for google iap, set the `audience_code` as well as `iap_principals` (group -> iap principal mapping) in the config
+
 
 ## Example data:
-
 - These are in the examples/scripts directory
-- You can generate data for the examples via `make generate-example-data`
 
 ## Configuration
+check `config.schema.json` for configuration format and required fields.
+there is also an example of each mode in this repository: `example_config_combined.yaml`, `example_config_main.yaml`, `example_config_local.yaml`
 
-Runs in `combined`, `main` and `region` mode. Combined is mostly for dev and testing.
+## Development
 
-check `config.schema.json`
+- Run `make develop`. The application will run on combined mode on `http://127.0.0.1:5000`
 
-## Development Setup
-
-To run the application locally for development, you need to start both the backend (Flask) and frontend (Vite) servers in separate terminals.
-
-**1. Start the Backend Server:**
-
-- Navigate to the project root directory (`script-runner`).
-- Activate the Python virtual environment (e.g., `source .venv/bin/activate`).
-- Set the configuration file path environment variable (replace with your actual config file):
-  ```bash
-  export CONFIG_FILE_PATH="example_config_main.yaml"
-  ```
-- Run the Flask development server:
-  ```bash
-  flask --app script_runner.app run
-  ```
-- The backend should now be running (typically on `http://127.0.0.1:5000`).
-
-**2. Start the Frontend Server:**
-
-- Open a **separate** terminal.
+- If you want UI hot reloading, you have to run the vite server separately.
 - Navigate to the frontend directory:
   ```bash
   cd script_runner/frontend
@@ -50,16 +82,4 @@ To run the application locally for development, you need to start both the backe
   ```bash
   npm run dev
   ```
-- The frontend should now be running (typically on `http://localhost:5173`) and will automatically proxy API requests to the backend thanks to the proxy configured in `vite.config.ts`.
-
-**Accessing the App:**
-
-Open your browser and navigate to the frontend URL (e.g., `http://localhost:5173`).
-
-**Stopping the Servers:**
-
-Press `Ctrl + C` in each terminal window.
-
-**(Optional) Using Make:**
-
-This project may contain a `Makefile` with a command to simplify this process (e.g., `make devserver`). Check the `Makefile` content; if available, this command might start both servers for you.
+- The frontend should now be running on `http://localhost:5173` and will automatically proxy API requests to the backend thanks to the proxy configured in `vite.config.ts`.

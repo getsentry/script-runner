@@ -66,8 +66,9 @@ def get_config() -> dict[str, Any]:
                     "parameters": [
                         {
                             "name": p.name,
+                            "type": p.type.value,
                             "default": p.default,
-                            "enumValues": p.enumValues,
+                            "enumValues": p.enum_values,
                         }
                         for p in f.parameters
                     ],
