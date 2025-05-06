@@ -1,5 +1,10 @@
 export type RunResult = { [region: string]: unknown };
 
+export type RunResultWithErrors = {
+  data: { [region: string]: unknown };
+  errors: { [region: string]: string };
+};
+
 export type ConfigParam = {
   name: string;
   default: string | null;
