@@ -173,45 +173,6 @@ if not isinstance(config, RegionConfig):
                 res.raise_for_status()
                 results[region.name] = res.json()
 
-            except requests.exceptions.HTTPError as e:
-                status_code = e.response.status_code
-                error_detail = e.response.text
-                logging.error(
-                    f"""
-                    HTTP error on region {region.name}: Status {status_code}.
-                    Response: {error_detail[:200]}...
-                    """,
-                    exc_info=True,
-                )
-                errors[region.name] = {
-                    "type": "HTTPError",
-                    "message": f"Upstream HTTP error from region {region.name}",
-                    "status_received": status_code,
-                    "remote_details": error_detail[:200],
-                }
-                continue
-
-            except requests.exceptions.JSONDecodeError as e:
-                status_code = res.status_code if "res" in locals() else "N/A"
-                response_text = (
-                    res.text
-                    if "res" in locals()
-                    else "N/A (response object not available)"
-                )
-                logging.error(
-                    f"""
-                    Invalid JSON on region {region.name} (Status {status_code}): {e}.
-                    Response text: {response_text[:200]}...
-                    """,
-                    exc_info=True,
-                )
-                errors[region.name] = {
-                    "type": "JSONDecodeError",
-                    "message": f"Invalid JSON response from region {region.name}",
-                    "status_received": status_code,
-                    "remote_response_snippet": response_text[:200],
-                }
-                continue
             except requests.exceptions.RequestException as e:
                 logging.error(
                     f"Request failed for region {region.name}: {e}", exc_info=True
@@ -226,7 +187,6 @@ if not isinstance(config, RegionConfig):
                     "message": f"Network or connection error contacting region {region.name}",
                     "details": str(e),
                 }
-                continue
             except Exception as e:
                 logging.error(
                     f"Unexpected error processing region {region.name}: {e}",
@@ -237,7 +197,6 @@ if not isinstance(config, RegionConfig):
                     "message": f"An unexpected error occurred processing region {region.name}",
                     "details": str(e),
                 }
-                continue
 
         return make_response(jsonify({"results": results, "errors": errors}), 200)
 
