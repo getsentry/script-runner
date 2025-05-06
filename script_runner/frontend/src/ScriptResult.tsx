@@ -187,10 +187,7 @@ function ScriptResult(props: Props) {
               <h4>Region: {regionName} (Failed)</h4>
               <p><strong>Error Type:</strong> {errorData.type}</p>
               <p><strong>Message:</strong> {errorData.message}</p>
-              {errorData.status_received && <p><strong>Status Received:</strong> {errorData.status_received}</p>}
-              {errorData.remote_details && <p><strong>Remote Details:</strong> <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{escapeHtml(errorData.remote_details)}</pre></p>}
-              {errorData.remote_response_snippet && <p><strong>Remote Snippet:</strong> <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{escapeHtml(errorData.remote_response_snippet)}</pre></p>}
-              {errorData.details && <p><strong>Details:</strong> <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{escapeHtml(errorData.details)}</pre></p>}
+              {errorData.status_code && <p><strong>Status Received:</strong> {errorData.status_code}</p>}
             </div>
           ))}
         </div>
