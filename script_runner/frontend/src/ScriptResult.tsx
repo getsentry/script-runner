@@ -194,7 +194,7 @@ function ScriptResult(props: Props) {
       {/* Display Errors First, if any */}
       {hasErrors && (
         <div className="errors-section" style={{ marginBottom: '20px' }}>
-          <h3>Region-Specific Errors:</h3>
+          <h3>Errors:</h3>
           {Object.entries(props.data!.errors).map(([regionName, errorData]) => (
             <div key={regionName} className="error-message-box" /* Add your red box styling here */
                  style={{ border: '1px solid red', padding: '10px', marginBottom: '10px', backgroundColor: '#ffebee' }}>
