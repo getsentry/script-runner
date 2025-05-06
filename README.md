@@ -67,7 +67,7 @@ there is also an example of each mode in this repository: `example_config_combin
 
 ## Development
 
-- Run `make develop`. The application will run on combined mode on `http://127.0.0.1:5000`
+- Run `make devserver`. The application will run on combined mode on `http://127.0.0.1:5000`
 
 - If you want UI hot reloading, you have to run the vite server separately.
 - Navigate to the frontend directory:
