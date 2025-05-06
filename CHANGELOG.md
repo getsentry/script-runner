@@ -1,3 +1,13 @@
+## 0.2.5
+
+### Various fixes & improvements
+
+- Add some error handling for a failed region (#77) by @kneeyo1
+- Fix typing issues with mypy (#80) by @kneeyo1
+- custom function parameters and input types (#78) by @lynnagara
+- if user has no groups display list of groups they don't have access to (#79) by @lynnagara
+- remove build-docker-image job (#73) by @lynnagara
+
 ## 0.2.4
 
 ### Various fixes & improvements
