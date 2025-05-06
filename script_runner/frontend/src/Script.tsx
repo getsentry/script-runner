@@ -103,7 +103,7 @@ function Script(props: Props) {
                         <label htmlFor={arg.name}>{arg.name}</label>
                       </div>
                       <div>
-                        {arg.enumValues && (
+                        {arg.type == "select" && (
                           <select
                             id={arg.name}
                             required
@@ -114,12 +114,12 @@ function Script(props: Props) {
                             }
                           >
                             <option value="">Select...</option>
-                            {arg.enumValues.map((v) => (
+                            {arg.enumValues!.map((v) => (
                               <option value={v}>{v}</option>
                             ))}
                           </select>
                         )}
-                        {!arg.enumValues && (
+                        {arg.type == "text" && (
                           <input
                             type="text"
                             id={arg.name}
@@ -131,6 +131,51 @@ function Script(props: Props) {
                             disabled={disabled}
                           />
                         )}
+                        {arg.type == "textarea" && (
+                          <textarea
+                            id={arg.name}
+                            value={params[idx] || ""}
+                            onChange={(e) =>
+                              handleInputChange(idx, e.target.value)
+                            }
+                            required
+                            disabled={disabled}
+                          />
+                        )}
+                        {arg.type == "integer" && (
+                          <input
+                            type="number"
+                            id={arg.name}
+                            value={Number(params[idx]) || 0}
+                            onChange={(e) => {
+                              console.log(e.target.value)
+                              if (!Number.isInteger(e.target.valueAsNumber)) {
+                                setError("invalid integer")
+                                return;
+                              }
+                              handleInputChange(idx, e.target.value)
+                            }}
+                            required
+                            disabled={disabled}
+                          />
+                        )}
+                        {arg.type == "number" && (
+                          <input
+                            type="number"
+                            id={arg.name}
+                            value={Number(params[idx]) || 0}
+                            onChange={(e) => {
+                              if (isNaN(e.target.valueAsNumber)) {
+                                setError("Invalid number");
+                                return;
+                              }
+                              handleInputChange(idx, e.target.value)
+                            }}
+                            required
+                            disabled={disabled}
+                          />
+                        )}
+
                       </div>
                     </div>
                   );

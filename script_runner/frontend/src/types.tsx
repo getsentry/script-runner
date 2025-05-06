@@ -19,6 +19,7 @@ export interface RegionError {
 export type ConfigParam = {
   name: string;
   default: string | null;
+  type: 'text' | 'textarea' | 'select' | 'number' | 'integer';
   enumValues: string[] | null;
 };
 

@@ -2,25 +2,24 @@
 example for tests
 """
 
-from typing import Literal
-
 from script_runner import read, write
+from script_runner.function_parameter import Select, Text
 
 
 @read
-def hello(to: str = "world") -> str:
+def hello(to: Text = Text(default="world")) -> str:
     """
     This function says hello to someone
     """
-    return f"hello {to}"
+    return f"hello {to.value}"
 
 
 @read
-def hello_with_enum(to: Literal["foo", "bar"] = "foo") -> str:
+def hello_with_enum(to: Select = Select(options=["foo", "bar"], default="foo")) -> str:
     """
     Demo of literal type + default value
     """
-    return f"hello {to}"
+    return f"hello {to.value}"
 
 
 @write

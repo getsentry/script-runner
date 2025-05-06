@@ -7,7 +7,9 @@ from script_runner.function import WrappedFunction
 
 
 def execute_with_context(
-    func: WrappedFunction, mock_context: FunctionContext[Any], args: list[str]
+    func: WrappedFunction,
+    mock_context: FunctionContext[Any],
+    args: list[str],
 ) -> Any:
     """
     Run a function with a mock context, and return the result.
