@@ -98,20 +98,6 @@ function getGridData(mergedData: MergedRowData[] | null) {
   return null;
 }
 
-// Helper to prevent XSS if displaying raw remote details/snippets
-function escapeHtml(unsafe: string | undefined | null): string {
-  if (unsafe === null || typeof unsafe === 'undefined') return '';
-  return unsafe
-       .toString()
-       .replace(/&/g, "&amp;")
-       .replace(/</g, "&lt;")
-       .replace(/>/g, "&gt;")
-       .replace(/"/g, "&quot;")
-       .replace(/'/g, "&#039;");
-}
-
-
-
 function ScriptResult(props: Props) {
   const [displayType, setDisplayType] = useState<string>('json');
   const [filteredResults, setFilteredResults] = useState<RunResult['results'] | null>(null);
@@ -198,9 +184,9 @@ function ScriptResult(props: Props) {
           {Object.entries(props.data!.errors).map(([regionName, errorData]) => (
             <div key={regionName} className="error-message-box" /* Add your red box styling here */
                  style={{ border: '1px solid red', padding: '10px', marginBottom: '10px', backgroundColor: '#ffebee' }}>
-              <h4>Region: {escapeHtml(regionName)} (Failed)</h4>
-              <p><strong>Error Type:</strong> {escapeHtml(errorData.type)}</p>
-              <p><strong>Message:</strong> {escapeHtml(errorData.message)}</p>
+              <h4>Region: {regionName} (Failed)</h4>
+              <p><strong>Error Type:</strong> {errorData.type}</p>
+              <p><strong>Message:</strong> {errorData.message}</p>
               {errorData.status_received && <p><strong>Status Received:</strong> {errorData.status_received}</p>}
               {errorData.remote_details && <p><strong>Remote Details:</strong> <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{escapeHtml(errorData.remote_details)}</pre></p>}
               {errorData.remote_response_snippet && <p><strong>Remote Snippet:</strong> <pre style={{whiteSpace: 'pre-wrap', wordBreak: 'break-all'}}>{escapeHtml(errorData.remote_response_snippet)}</pre></p>}

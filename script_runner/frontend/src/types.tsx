@@ -10,10 +10,7 @@ export type RunResult = {
 export interface RegionError {
   type: string;
   message: string;
-  status_received?: number;
-  remote_details?: string;
-  remote_response_snippet?: string;
-  details?: string;
+  status_code: number;
 }
 
 export type ConfigParam = {
