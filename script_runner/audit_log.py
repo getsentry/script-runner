@@ -41,8 +41,8 @@ class DatadogEventLogger(AuditLogger):
 
 
 class SlackEventLogger(AuditLogger):
-    def __init__(self, key: str, url: str) -> None:
-        self.__notifier = slack_notifier.SlackNotifier(key, url)
+    def __init__(self, eng_pipes_key: str, eng_pipes_url: str) -> None:
+        self.__notifier = slack_notifier.SlackNotifier(eng_pipes_key, eng_pipes_url)
 
     def log(self, user: str, group: str, function: str, region: str) -> None:
         self.__notifier.send(

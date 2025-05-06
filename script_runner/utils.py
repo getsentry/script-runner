@@ -16,6 +16,7 @@ import yaml
 from script_runner.audit_log import (
     AuditLogger,
     DatadogEventLogger,
+    SlackEventLogger,
     StandardOutputLogger,
 )
 from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
@@ -137,6 +138,13 @@ class CommonFields:
         if "datadog" in audit_log_data:
             audit_loggers.append(
                 DatadogEventLogger(api_key=audit_log_data["datadog"]["api_key"])
+            )
+        if "slack" in audit_log_data:
+            audit_loggers.append(
+                SlackEventLogger(
+                    eng_pipes_key=audit_log_data["slack"]["eng_pipes_key"],
+                    eng_pipes_url=audit_log_data["slack"]["eng_pipes_url"],
+                )
             )
 
         sentry_dsn = data.get("sentry_dsn")
