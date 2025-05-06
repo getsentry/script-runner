@@ -6,7 +6,15 @@ from typing import Any, Callable
 
 import requests
 import sentry_sdk
-from flask import Blueprint, Response, g, jsonify, request, send_from_directory
+from flask import (
+    Blueprint,
+    Response,
+    g,
+    jsonify,
+    make_response,
+    request,
+    send_from_directory,
+)
 
 from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
@@ -31,8 +39,7 @@ def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
             return res
         except UnauthorizedUser as e:
             logging.error(e, exc_info=True)
-            err_response = jsonify({"error": "Unauthorized"})
-            err_response.status_code = 401
+            err_response = make_response(jsonify({"error": "Unauthorized"}), 401)
             return err_response
 
     return authenticate
@@ -94,7 +101,7 @@ def get_config() -> dict[str, Any]:
 
 @app_blueprint.route("/health")
 def health() -> Response:
-    return jsonify({"status": "ok"})
+    return make_response(jsonify({"status": "ok"}))
 
 
 if not isinstance(config, RegionConfig):
@@ -139,8 +146,7 @@ if not isinstance(config, RegionConfig):
                 (r for r in config.main.regions if r.name == requested_region), None
             )
             if region is None:
-                err_response = jsonify({"error": "Invalid region"})
-                err_response.status_code = 400
+                err_response = make_response(jsonify({"error": "Invalid region"}), 400)
                 return err_response
 
             for audit_logger in config.audit_loggers:
@@ -168,7 +174,7 @@ if not isinstance(config, RegionConfig):
             assert res.status_code == 200
             results[region.name] = res.json()
 
-        return jsonify(results)
+        return make_response(jsonify(results), 200)
 
     @app_blueprint.route("/config")
     def fetch_config() -> Response:
@@ -188,7 +194,7 @@ if not isinstance(config, RegionConfig):
         res["groups"] = filtered_groups
         res["groupsWithoutAccess"] = groups_without_access
 
-        return jsonify(res)
+        return make_response(jsonify(res), 200)
 
 
 if not isinstance(config, MainConfig):
@@ -224,4 +230,4 @@ if not isinstance(config, MainConfig):
         group_config = config.region.configs.get(group_name, None)
         g.region = data["region"]
         g.group_config = group_config
-        return jsonify(func(*params))
+        return make_response(jsonify(func(*params)), 200)
