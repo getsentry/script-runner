@@ -172,7 +172,11 @@ function App() {
       <div className="page-container">
         <Nav navigate={navigate} groups={config.groups} route={route} />
         <div className="content">
-          {config.groups.length > 0 ? getActiveComponent() : <>nothing to see here</>}
+          {config.groups.length > 0 ? getActiveComponent() :
+            config.groupsWithoutAccess.length > 0
+              ? <>you don't have access to any of the following groups: {config.groupsWithoutAccess.join(", ")}</>
+              : <>nothing to see here</>
+          }
         </div>
       </div>
     </>
