@@ -131,6 +131,7 @@ if not isinstance(config, RegionConfig):
         data = request.get_json()
 
         results = {}
+        errors = {}
 
         group_name = data["group"]
         group = config.groups[group_name]
@@ -158,23 +159,46 @@ if not isinstance(config, RegionConfig):
                 )
 
             scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
+            try:
+                res = requests.post(
+                    f"{scheme}://{region.url}/run_region",
+                    json={
+                        "group": group_name,
+                        "function": function.name,
+                        "function_checksum": function.checksum,
+                        "parameters": params,
+                        "region": region.name,
+                    },
+                )
+                res.raise_for_status()
+                results[region.name] = res.json()
 
-            res = requests.post(
-                f"{scheme}://{region.url}/run_region",
-                json={
-                    "group": group_name,
-                    "function": function.name,
-                    "function_checksum": function.checksum,
-                    "parameters": params,
-                    "region": region.name,
-                },
-            )
+            except requests.exceptions.RequestException as e:
+                logging.error(
+                    f"Request failed for region {region.name}: {e}", exc_info=True
+                )
+                error_type = (
+                    "TimeoutError"
+                    if isinstance(e, requests.exceptions.Timeout)
+                    else "ConnectionError"
+                )
+                errors[region.name] = {
+                    "type": error_type,
+                    "message": f"Network or connection error contacting region {region.name}",
+                    "details": str(e),
+                }
+            except Exception as e:
+                logging.error(
+                    f"Unexpected error processing region {region.name}: {e}",
+                    exc_info=True,
+                )
+                errors[region.name] = {
+                    "type": "GenericError",
+                    "message": f"An unexpected error occurred processing region {region.name}",
+                    "details": str(e),
+                }
 
-            # TODO: handle errors properly
-            assert res.status_code == 200
-            results[region.name] = res.json()
-
-        return make_response(jsonify(results), 200)
+        return make_response(jsonify({"results": results, "errors": errors}), 200)
 
     @app_blueprint.route("/config")
     def fetch_config() -> Response:

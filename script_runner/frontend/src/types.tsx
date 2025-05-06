@@ -1,4 +1,17 @@
-export type RunResult = { [region: string]: unknown };
+export type RunResult = {
+  results: {
+    [regionName: string]: unknown;
+  };
+  errors: {
+    [regionName: string]: RegionError;
+  }
+}
+
+export interface RegionError {
+  type: string;
+  message: string;
+  status_code: number;
+}
 
 export type ConfigParam = {
   name: string;
