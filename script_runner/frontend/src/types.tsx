@@ -1,9 +1,20 @@
-export type RunResult = { [region: string]: unknown };
+export type RunResult = {
+  results: {
+    [regionName: string]: unknown;
+  };
+  errors: {
+    [regionName: string]: RegionError;
+  }
+}
 
-export type RunResultWithErrors = {
-  data: { [region: string]: unknown };
-  errors: { [region: string]: string };
-};
+export interface RegionError {
+  type: string;
+  message: string;
+  status_received?: number;
+  remote_details?: string;
+  remote_response_snippet?: string;
+  details?: string;
+}
 
 export type ConfigParam = {
   name: string;

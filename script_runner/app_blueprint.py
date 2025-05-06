@@ -232,7 +232,7 @@ if not isinstance(config, RegionConfig):
                 }
                 continue
 
-        return jsonify({"data": results, "errors": errors})
+        return jsonify({"results": results, "errors": errors})
 
     @app_blueprint.route("/config")
     def fetch_config() -> Response:
