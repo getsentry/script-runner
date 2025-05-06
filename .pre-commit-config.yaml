@@ -32,4 +32,11 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies:
-          [types-setuptools, types-requests, google-auth, PyJWT]
+          [
+            types-setuptools,
+            types-PyYAML,
+            types-Flask,
+            types-requests,
+            google-auth,
+            PyJWT,
+          ]
