@@ -1,7 +1,7 @@
 import logging
 from abc import ABC, abstractmethod
 
-from infra_event_notifier import datadog_notifier
+from infra_event_notifier import datadog_notifier, slack_notifier
 
 # TODO: move this to the CLI once it exists and allow user to configure the level
 logging.basicConfig(level=logging.INFO)
@@ -37,4 +37,15 @@ class DatadogEventLogger(AuditLogger):
                 "sentry_user": user,
                 "source_category": "infra-tools",
             },
+        )
+
+
+class SlackEventLogger(AuditLogger):
+    def __init__(self, eng_pipes_key: str, eng_pipes_url: str) -> None:
+        self.__notifier = slack_notifier.SlackNotifier(eng_pipes_key, eng_pipes_url)
+
+    def log(self, user: str, group: str, function: str, region: str) -> None:
+        self.__notifier.send(
+            title="Script Runner: Write action",
+            body=f"User: {user}, Group: {group}, Function: {function}, Region: {region}",
         )
