@@ -1,9 +1,10 @@
+from unittest.mock import ANY
+
 import pytest
 
 from script_runner.auth import GoogleAuth, NoAuth
 from script_runner.function_parameter import InputType
 from script_runner.utils import CommonFields, FunctionParameter, load_group
-from unittest.mock import ANY
 
 
 def test_common_fields() -> None:
