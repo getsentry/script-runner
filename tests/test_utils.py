@@ -3,6 +3,7 @@ import pytest
 from script_runner.auth import GoogleAuth, NoAuth
 from script_runner.function_parameter import InputType
 from script_runner.utils import CommonFields, FunctionParameter, load_group
+from unittest.mock import ANY
 
 
 def test_common_fields() -> None:
@@ -50,7 +51,11 @@ def test_validate_config_functions() -> None:
     assert [f.parameters for f in group.functions] == [
         [
             FunctionParameter(
-                name="to", type=InputType.TEXT, default="world", enum_values=None
+                name="to",
+                type=InputType.TEXT,
+                default="world",
+                enum_values=None,
+                _ref=ANY,
             )
         ],
         [
@@ -59,6 +64,7 @@ def test_validate_config_functions() -> None:
                 type=InputType.SELECT,
                 default="foo",
                 enum_values=["foo", "bar"],
+                _ref=ANY,
             )
         ],
         [],
