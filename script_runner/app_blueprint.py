@@ -300,7 +300,7 @@ if not isinstance(config, MainConfig):
 
     @app_blueprint.route("/autocomplete_region", methods=["POST"])
     @authenticate_request
-    def autocompmlete_one_region() -> Response:
+    def autocomplete_one_region() -> Response:
         """
         Get autocomplete values for one region. Called from the `/autocomplete` endpoint.
         """
