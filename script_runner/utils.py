@@ -21,7 +21,10 @@ from script_runner.audit_log import (
 )
 from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
 from script_runner.function import WrappedFunction
-from script_runner.function_parameter import InputType, FunctionParameter as RealFunctionParameter
+from script_runner.function_parameter import FunctionParameter as RealFunctionParameter
+from script_runner.function_parameter import (
+    InputType,
+)
 
 
 class ConfigError(Exception):
@@ -63,7 +66,7 @@ class FunctionParameter:
     type: InputType
     default: str | None
     enum_values: list[str] | None  # applies only to select
-    _ref: RealFunctionParameter
+    _ref: RealFunctionParameter[Any]
 
 
 @dataclass(frozen=True)
