@@ -16,6 +16,8 @@ interface Props {
   ) => Promise<RunResult>;
 }
 
+const REEXECUTION_DELAY_MS = 2000;
+
 function Script(props: Props) {
   const { name: functionName, parameters, source, isReadonly } = props.function;
   const [params, setParams] = useState<(string | null)[]>(
@@ -42,6 +44,8 @@ function Script(props: Props) {
   }, [parameters, props.group, props.function, props.execute]);
 
   function handleInputChange(idx: number, value: string) {
+    setError(null);
+
     setParams((prev) => {
       const next = [...prev];
       next[idx] = value;
@@ -54,9 +58,8 @@ function Script(props: Props) {
       return;
     }
 
-    setError(null);
-
     if (params.some((p) => p === null)) {
+      setError("All required parameters must be provided.");
       return;
     }
 
@@ -66,7 +69,6 @@ function Script(props: Props) {
     }
 
     setIsRunning(true);
-
     props
       .execute(props.regions, props.group, functionName, params as string[])
       .then((result: RunResult) => {
@@ -77,10 +79,18 @@ function Script(props: Props) {
       .catch((err) => {
         setError(err.error);
         setIsRunning(false);
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setIsRunning(false);
+        }, REEXECUTION_DELAY_MS);
       });
   }
 
-  const disabled = isRunning || hasResult || props.regions.length === 0;
+  const disabled = isRunning || props.regions.length === 0;
+  const inputsDisabled = isRunning;
+
+  // console.log(`Script Render: isRunning = ${isRunning}, props.regions.length = ${props.regions.length}, disabled = ${disabled}`);
 
   return (
     <div className="function-main">
@@ -107,7 +117,7 @@ function Script(props: Props) {
                           <select
                             id={arg.name}
                             required
-                            disabled={disabled}
+                            disabled={inputsDisabled}
                             value={params[idx] || ""}
                             onChange={(e) =>
                               handleInputChange(idx, e.target.value)
@@ -128,7 +138,7 @@ function Script(props: Props) {
                               handleInputChange(idx, e.target.value)
                             }
                             required
-                            disabled={disabled}
+                            disabled={inputsDisabled}
                           />
                         )}
                         {arg.type == "textarea" && (
@@ -139,7 +149,7 @@ function Script(props: Props) {
                               handleInputChange(idx, e.target.value)
                             }
                             required
-                            disabled={disabled}
+                            disabled={inputsDisabled}
                           />
                         )}
                         {arg.type == "integer" && (
@@ -156,7 +166,7 @@ function Script(props: Props) {
                               handleInputChange(idx, e.target.value)
                             }}
                             required
-                            disabled={disabled}
+                            disabled={inputsDisabled}
                           />
                         )}
                         {arg.type == "number" && (
@@ -172,7 +182,7 @@ function Script(props: Props) {
                               handleInputChange(idx, e.target.value)
                             }}
                             required
-                            disabled={disabled}
+                            disabled={inputsDisabled}
                           />
                         )}
 
@@ -183,7 +193,7 @@ function Script(props: Props) {
               </div>
             )}
             {!isReadonly && <div className="input-group confirm">
-              <input type="checkbox" id="confirm-write" checked={confirmWrite} disabled={disabled} onChange={e => setConfirmWrite(e.target.checked)} />
+              <input type="checkbox" id="confirm-write" checked={confirmWrite} disabled={inputsDisabled} onChange={e => setConfirmWrite(e.target.checked)} />
               <label htmlFor="confirm-write">I accept this function may be dangerous -- let's do it.</label>
             </div>}
             <button className="execute" disabled={disabled}>execute function</button>
