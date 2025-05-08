@@ -21,7 +21,7 @@ from script_runner.audit_log import (
 )
 from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
 from script_runner.function import WrappedFunction
-from script_runner.function_parameter import InputType
+from script_runner.function_parameter import InputType, FunctionParameter as RealFunctionParameter
 
 
 class ConfigError(Exception):
@@ -63,6 +63,7 @@ class FunctionParameter:
     type: InputType
     default: str | None
     enum_values: list[str] | None  # applies only to select
+    _ref: RealFunctionParameter
 
 
 @dataclass(frozen=True)
@@ -258,6 +259,7 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
                         type=p.input_type(),
                         default=p.default,
                         enum_values=p.options,
+                        _ref=p,
                     )
                     for (name, p) in function._params
                 ],
