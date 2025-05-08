@@ -5,7 +5,15 @@ Script runner demos
 import random
 from datetime import datetime, timedelta
 
-from script_runner import Integer, Number, Select, Text, TextArea, read, write
+from script_runner import (
+    Autocomplete,
+    Integer,
+    Number,
+    Text,
+    TextArea,
+    read,
+    write,
+)
 
 
 @read
@@ -17,7 +25,9 @@ def hello(to: Text = Text(default="world")) -> str:
 
 
 @read
-def hello_with_enum(to: Select = Select(options=["foo", "bar"], default="foo")) -> str:
+def hello_with_enum(
+    to: Autocomplete = Autocomplete(options=["foo", "bar"], default="foo")
+) -> str:
     """
     Demo of literal type + default value
     """
@@ -57,4 +67,16 @@ def render_chart() -> list[dict[str, str | int]]:
     )
 
 
-__all__ = ["hello", "hello_with_enum", "writes_to_file", "render_chart", "add_numbers"]
+def get_options() -> list[str]:
+    import random
+
+    return [str(random.randint(0, 100) * i) for i in range(10)]
+
+
+__all__ = [
+    "hello",
+    "hello_with_enum",
+    "writes_to_file",
+    "render_chart",
+    "add_numbers",
+]

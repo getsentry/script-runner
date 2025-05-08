@@ -1,4 +1,4 @@
-import { Config, RunResult } from "./types.tsx";
+import { Config, RunResult, OptionResult } from "./types.tsx";
 
 class Api {
   private getJson(endpoint: string) {
@@ -28,6 +28,10 @@ class Api {
 
   async run(data: unknown): Promise<RunResult> {
     return await this.postJson("/run", data);
+  }
+
+  async getSelectOptions(data: { group: string, function: string, regions: string[] }): Promise<OptionResult> {
+    return await this.postJson("/autocomplete", data);
   }
 }
 

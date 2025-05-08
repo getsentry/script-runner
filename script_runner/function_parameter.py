@@ -7,8 +7,10 @@ from typing import Callable, Generic, TypeVar
 class InputType(StrEnum):
     TEXT = "text"  # <input type=text />
     TEXTAREA = "textarea"  # <textarea />
-    SELECT = "select"  # <select />
-    AUTOCOMPLETE = "autocomplete"  # <input type=text /> with autocomplete
+    AUTOCOMPLETE = "autocomplete"  # <input /> with autocomplete
+    DYNAMIC_AUTOCOMPLETE = (
+        "dynamic_autocomplete"  # <input type=text /> with dynamically fetchced options
+    )
     NUMBER = "number"  # <input type=number />
     INTEGER = "integer"  # <input type=number /> with integer validation
 
@@ -121,7 +123,7 @@ class Integer(FunctionParameter[int]):
         return int(value)
 
 
-class Select(FunctionParameter[str]):
+class Autocomplete(FunctionParameter[str]):
     """
     basic select which supports choosing one value from a list of strings
     """
@@ -132,7 +134,7 @@ class Select(FunctionParameter[str]):
             self.set_default(default)
 
     def input_type(self) -> InputType:
-        return InputType.SELECT
+        return InputType.AUTOCOMPLETE
 
     def encode(self, value: str) -> str:
         return value
@@ -145,7 +147,7 @@ class Select(FunctionParameter[str]):
         return self._options
 
 
-class Autocomplete(FunctionParameter[str]):
+class DynamicAutocomplete(FunctionParameter[str]):
     """
     select with dynamically generated options
 

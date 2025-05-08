@@ -3,17 +3,14 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ScriptResult from "./ScriptResult.tsx";
 import { RunResult, ConfigFunction } from "./types.tsx";
 import Tag from "./Tag";
+import Api from "./api.tsx";
+import Input from './Input.tsx'
 
 interface Props {
   regions: string[];
   group: string;
   function: ConfigFunction;
-  execute: (
-    regions: string[],
-    group: string,
-    func: string,
-    args: string[]
-  ) => Promise<RunResult>;
+  api: Api;
 }
 
 function Script(props: Props) {
@@ -31,6 +28,9 @@ function Script(props: Props) {
   // the user has to confirm a write function
   const [confirmWrite, setConfirmWrite] = useState<boolean>(false);
 
+  // select options keyed by the parameter name
+  const [_selectOptions, setSelectOptions] = useState<{ [fieldName: string]: string[] }>({});
+
   // If the selected function changes, reset all state
   useEffect(() => {
     setParams(parameters.map((a) => a.default));
@@ -39,7 +39,31 @@ function Script(props: Props) {
     setCodeCollapsed(false);
     setError(null);
     setConfirmWrite(false);
-  }, [parameters, props.group, props.function, props.execute]);
+
+    // fetch select options
+    props.api.getSelectOptions({
+      group: props.group,
+      function: functionName,
+      regions: props.regions,
+    }).then((optionsByRegion) => {
+      const options: { [fieldName: string]: string[] } = {};
+
+      for (const regionKey in optionsByRegion) {
+        const region = optionsByRegion[regionKey];
+
+        for (const key in region) {
+          if (options[key]) {
+            options[key].push(...region[key]);
+          } else {
+            options[key] = [...region[key]];
+          }
+        }
+      }
+
+      setSelectOptions(options);
+    });
+
+  }, [parameters, props.group, props.function, props.api]);
 
   function handleInputChange(idx: number, value: string) {
     setParams((prev) => {
@@ -67,17 +91,19 @@ function Script(props: Props) {
 
     setIsRunning(true);
 
-    props
-      .execute(props.regions, props.group, functionName, params as string[])
-      .then((result: RunResult) => {
-        setResult(result);
-        setHasResult(true);
-        setIsRunning(false);
-      })
-      .catch((err) => {
-        setError(err.error);
-        setIsRunning(false);
-      });
+    props.api.run({
+      'group': props.group,
+      'function': functionName,
+      'parameters': params,
+      'regions': props.regions,
+    }).then((result: RunResult) => {
+      setResult(result);
+      setHasResult(true);
+      setIsRunning(false);
+    }).catch((err) => {
+      setError(err.error);
+      setIsRunning(false);
+    });
   }
 
   const disabled = isRunning || hasResult || props.regions.length === 0;
@@ -103,52 +129,24 @@ function Script(props: Props) {
                         <label htmlFor={arg.name}>{arg.name}</label>
                       </div>
                       <div>
-                        {arg.type == "select" && (
-                          <select
-                            id={arg.name}
-                            required
-                            disabled={disabled}
-                            value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                          >
-                            <option value="">Select...</option>
-                            {arg.enumValues!.map((v) => (
-                              <option value={v}>{v}</option>
-                            ))}
-                          </select>
-                        )}
-                        {arg.type == "text" && (
-                          <input
-                            type="text"
+                        {(arg.type !== "number" && arg.type !== "integer") && (
+                          <Input
                             id={arg.name}
                             value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                            required
+                            type={arg.type}
                             disabled={disabled}
+                            onChange={(value) =>
+                              handleInputChange(idx, value)
+                            }
+                            initialOptions={arg.enumValues}
                           />
                         )}
-                        {arg.type == "textarea" && (
-                          <textarea
-                            id={arg.name}
-                            value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                            required
-                            disabled={disabled}
-                          />
-                        )}
-                        {arg.type == "integer" && (
+                        {arg.type === "integer" && (
                           <input
                             type="number"
                             id={arg.name}
                             value={Number(params[idx]) || 0}
                             onChange={(e) => {
-                              console.log(e.target.value)
                               if (!Number.isInteger(e.target.valueAsNumber)) {
                                 setError("invalid integer")
                                 return;
@@ -159,7 +157,7 @@ function Script(props: Props) {
                             disabled={disabled}
                           />
                         )}
-                        {arg.type == "number" && (
+                        {arg.type === "number" && (
                           <input
                             type="number"
                             id={arg.name}
@@ -181,7 +179,8 @@ function Script(props: Props) {
                   );
                 })}
               </div>
-            )}
+            )
+            }
             {!isReadonly && <div className="input-group confirm">
               <input type="checkbox" id="confirm-write" checked={confirmWrite} disabled={disabled} onChange={e => setConfirmWrite(e.target.checked)} />
               <label htmlFor="confirm-write">I accept this function may be dangerous -- let's do it.</label>
