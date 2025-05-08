@@ -18,6 +18,7 @@ from flask import (
 
 from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
+from script_runner.function_parameter import Autocomplete
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
 config = load_config()
@@ -120,6 +121,47 @@ if not isinstance(config, RegionConfig):
     @cache_static_files
     def static_file(filename: str) -> Response:
         return send_from_directory("frontend/dist/assets", filename)
+
+    @app_blueprint.route("/autocomplete", methods=["POST"])
+    @authenticate_request
+    def autocomplete() -> Response:
+        """
+        Get autocomplete options for a function parameter
+        """
+        assert not isinstance(config, RegionConfig)
+        data = request.get_json()
+        group_name = data["group"]
+        group = config.groups[group_name]
+        requested_function = data["function"]
+        function = next(
+            (f for f in group.functions if f.name == requested_function), None
+        )
+        assert function is not None, "Invalid function"
+
+        results = {}
+
+        for requested_region in data["regions"]:
+            region = next(
+                (r for r in config.main.regions if r.name == requested_region), None
+            )
+            if region is None:
+                err_response = make_response(jsonify({"error": "Invalid region"}), 400)
+                return err_response
+
+            scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
+
+            res = requests.post(
+                f"{scheme}://{region.url}/options_region",
+                json={
+                    "group": group_name,
+                    "function": function.name,
+                    "region": region.name,
+                },
+            )
+            res.raise_for_status()
+            results[region.name] = res.json()
+
+        return make_response(jsonify(results), 200)
 
     @app_blueprint.route("/run", methods=["POST"])
     @authenticate_request
@@ -255,3 +297,34 @@ if not isinstance(config, MainConfig):
         g.region = data["region"]
         g.group_config = group_config
         return make_response(jsonify(func(*params)), 200)
+
+    @app_blueprint.route("/autocomplete_region", methods=["POST"])
+    @authenticate_request
+    def autocomplete_one_region() -> Response:
+        """
+        Get autocomplete values for one region. Called from the `/autocomplete` endpoint.
+        """
+
+        assert isinstance(config, (RegionConfig, CombinedConfig))
+
+        data = request.get_json()
+        group_name = data["group"]
+        group = config.groups[group_name]
+        requested_function = data["function"]
+
+        options = {}
+
+        module = importlib.import_module(group.module)
+        func = getattr(module, requested_function)
+        assert isinstance(func, WrappedFunction)
+
+        function = next(
+            (f for f in group.functions if f.name == requested_function), None
+        )
+        assert function is not None
+
+        for param in function.parameters:
+            if isinstance(param._ref, Autocomplete):
+                options[param.name] = param._ref.get_autocomplete_options()
+
+        return make_response(jsonify(options), 200)
