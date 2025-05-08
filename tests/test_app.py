@@ -1,5 +1,5 @@
 import os
-from collections.abc import Generator
+from typing import Generator
 
 import pytest
 from flask import Flask, Response
@@ -43,14 +43,14 @@ def app() -> Generator[Flask, None, None]:
 @pytest.fixture()
 def client(
     app: Flask,
-) -> FlaskClient[Response]:
+) -> "FlaskClient[Response]":
     """
     A Flask test client for the app.
     """
     return app.test_client()
 
 
-def test_health_endpoint(client: FlaskClient[Response]) -> None:
+def test_health_endpoint(client: "FlaskClient[Response]") -> None:
     """
     Test the /health endpoint.
     """
