@@ -24,7 +24,8 @@ All of the arguments to a function must be annotated with one of the supported p
 - Textarea
 - Integer
 - Number
-- Select
+- Autocomplete
+- DynamicAutocomplete
 
 Example:
 ```python
