@@ -13,7 +13,7 @@ from script_runner.app import config
 from script_runner.decorators import authenticate_request, get_config
 from script_runner.utils import CombinedConfig, RegionConfig
 
-main_config_bp = Blueprint("main_config", __name__)
+main_config_bp: Blueprint = Blueprint("main_config", __name__)
 
 
 @main_config_bp.route("/run", methods=["POST"])

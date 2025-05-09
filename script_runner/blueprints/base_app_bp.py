@@ -5,7 +5,7 @@ from flask import (
     make_response,
 )
 
-base_app_bp = Blueprint("base", __name__)
+base_app_bp: Blueprint = Blueprint("base", __name__)
 
 
 @base_app_bp.route("/health")

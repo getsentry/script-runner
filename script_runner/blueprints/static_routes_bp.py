@@ -2,7 +2,7 @@ from flask import Blueprint, Response, send_from_directory
 
 from ..decorators import cache_static_files
 
-static_files_bp = Blueprint("static_files", __name__)
+static_files_bp: Blueprint = Blueprint("static_files", __name__)
 
 
 @static_files_bp.route("/")
