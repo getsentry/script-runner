@@ -12,10 +12,10 @@ from flask import (
 from script_runner.app import config
 from script_runner.decorators import authenticate_request
 from script_runner.function import WrappedFunction
-from script_runner.function_parameter import Autocomplete
+from script_runner.function_parameter import DynamicAutocomplete
 from script_runner.utils import CombinedConfig, RegionConfig
 
-region_config_bp = Blueprint("region_config", __name__)
+region_config_bp: Blueprint = Blueprint("region_config", __name__)
 
 
 @region_config_bp.route("/run_region", methods=["POST"])
@@ -74,7 +74,7 @@ def autocomplete_one_region() -> Response:
     assert function is not None
 
     for param in function.parameters:
-        if isinstance(param._ref, Autocomplete):
+        if isinstance(param._ref, DynamicAutocomplete):
             options[param.name] = param._ref.get_autocomplete_options()
 
     return make_response(jsonify(options), 200)
