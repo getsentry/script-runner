@@ -111,7 +111,7 @@ function Script(props: Props) {
                           onChange={(value) =>
                             handleInputChange(idx, value)
                           }
-                          initialOptions={arg.enumValues}
+                          options={arg.enumValues}
                         />
                       </div>
                     </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ParamType } from "./types";
 
 
@@ -9,27 +9,17 @@ type Props = {
   onChange: (value: string) => void;
   type: ParamType;
   // applies to autocomplete and dynamic_autocomplete
-  initialOptions: string[] | null;
-  loadOptions?: (input: string) => Promise<string[]>;
+  options: string[] | null;
 }
 
 // A custom input with optional autocomplete functionality
 function Input(props: Props) {
-  const [options, setOptions] = useState<string[]>(props.initialOptions || []);
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
   function filterOptions(): string[] {
     // return first 5 options
-    return options.filter(option => option.toLowerCase().includes(props.value.toLowerCase())).slice(0, 5);
+    return (props.options || []).filter(option => option.toLowerCase().includes(props.value.toLowerCase())).slice(0, 5);
   }
-
-  useEffect(() => {
-    if (props.loadOptions) {
-      props.loadOptions(props.value).then((newOptions) => {
-        setOptions(newOptions);
-      });
-    }
-  }, [])
 
   const filteredOptions = filterOptions();
 
