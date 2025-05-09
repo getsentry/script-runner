@@ -1,6 +1,7 @@
 from script_runner.context import get_function_context
 from script_runner.function import read, write
 from script_runner.function_parameter import (
+    Autocomplete,
     FunctionParameter,
     Integer,
     Number,
@@ -19,4 +20,5 @@ __all__ = [
     "Number",
     "Integer",
     "Select",
+    "Autocomplete",
 ]

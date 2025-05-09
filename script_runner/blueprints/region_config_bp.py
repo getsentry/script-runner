@@ -12,6 +12,7 @@ from flask import (
 from script_runner.app import config
 from script_runner.decorators import authenticate_request
 from script_runner.function import WrappedFunction
+from script_runner.function_parameter import Autocomplete
 from script_runner.utils import CombinedConfig, RegionConfig
 
 region_config_bp = Blueprint("region_config", __name__)
@@ -47,3 +48,33 @@ def run_one_region() -> Response:
     g.region = data["region"]
     g.group_config = group_config
     return make_response(jsonify(func(*params)), 200)
+
+
+@region_config_bp.route("/autocomplete_region", methods=["POST"])
+@authenticate_request
+def autocomplete_one_region() -> Response:
+    """
+    Get autocomplete values for one region. Called from the `/autocomplete` endpoint.
+    """
+
+    assert isinstance(config, (RegionConfig, CombinedConfig))
+
+    data = request.get_json()
+    group_name = data["group"]
+    group = config.groups[group_name]
+    requested_function = data["function"]
+
+    options = {}
+
+    module = importlib.import_module(group.module)
+    func = getattr(module, requested_function)
+    assert isinstance(func, WrappedFunction)
+
+    function = next((f for f in group.functions if f.name == requested_function), None)
+    assert function is not None
+
+    for param in function.parameters:
+        if isinstance(param._ref, Autocomplete):
+            options[param.name] = param._ref.get_autocomplete_options()
+
+    return make_response(jsonify(options), 200)

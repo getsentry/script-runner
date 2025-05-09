@@ -1,3 +1,5 @@
+from unittest.mock import ANY
+
 import pytest
 
 from script_runner.auth import GoogleAuth, NoAuth
@@ -50,7 +52,11 @@ def test_validate_config_functions() -> None:
     assert [f.parameters for f in group.functions] == [
         [
             FunctionParameter(
-                name="to", type=InputType.TEXT, default="world", enum_values=None
+                name="to",
+                type=InputType.TEXT,
+                default="world",
+                enum_values=None,
+                _ref=ANY,
             )
         ],
         [
@@ -59,6 +65,7 @@ def test_validate_config_functions() -> None:
                 type=InputType.SELECT,
                 default="foo",
                 enum_values=["foo", "bar"],
+                _ref=ANY,
             )
         ],
         [],
