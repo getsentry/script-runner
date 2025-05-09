@@ -21,7 +21,7 @@ dependencies = { file = ["requirements.txt"] }
 
 [tool.setuptools]
 include-package-data = false
-packages = ["script_runner"]
+packages = ["script_runner", "script_runner.blueprints"]
 
 [tool.setuptools.package-data]
 script_runner = ["config.schema.json", "frontend/dist/**/*"]
