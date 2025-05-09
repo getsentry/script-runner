@@ -12,8 +12,8 @@ from flask import (
 from script_runner.app import config
 from script_runner.decorators import (
     authenticate_request,
-    get_config,
     cache_autocomplete,
+    get_config,
 )
 from script_runner.utils import CombinedConfig, RegionConfig
 
