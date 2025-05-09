@@ -286,11 +286,11 @@ li.home-search-result:hover {
 }
 
 .autocomplete-list a {
-  margin: 8px;
+  padding: 4px 8px;
   display: block;
 }
 
-.autocomplete-list a:hover {
+.autocomplete-list a.active {
   background-color: var(--border);
 }
 

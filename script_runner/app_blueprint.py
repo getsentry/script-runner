@@ -56,6 +56,18 @@ def cache_static_files(f: Callable[..., Response]) -> Callable[..., Response]:
     return add_cache_headers
 
 
+def cache_autocomplete(f: Callable[..., Response]) -> Callable[..., Response]:
+    """Cache autocomplete responses in browser for 5 minutes"""
+
+    @wraps(f)
+    def add_cache_headers(*args: Any, **kwargs: Any) -> Response:
+        res = f(*args, **kwargs)
+        res.headers["Cache-Control"] = "public, max-age=300"
+        return res
+
+    return add_cache_headers
+
+
 @functools.lru_cache(maxsize=1)
 def get_config() -> dict[str, Any]:
     assert isinstance(config, (MainConfig, CombinedConfig))
@@ -122,17 +134,19 @@ if not isinstance(config, RegionConfig):
     def static_file(filename: str) -> Response:
         return send_from_directory("frontend/dist/assets", filename)
 
-    @app_blueprint.route("/autocomplete", methods=["POST"])
+    @app_blueprint.route("/autocomplete", methods=["GET"])
     @authenticate_request
+    @cache_autocomplete
     def autocomplete() -> Response:
         """
         Get autocomplete options for a function parameter
         """
         assert not isinstance(config, RegionConfig)
-        data = request.get_json()
-        group_name = data["group"]
+
+        group_name = request.args["group"]
         group = config.groups[group_name]
-        requested_function = data["function"]
+        requested_function = request.args["function"]
+        regions = request.args["regions"].split(",")
         function = next(
             (f for f in group.functions if f.name == requested_function), None
         )
@@ -140,7 +154,7 @@ if not isinstance(config, RegionConfig):
 
         results = {}
 
-        for requested_region in data["regions"]:
+        for requested_region in regions:
             region = next(
                 (r for r in config.main.regions if r.name == requested_region), None
             )
@@ -150,12 +164,11 @@ if not isinstance(config, RegionConfig):
 
             scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
 
-            res = requests.post(
+            res = requests.get(
                 f"{scheme}://{region.url}/autocomplete_region",
-                json={
+                params={
                     "group": group_name,
                     "function": function.name,
-                    "region": region.name,
                 },
             )
             res.raise_for_status()
@@ -298,7 +311,7 @@ if not isinstance(config, MainConfig):
         g.group_config = group_config
         return make_response(jsonify(func(*params)), 200)
 
-    @app_blueprint.route("/autocomplete_region", methods=["POST"])
+    @app_blueprint.route("/autocomplete_region", methods=["GET"])
     @authenticate_request
     def autocomplete_one_region() -> Response:
         """
@@ -307,16 +320,11 @@ if not isinstance(config, MainConfig):
 
         assert isinstance(config, (RegionConfig, CombinedConfig))
 
-        data = request.get_json()
-        group_name = data["group"]
+        group_name = request.args["group"]
         group = config.groups[group_name]
-        requested_function = data["function"]
+        requested_function = request.args["function"]
 
         options = {}
-
-        module = importlib.import_module(group.module)
-        func = getattr(module, requested_function)
-        assert isinstance(func, WrappedFunction)
 
         function = next(
             (f for f in group.functions if f.name == requested_function), None

@@ -28,6 +28,10 @@ function Script(props: Props) {
   // the user has to confirm a write function
   const [confirmWrite, setConfirmWrite] = useState<boolean>(false);
 
+  // all the dynamic autocomplete options keyed by the parameter name
+  const [dynamicOptions, setDynamicOptions] = useState<{ [fieldName: string]: string[] }>({});
+
+
   // If the selected function changes, reset all state
   useEffect(() => {
     setParams(parameters.map((a) => a.default));
@@ -36,8 +40,27 @@ function Script(props: Props) {
     setCodeCollapsed(false);
     setError(null);
     setConfirmWrite(false);
+    setDynamicOptions({})
 
-  }, [parameters, props.group, props.function, props.api]);
+    if (parameters.some((p) => p.type === "dynamic_autocomplete")) {
+      props.api.getAutocompleteOptions({
+        'group': props.group,
+        'function': functionName,
+        'regions': props.regions
+      }).then((optionResult) => {
+        const options: { [fieldName: string]: string[] } = {};
+        for (const region in optionResult) {
+          for (const field in optionResult[region]) {
+            if (!(field in options)) {
+              options[field] = [];
+            }
+            options[field] = optionResult[region][field];
+          }
+        }
+        setDynamicOptions(options);
+      });
+    }
+  }, [parameters, props.group, props.function]);
 
   function handleInputChange(idx: number, value: string) {
     setParams((prev) => {
