@@ -18,7 +18,7 @@ For a single deployment in one region use `mode:combined`. Currently we only use
 ## Writing custom scripts
 Scripts are standard python functions organized into groups.
 
-All of the arguments to a function must be annotated with one of the supported parameter types. Currently there are 5.
+All of the arguments to a function must be annotated with one of the supported parameter types. The currently supported ones are:
 
 - Text
 - Textarea
