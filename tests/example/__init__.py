@@ -3,7 +3,7 @@ example for tests
 """
 
 from script_runner import read, write
-from script_runner.function_parameter import Select, Text
+from script_runner.function_parameter import Autocomplete, Text
 
 
 @read
@@ -15,7 +15,9 @@ def hello(to: Text = Text(default="world")) -> str:
 
 
 @read
-def hello_with_enum(to: Select = Select(options=["foo", "bar"], default="foo")) -> str:
+def hello_with_enum(
+    to: Autocomplete = Autocomplete(options=["foo", "bar"], default="foo")
+) -> str:
     """
     Demo of literal type + default value
     """

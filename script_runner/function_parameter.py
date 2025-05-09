@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
-from enum import Enum
-from typing import Generic, TypeVar
+from enum import StrEnum
+from typing import Callable, Generic, TypeVar
 
 
 # This is the list of types that the UI knows how to handle
-class InputType(Enum):
+class InputType(StrEnum):
     TEXT = "text"  # <input type=text />
     TEXTAREA = "textarea"  # <textarea />
-    SELECT = "select"  # <select />
+    AUTOCOMPLETE = "autocomplete"  # <input /> with autocomplete
+    DYNAMIC_AUTOCOMPLETE = (
+        "dynamic_autocomplete"  # <input type=text /> with dynamically fetchced options
+    )
     NUMBER = "number"  # <input type=number />
     INTEGER = "integer"  # <input type=number /> with integer validation
 
@@ -120,7 +123,7 @@ class Integer(FunctionParameter[int]):
         return int(value)
 
 
-class Select(FunctionParameter[str]):
+class Autocomplete(FunctionParameter[str]):
     """
     basic select which supports choosing one value from a list of strings
     """
@@ -131,7 +134,7 @@ class Select(FunctionParameter[str]):
             self.set_default(default)
 
     def input_type(self) -> InputType:
-        return InputType.SELECT
+        return InputType.AUTOCOMPLETE
 
     def encode(self, value: str) -> str:
         return value
@@ -142,3 +145,30 @@ class Select(FunctionParameter[str]):
     @property
     def options(self) -> list[str]:
         return self._options
+
+
+class DynamicAutocomplete(FunctionParameter[str]):
+    """
+    select with dynamically generated options
+
+    the options callable gets passed the list of selected regions to autocomplete for
+    """
+
+    def __init__(
+        self, *, options: Callable[[], list[str]], default: str | None = None
+    ) -> None:
+        self._options = options
+        if default is not None:
+            self.set_default(default)
+
+    def input_type(self) -> InputType:
+        return InputType.AUTOCOMPLETE
+
+    def encode(self, value: str) -> str:
+        return value
+
+    def decode(self, value: str) -> str:
+        return value
+
+    def get_autocomplete_options(self) -> list[str]:
+        return self._options()

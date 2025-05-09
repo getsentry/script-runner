@@ -191,7 +191,7 @@ a.group-text {
 }
 
 li.home-search-result:hover {
-  background-color: var(--border);
+  background-color: var(--bg-light);
 }
 
 .function-group {
@@ -266,8 +266,42 @@ li.home-search-result:hover {
   margin-bottom: 10px;
 }
 
-.funciton-execute .confirm input {
+.function-execute .confirm input {
   margin: 0 0 5px 0;
+}
+
+.input-container {
+  position: relative;
+  display: flex;
+  width: 300px;
+}
+
+.autocomplete-list {
+  position: absolute;
+  border: 1px solid var(--border);
+  width: 100%;
+  background-color: white;
+  top: 22px;
+  box-sizing: border-box;
+}
+
+.autocomplete-list a {
+  margin: 8px;
+  display: block;
+}
+
+.autocomplete-list a:hover {
+  background-color: var(--border);
+}
+
+.input-container ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 10px 0;
+}
+
+.input-container input {
+  width: 100%;
 }
 
 .function-hint {
