@@ -18,7 +18,7 @@ from flask import (
 
 from script_runner.auth import UnauthorizedUser
 from script_runner.function import WrappedFunction
-from script_runner.function_parameter import Autocomplete
+from script_runner.function_parameter import DynamicAutocomplete
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
 config = load_config()
@@ -151,7 +151,7 @@ if not isinstance(config, RegionConfig):
             scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
 
             res = requests.post(
-                f"{scheme}://{region.url}/options_region",
+                f"{scheme}://{region.url}/autocomplete_region",
                 json={
                     "group": group_name,
                     "function": function.name,
@@ -324,7 +324,7 @@ if not isinstance(config, MainConfig):
         assert function is not None
 
         for param in function.parameters:
-            if isinstance(param._ref, Autocomplete):
+            if isinstance(param._ref, DynamicAutocomplete):
                 options[param.name] = param._ref.get_autocomplete_options()
 
         return make_response(jsonify(options), 200)

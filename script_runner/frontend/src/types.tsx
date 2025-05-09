@@ -7,16 +7,24 @@ export type RunResult = {
   }
 }
 
+export type OptionResult = {
+  [regionName: string]: {
+    [fieldName: string]: string;
+  };
+}
+
 export interface RegionError {
   type: string;
   message: string;
   status_code: number;
 }
 
+export type ParamType = 'text' | 'textarea' | 'autocomplete' | 'dynamic_autocomplete' | 'number' | 'integer';
+
 export type ConfigParam = {
   name: string;
   default: string | null;
-  type: 'text' | 'textarea' | 'select' | 'number' | 'integer';
+  type: ParamType;
   enumValues: string[] | null;
 };
 

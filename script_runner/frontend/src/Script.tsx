@@ -3,17 +3,14 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import ScriptResult from "./ScriptResult.tsx";
 import { RunResult, ConfigFunction } from "./types.tsx";
 import Tag from "./Tag";
+import Api from "./api.tsx";
+import Input from './Input.tsx'
 
 interface Props {
   regions: string[];
   group: string;
   function: ConfigFunction;
-  execute: (
-    regions: string[],
-    group: string,
-    func: string,
-    args: string[]
-  ) => Promise<RunResult>;
+  api: Api;
 }
 
 function Script(props: Props) {
@@ -39,7 +36,8 @@ function Script(props: Props) {
     setCodeCollapsed(false);
     setError(null);
     setConfirmWrite(false);
-  }, [parameters, props.group, props.function, props.execute]);
+
+  }, [parameters, props.group, props.function, props.api]);
 
   function handleInputChange(idx: number, value: string) {
     setParams((prev) => {
@@ -67,17 +65,19 @@ function Script(props: Props) {
 
     setIsRunning(true);
 
-    props
-      .execute(props.regions, props.group, functionName, params as string[])
-      .then((result: RunResult) => {
-        setResult(result);
-        setHasResult(true);
-        setIsRunning(false);
-      })
-      .catch((err) => {
-        setError(err.error);
-        setIsRunning(false);
-      });
+    props.api.run({
+      'group': props.group,
+      'function': functionName,
+      'parameters': params,
+      'regions': props.regions,
+    }).then((result: RunResult) => {
+      setResult(result);
+      setHasResult(true);
+      setIsRunning(false);
+    }).catch((err) => {
+      setError(err.error);
+      setIsRunning(false);
+    });
   }
 
   const disabled = isRunning || hasResult || props.regions.length === 0;
@@ -103,85 +103,23 @@ function Script(props: Props) {
                         <label htmlFor={arg.name}>{arg.name}</label>
                       </div>
                       <div>
-                        {arg.type == "select" && (
-                          <select
-                            id={arg.name}
-                            required
-                            disabled={disabled}
-                            value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                          >
-                            <option value="">Select...</option>
-                            {arg.enumValues!.map((v) => (
-                              <option value={v}>{v}</option>
-                            ))}
-                          </select>
-                        )}
-                        {arg.type == "text" && (
-                          <input
-                            type="text"
-                            id={arg.name}
-                            value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                            required
-                            disabled={disabled}
-                          />
-                        )}
-                        {arg.type == "textarea" && (
-                          <textarea
-                            id={arg.name}
-                            value={params[idx] || ""}
-                            onChange={(e) =>
-                              handleInputChange(idx, e.target.value)
-                            }
-                            required
-                            disabled={disabled}
-                          />
-                        )}
-                        {arg.type == "integer" && (
-                          <input
-                            type="number"
-                            id={arg.name}
-                            value={Number(params[idx]) || 0}
-                            onChange={(e) => {
-                              console.log(e.target.value)
-                              if (!Number.isInteger(e.target.valueAsNumber)) {
-                                setError("invalid integer")
-                                return;
-                              }
-                              handleInputChange(idx, e.target.value)
-                            }}
-                            required
-                            disabled={disabled}
-                          />
-                        )}
-                        {arg.type == "number" && (
-                          <input
-                            type="number"
-                            id={arg.name}
-                            value={Number(params[idx]) || 0}
-                            onChange={(e) => {
-                              if (isNaN(e.target.valueAsNumber)) {
-                                setError("Invalid number");
-                                return;
-                              }
-                              handleInputChange(idx, e.target.value)
-                            }}
-                            required
-                            disabled={disabled}
-                          />
-                        )}
-
+                        <Input
+                          id={arg.name}
+                          value={params[idx] || ""}
+                          type={arg.type}
+                          disabled={disabled}
+                          onChange={(value) =>
+                            handleInputChange(idx, value)
+                          }
+                          options={arg.enumValues}
+                        />
                       </div>
                     </div>
                   );
                 })}
               </div>
-            )}
+            )
+            }
             {!isReadonly && <div className="input-group confirm">
               <input type="checkbox" id="confirm-write" checked={confirmWrite} disabled={disabled} onChange={e => setConfirmWrite(e.target.checked)} />
               <label htmlFor="confirm-write">I accept this function may be dangerous -- let's do it.</label>
