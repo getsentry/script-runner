@@ -28,9 +28,6 @@ function Script(props: Props) {
   // the user has to confirm a write function
   const [confirmWrite, setConfirmWrite] = useState<boolean>(false);
 
-  // select options keyed by the parameter name
-  const [_selectOptions, setSelectOptions] = useState<{ [fieldName: string]: string[] }>({});
-
   // If the selected function changes, reset all state
   useEffect(() => {
     setParams(parameters.map((a) => a.default));
@@ -39,29 +36,6 @@ function Script(props: Props) {
     setCodeCollapsed(false);
     setError(null);
     setConfirmWrite(false);
-
-    // fetch select options
-    props.api.getSelectOptions({
-      group: props.group,
-      function: functionName,
-      regions: props.regions,
-    }).then((optionsByRegion) => {
-      const options: { [fieldName: string]: string[] } = {};
-
-      for (const regionKey in optionsByRegion) {
-        const region = optionsByRegion[regionKey];
-
-        for (const key in region) {
-          if (options[key]) {
-            options[key].push(...region[key]);
-          } else {
-            options[key] = [...region[key]];
-          }
-        }
-      }
-
-      setSelectOptions(options);
-    });
 
   }, [parameters, props.group, props.function, props.api]);
 

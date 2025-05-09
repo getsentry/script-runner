@@ -67,12 +67,6 @@ def render_chart() -> list[dict[str, str | int]]:
     )
 
 
-def get_options() -> list[str]:
-    import random
-
-    return [str(random.randint(0, 100) * i) for i in range(10)]
-
-
 __all__ = [
     "hello",
     "hello_with_enum",
