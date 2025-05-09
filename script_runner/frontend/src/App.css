@@ -288,6 +288,7 @@ li.home-search-result:hover {
 .autocomplete-list a {
   padding: 4px 8px;
   display: block;
+  z-index: 1000;
 }
 
 .autocomplete-list a.active {
