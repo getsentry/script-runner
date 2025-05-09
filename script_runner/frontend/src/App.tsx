@@ -90,14 +90,6 @@ function App() {
     window.location.hash = hash;
   }, [route]);
 
-  function execute(regions: string[], group: string, func: string, parameters: string[]) {
-    return api.run({
-      'group': group,
-      'function': func,
-      'parameters': parameters,
-      'regions': regions,
-    })
-  }
 
   function navigate(to: Route) {
     setRoute(to)
@@ -144,7 +136,7 @@ function App() {
         return <NotFound />
       }
 
-      return <Script regions={route.regions} group={route.group} function={functionDef} execute={execute} />
+      return <Script regions={route.regions} group={route.group} function={functionDef} api={api} />
     }
 
     if ("group" in route) {

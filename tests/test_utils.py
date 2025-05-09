@@ -62,7 +62,7 @@ def test_validate_config_functions() -> None:
         [
             FunctionParameter(
                 name="to",
-                type=InputType.SELECT,
+                type=InputType.AUTOCOMPLETE,
                 default="foo",
                 enum_values=["foo", "bar"],
                 _ref=ANY,
