@@ -56,12 +56,12 @@ def autocomplete_one_region() -> Response:
     """
     Get autocomplete values for one region. Called from the `/autocomplete` endpoint.
     """
-
     assert isinstance(config, (RegionConfig, CombinedConfig))
 
     group_name = request.args["group"]
     group = config.groups[group_name]
     requested_function = request.args["function"]
+    region = request.args["region"]
 
     options = {}
 
@@ -71,5 +71,10 @@ def autocomplete_one_region() -> Response:
     for param in function.parameters:
         if isinstance(param._ref, DynamicAutocomplete):
             options[param.name] = param._ref.get_autocomplete_options()
+
+    group_config = config.region.configs.get(group_name, None)
+    g.region = region
+    g.group_config = group_config
+
 
     return make_response(jsonify(options), 200)

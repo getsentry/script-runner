@@ -131,6 +131,7 @@ def autocomplete() -> Response:
             params={
                 "group": group_name,
                 "function": function.name,
+                "region": region.name
             },
         )
         res.raise_for_status()
