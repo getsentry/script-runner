@@ -134,7 +134,7 @@ function Script(props: Props) {
                           onChange={(value) =>
                             handleInputChange(idx, value)
                           }
-                          options={arg.enumValues}
+                          options={dynamicOptions[arg.name] || arg.enumValues}
                         />
                       </div>
                     </div>
