@@ -9,7 +9,7 @@ type Props = {
   onChange: (value: string) => void;
   type: ParamType;
   // applies to autocomplete and dynamic_autocomplete
-  initialOptions?: string[] | null;
+  initialOptions: string[] | null;
   loadOptions?: (input: string) => Promise<string[]>;
 }
 
@@ -50,6 +50,22 @@ function Input(props: Props) {
         setDropdownVisible(false);
       }, 100);
     }
+  }
+
+
+  if (props.type === "number" || props.type === "integer") {
+    return (
+      <input
+        type="number"
+        id={props.id}
+        value={Number(props.value) || 0}
+        onChange={(e) => {
+          props.onChange(String(e.target.value))
+        }}
+        required
+        disabled={props.disabled}
+      />
+    )
   }
 
 

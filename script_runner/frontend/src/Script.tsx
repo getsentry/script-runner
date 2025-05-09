@@ -103,51 +103,16 @@ function Script(props: Props) {
                         <label htmlFor={arg.name}>{arg.name}</label>
                       </div>
                       <div>
-                        {(arg.type !== "number" && arg.type !== "integer") && (
-                          <Input
-                            id={arg.name}
-                            value={params[idx] || ""}
-                            type={arg.type}
-                            disabled={disabled}
-                            onChange={(value) =>
-                              handleInputChange(idx, value)
-                            }
-                            initialOptions={arg.enumValues}
-                          />
-                        )}
-                        {arg.type === "integer" && (
-                          <input
-                            type="number"
-                            id={arg.name}
-                            value={Number(params[idx]) || 0}
-                            onChange={(e) => {
-                              if (!Number.isInteger(e.target.valueAsNumber)) {
-                                setError("invalid integer")
-                                return;
-                              }
-                              handleInputChange(idx, e.target.value)
-                            }}
-                            required
-                            disabled={disabled}
-                          />
-                        )}
-                        {arg.type === "number" && (
-                          <input
-                            type="number"
-                            id={arg.name}
-                            value={Number(params[idx]) || 0}
-                            onChange={(e) => {
-                              if (isNaN(e.target.valueAsNumber)) {
-                                setError("Invalid number");
-                                return;
-                              }
-                              handleInputChange(idx, e.target.value)
-                            }}
-                            required
-                            disabled={disabled}
-                          />
-                        )}
-
+                        <Input
+                          id={arg.name}
+                          value={params[idx] || ""}
+                          type={arg.type}
+                          disabled={disabled}
+                          onChange={(value) =>
+                            handleInputChange(idx, value)
+                          }
+                          initialOptions={arg.enumValues}
+                        />
                       </div>
                     </div>
                   );
