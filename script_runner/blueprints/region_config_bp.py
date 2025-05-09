@@ -68,13 +68,12 @@ def autocomplete_one_region() -> Response:
     function = next((f for f in group.functions if f.name == requested_function), None)
     assert function is not None
 
-    for param in function.parameters:
-        if isinstance(param._ref, DynamicAutocomplete):
-            options[param.name] = param._ref.get_autocomplete_options()
-
     group_config = config.region.configs.get(group_name, None)
     g.region = region
     g.group_config = group_config
 
+    for param in function.parameters:
+        if isinstance(param._ref, DynamicAutocomplete):
+            options[param.name] = param._ref.get_autocomplete_options()
 
     return make_response(jsonify(options), 200)
