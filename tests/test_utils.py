@@ -49,7 +49,6 @@ def test_validate_config_functions() -> None:
         "some_write_function",
         "basic_autocomplete",
         "dynamic_autocomplete",
-
     ]
     assert [f.parameters for f in group.functions] == [
         [
