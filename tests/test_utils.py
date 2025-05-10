@@ -46,8 +46,10 @@ def test_validate_config_functions() -> None:
     assert group.module == module
     assert [f.name for f in group.functions] == [
         "hello",
-        "hello_with_enum",
         "some_write_function",
+        "basic_autocomplete",
+        "dynamic_autocomplete",
+
     ]
     assert [f.parameters for f in group.functions] == [
         [
@@ -59,6 +61,7 @@ def test_validate_config_functions() -> None:
                 _ref=ANY,
             )
         ],
+        [],
         [
             FunctionParameter(
                 name="to",
@@ -68,7 +71,15 @@ def test_validate_config_functions() -> None:
                 _ref=ANY,
             )
         ],
-        [],
+        [
+            FunctionParameter(
+                name="value",
+                type=InputType.DYNAMIC_AUTOCOMPLETE,
+                default=None,
+                enum_values=None,
+                _ref=ANY,
+            )
+        ],
     ]
 
 
