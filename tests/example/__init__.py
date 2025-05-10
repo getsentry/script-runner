@@ -3,7 +3,7 @@ example for tests
 """
 
 from script_runner import read, write
-from script_runner.function_parameter import Autocomplete, Text
+from script_runner.function_parameter import Autocomplete, DynamicAutocomplete, Text
 
 
 @read
@@ -14,8 +14,13 @@ def hello(to: Text = Text(default="world")) -> str:
     return f"hello {to.value}"
 
 
+@write
+def some_write_function() -> None:
+    pass
+
+
 @read
-def hello_with_enum(
+def basic_autocomplete(
     to: Autocomplete = Autocomplete(options=["foo", "bar"], default="foo")
 ) -> str:
     """
@@ -24,13 +29,23 @@ def hello_with_enum(
     return f"hello {to.value}"
 
 
-@write
-def some_write_function() -> None:
-    pass
+def get_options() -> list[str]:
+    return [str(i) for i in range(4)]
+
+
+@read
+def dynamic_autocomplete(
+    value: DynamicAutocomplete = DynamicAutocomplete(options=get_options),
+) -> str:
+    """
+    Autocomplete demo with dynamic options
+    """
+    return f"Selected {value.value}"
 
 
 __all__ = [
     "hello",
-    "hello_with_enum",
     "some_write_function",
+    "basic_autocomplete",
+    "dynamic_autocomplete",
 ]
