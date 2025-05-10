@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { ParamType } from "./types";
 
+const MAX_OPTIONS = 5;
+
 
 type Props = {
   id: string;
@@ -16,9 +18,28 @@ type Props = {
 function Input(props: Props) {
   const [dropdownVisible, setDropdownVisible] = useState(false);
 
+  const [activeIndex, setActiveIndex] = useState(-1);
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'ArrowDown') {
+      const nextIndex = (activeIndex + 1) % 5;
+      setActiveIndex(nextIndex);
+    } else if (e.key === 'ArrowUp') {
+      const nextIndex = (activeIndex - 1 + 5) % 5;
+      setActiveIndex(nextIndex);
+    }
+    else if (e.key === 'Enter') {
+      if (activeIndex >= 0 && activeIndex < filteredOptions.length) {
+        fillOption(filteredOptions[activeIndex]);
+      }
+      // Don't immediately submit the form
+      e.preventDefault();
+    }
+  }
+
   function filterOptions(): string[] {
     // return first 5 options
-    return (props.options || []).filter(option => option.toLowerCase().includes(props.value.toLowerCase())).slice(0, 5);
+    return (props.options || []).filter(option => option.toLowerCase().includes(props.value.toLowerCase())).slice(0, MAX_OPTIONS);
   }
 
   const filteredOptions = filterOptions();
@@ -36,12 +57,9 @@ function Input(props: Props) {
 
   function handleBlur() {
     if (props.type === "autocomplete" || props.type === "dynamic_autocomplete") {
-      setTimeout(() => {
-        setDropdownVisible(false);
-      }, 100);
+      setDropdownVisible(false);
     }
   }
-
 
   if (props.type === "number" || props.type === "integer") {
     return (
@@ -57,7 +75,6 @@ function Input(props: Props) {
       />
     )
   }
-
 
   if (props.type === "textarea") {
     return (
@@ -79,13 +96,22 @@ function Input(props: Props) {
       disabled={props.disabled}
       onFocus={handleFocus}
       onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
     />
 
     {dropdownVisible && filteredOptions.length > 0 && (
       <div className="autocomplete-list">
         <ul>
           {filteredOptions.map((option, index) => (
-            <li key={index}><a onClick={() => fillOption(option)}>{option}</a></li>
+            <li key={index}>
+              <a
+                className={index === activeIndex ? "active" : ""}
+                onMouseEnter={() => setActiveIndex(index)} onMouseDown={() => fillOption(option)}
+                onMouseLeave={() => setActiveIndex(-1)}
+              >
+                {option}
+              </a>
+            </li>
           ))
           }
         </ul>

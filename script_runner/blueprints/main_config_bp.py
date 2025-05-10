@@ -10,7 +10,11 @@ from flask import (
 )
 
 from script_runner.app import config
-from script_runner.decorators import authenticate_request, get_config
+from script_runner.decorators import (
+    authenticate_request,
+    cache_autocomplete,
+    get_config,
+)
 from script_runner.utils import CombinedConfig, RegionConfig
 
 main_config_bp: Blueprint = Blueprint("main_config", __name__)
@@ -92,6 +96,48 @@ def run_all() -> Response:
             }
 
     return make_response(jsonify({"results": results, "errors": errors}), 200)
+
+
+@main_config_bp.route("/autocomplete", methods=["GET"])
+@authenticate_request
+@cache_autocomplete
+def autocomplete() -> Response:
+    """
+    Get autocomplete options for a function parameter
+    """
+    assert not isinstance(config, RegionConfig)
+
+    group_name = request.args["group"]
+    group = config.groups[group_name]
+    requested_function = request.args["function"]
+    regions = request.args["regions"].split(",")
+    function = next((f for f in group.functions if f.name == requested_function), None)
+    assert function is not None, "Invalid function"
+
+    results = {}
+
+    for requested_region in regions:
+        region = next(
+            (r for r in config.main.regions if r.name == requested_region), None
+        )
+        if region is None:
+            err_response = make_response(jsonify({"error": "Invalid region"}), 400)
+            return err_response
+
+        scheme = request.scheme if isinstance(config, CombinedConfig) else "http"
+
+        res = requests.get(
+            f"{scheme}://{region.url}/autocomplete_region",
+            params={
+                "group": group_name,
+                "function": function.name,
+                "region": region.name,
+            },
+        )
+        res.raise_for_status()
+        results[region.name] = res.json()
+
+    return make_response(jsonify(results), 200)
 
 
 @main_config_bp.route("/config")

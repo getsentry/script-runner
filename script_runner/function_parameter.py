@@ -9,7 +9,7 @@ class InputType(StrEnum):
     TEXTAREA = "textarea"  # <textarea />
     AUTOCOMPLETE = "autocomplete"  # <input /> with autocomplete
     DYNAMIC_AUTOCOMPLETE = (
-        "dynamic_autocomplete"  # <input type=text /> with dynamically fetchced options
+        "dynamic_autocomplete"  # <input type=text /> with dynamically fetched options
     )
     NUMBER = "number"  # <input type=number />
     INTEGER = "integer"  # <input type=number /> with integer validation
@@ -162,7 +162,7 @@ class DynamicAutocomplete(FunctionParameter[str]):
             self.set_default(default)
 
     def input_type(self) -> InputType:
-        return InputType.AUTOCOMPLETE
+        return InputType.DYNAMIC_AUTOCOMPLETE
 
     def encode(self, value: str) -> str:
         return value
