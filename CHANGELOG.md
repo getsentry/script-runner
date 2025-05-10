@@ -1,3 +1,15 @@
+## 0.2.6
+
+### Various fixes & improvements
+
+- feat: dynamic autocomplete (#88) by @lynnagara
+- add extra package (#89) by @kneeyo1
+- Refactoring to blueprints (#87) by @kneeyo1
+- autocomplete part 2: frontend component (#86) by @lynnagara
+- autocomplete: adding the backend type and api endpoint (#85) by @lynnagara
+- add Slack Event notifier (#81) by @kneeyo1
+- docs: fix devserver command (#82) by @lynnagara
+
 ## 0.2.5
 
 ### Various fixes & improvements
