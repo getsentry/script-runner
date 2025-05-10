@@ -134,7 +134,6 @@ def autocomplete() -> Response:
                 "region": region.name,
             },
         )
-        res.raise_for_status()
         results[region.name] = res.json()
 
     return make_response(jsonify(results), 200)
