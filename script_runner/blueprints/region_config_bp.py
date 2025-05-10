@@ -9,7 +9,7 @@ from flask import (
     request,
 )
 
-from script_runner.app import config
+from script_runner.config import config
 from script_runner.decorators import authenticate_request
 from script_runner.function import WrappedFunction
 from script_runner.function_parameter import DynamicAutocomplete

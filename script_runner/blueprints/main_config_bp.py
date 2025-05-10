@@ -9,13 +9,13 @@ from flask import (
     request,
 )
 
-from script_runner.app import config
 from script_runner.decorators import (
     authenticate_request,
     cache_autocomplete,
     get_config,
 )
 from script_runner.utils import CombinedConfig, RegionConfig
+from script_runner.config import config
 
 main_config_bp: Blueprint = Blueprint("main_config", __name__)
 
