@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 from script_runner import (
     Autocomplete,
+    DynamicAutocomplete,
     Integer,
     Number,
     Text,
@@ -20,16 +21,6 @@ from script_runner import (
 def hello(to: Text = Text(default="world")) -> str:
     """
     This function says hello to someone
-    """
-    return f"hello {to.value}"
-
-
-@read
-def hello_with_enum(
-    to: Autocomplete = Autocomplete(options=["foo", "bar"], default="foo")
-) -> str:
-    """
-    Demo of literal type + default value
     """
     return f"hello {to.value}"
 
@@ -67,10 +58,37 @@ def render_chart() -> list[dict[str, str | int]]:
     )
 
 
+@read
+def basic_autocomplete(
+    to: Autocomplete = Autocomplete(options=["foo", "bar"], default="foo")
+) -> str:
+    """
+    Demo of literal type + default value
+    """
+    return f"hello {to.value}"
+
+
+def get_options() -> list[str]:
+    import random
+
+    return [str(random.randint(0, 100) * i) for i in range(10)]
+
+
+@read
+def dynamic_autocomplete(
+    value: DynamicAutocomplete = DynamicAutocomplete(options=get_options),
+) -> str:
+    """
+    Autocomplete demo with dynamic options
+    """
+    return f"Selected {value.value}"
+
+
 __all__ = [
     "hello",
-    "hello_with_enum",
     "writes_to_file",
     "render_chart",
     "add_numbers",
+    "basic_autocomplete",
+    "dynamic_autocomplete",
 ]

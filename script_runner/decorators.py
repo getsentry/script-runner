@@ -35,6 +35,18 @@ def cache_static_files(f: Callable[..., Response]) -> Callable[..., Response]:
     return add_cache_headers
 
 
+def cache_autocomplete(f: Callable[..., Response]) -> Callable[..., Response]:
+    """Cache autocomplete responses in browser for 5 minutes"""
+
+    @wraps(f)
+    def add_cache_headers(*args: Any, **kwargs: Any) -> Response:
+        res = f(*args, **kwargs)
+        res.headers["Cache-Control"] = "public, max-age=300"
+        return res
+
+    return add_cache_headers
+
+
 @functools.lru_cache(maxsize=1)
 def get_config() -> dict[str, Any]:
     assert isinstance(config, (MainConfig, CombinedConfig))

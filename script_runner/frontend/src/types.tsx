@@ -9,7 +9,7 @@ export type RunResult = {
 
 export type OptionResult = {
   [regionName: string]: {
-    [fieldName: string]: string;
+    [fieldName: string]: string[];
   };
 }
 

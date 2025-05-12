@@ -30,8 +30,17 @@ class Api {
     return await this.postJson("/run", data);
   }
 
-  async geAutocompleteOptions(data: { group: string, function: string, regions: string[] }): Promise<OptionResult> {
-    return await this.postJson("/autocomplete", data);
+  async getAutocompleteOptions(data: { group: string, function: string, regions: string[] }): Promise<OptionResult> {
+    const { group, function: functionName, regions } = data;
+
+    const searchParams = new URLSearchParams({
+      group,
+      function: functionName,
+      regions: regions.join(","),
+    }).toString();
+
+
+    return await this.getJson("/autocomplete?" + searchParams);
   }
 }
 
