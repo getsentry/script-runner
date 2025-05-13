@@ -1,3 +1,10 @@
+## 0.2.7
+
+### Various fixes & improvements
+
+- test utilities for autocomplete (#90) by @lynnagara
+- fix empty headers in /autocomplete endpoint (#91) by @lynnagara
+
 ## 0.2.6
 
 ### Various fixes & improvements
