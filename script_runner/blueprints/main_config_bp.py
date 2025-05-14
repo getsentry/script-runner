@@ -99,7 +99,6 @@ def run_all() -> Response:
 
 
 @main_config_bp.route("/autocomplete", methods=["GET"])
-@authenticate_request
 @cache_autocomplete
 def autocomplete() -> Response:
     """
