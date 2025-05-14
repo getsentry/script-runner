@@ -1,3 +1,9 @@
+## 0.2.8
+
+### Various fixes & improvements
+
+- fix autocomplete (#92) by @lynnagara
+
 ## 0.2.7
 
 ### Various fixes & improvements
