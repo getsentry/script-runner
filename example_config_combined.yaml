@@ -14,5 +14,3 @@ region:
   configs: {}
 audit_logs:
   console:
-  # datadog:
-  #   api_key: TODO
