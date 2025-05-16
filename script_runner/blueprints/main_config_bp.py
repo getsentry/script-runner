@@ -99,7 +99,6 @@ def run_all() -> Response:
 
 
 @main_config_bp.route("/autocomplete", methods=["GET"])
-@authenticate_request
 @cache_autocomplete
 def autocomplete() -> Response:
     """
@@ -134,7 +133,6 @@ def autocomplete() -> Response:
                 "region": region.name,
             },
         )
-        res.raise_for_status()
         results[region.name] = res.json()
 
     return make_response(jsonify(results), 200)

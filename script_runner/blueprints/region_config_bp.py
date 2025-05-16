@@ -51,7 +51,6 @@ def run_one_region() -> Response:
 
 
 @region_config_bp.route("/autocomplete_region", methods=["GET"])
-@authenticate_request
 def autocomplete_one_region() -> Response:
     """
     Get autocomplete values for one region. Called from the `/autocomplete` endpoint.
