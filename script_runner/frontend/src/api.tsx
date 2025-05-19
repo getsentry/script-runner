@@ -33,6 +33,10 @@ class Api {
   async getAutocompleteOptions(data: { group: string, function: string, regions: string[] }): Promise<OptionResult> {
     const { group, function: functionName, regions } = data;
 
+    if (regions.length === 0) {
+      return {};
+    }
+
     const searchParams = new URLSearchParams({
       group,
       function: functionName,
