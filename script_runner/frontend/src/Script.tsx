@@ -60,7 +60,7 @@ function Script(props: Props) {
         setDynamicOptions(options);
       });
     }
-  }, [parameters, props.group, props.function, props.api]);
+  }, [parameters, props.group, props.function, props.api, props.regions, functionName]);
 
   function handleInputChange(idx: number, value: string) {
     setParams((prev) => {
