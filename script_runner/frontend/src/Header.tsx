@@ -3,7 +3,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 
 interface Props {
-  title: string;
+  title: string | null;
   regions: string[];
   route: Route;
   navigate: (to: Route) => void;
