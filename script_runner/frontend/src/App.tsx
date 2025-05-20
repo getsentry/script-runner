@@ -36,6 +36,9 @@ function App() {
     api.getConfig()
       .then((data: Config) => {
         setConfig(data);
+        if (data.title) {
+          document.title = data.title;
+        }
       })
       .then(() => {
         parseHashAndSetRoute();

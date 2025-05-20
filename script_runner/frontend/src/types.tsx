@@ -49,7 +49,7 @@ export interface ConfigGroup {
 }
 
 export interface Config {
-  title: string;
+  title: string | null;
   regions: string[];
   groups: ConfigGroup[];
   groupsWithoutAccess: string[];
