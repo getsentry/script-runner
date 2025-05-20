@@ -60,7 +60,7 @@ function Script(props: Props) {
         setDynamicOptions(options);
       });
     }
-  }, [parameters, props.group, props.function, props.api]);
+  }, [parameters, props.group, props.function, props.api, props.regions, functionName]);
 
   function handleInputChange(idx: number, value: string) {
     setParams((prev) => {
@@ -71,10 +71,8 @@ function Script(props: Props) {
   }
 
   function executeFunction() {
-    if (hasResult) {
-      return;
-    }
-
+    setResult(null);
+    setHasResult(false);
     setError(null);
 
     if (params.some((p) => p === null)) {
@@ -93,17 +91,26 @@ function Script(props: Props) {
       'function': functionName,
       'parameters': params,
       'regions': props.regions,
-    }).then((result: RunResult) => {
-      setResult(result);
+    }).then((apiRunResult: RunResult) => {
+      setResult(apiRunResult);
       setHasResult(true);
       setIsRunning(false);
     }).catch((err) => {
       setError(err.error);
+      setResult(null);
+      setHasResult(false);
       setIsRunning(false);
     });
   }
 
-  const disabled = isRunning || hasResult || props.regions.length === 0;
+  const disabled = isRunning || props.regions.length === 0;
+
+  const buttonText = hasResult ? "Run Again" : "execute function";
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    executeFunction();
+  };
 
   return (
     <div className="function-main">
@@ -113,7 +120,7 @@ function Script(props: Props) {
           <span>{functionName}</span>
         </div>
         <div className="function-execute">
-          <form action={executeFunction}>
+          <form onSubmit={handleSubmit}>
             {parameters.length > 0 && (
               <div>
                 <div>
@@ -121,7 +128,7 @@ function Script(props: Props) {
                 </div>
                 {parameters.map((arg, idx) => {
                   return (
-                    <div className="input-group arg">
+                    <div className="input-group arg" key={`${functionName}-param-${arg.name}-${idx}`}> {/* Improved key */}
                       <div>
                         <label htmlFor={arg.name}>{arg.name}</label>
                       </div>
@@ -141,13 +148,22 @@ function Script(props: Props) {
                   );
                 })}
               </div>
-            )
-            }
-            {!isReadonly && <div className="input-group confirm">
-              <input type="checkbox" id="confirm-write" checked={confirmWrite} disabled={disabled} onChange={e => setConfirmWrite(e.target.checked)} />
-              <label htmlFor="confirm-write">I accept this function may be dangerous -- let's do it.</label>
-            </div>}
-            <button className="execute" disabled={disabled}>execute function</button>
+            )}
+            {!isReadonly && (
+              <div className="input-group confirm">
+                <input
+                  type="checkbox"
+                  id="confirm-write"
+                  checked={confirmWrite}
+                  disabled={disabled}
+                  onChange={e => setConfirmWrite(e.target.checked)}
+                />
+                <label htmlFor="confirm-write">I accept this function may be dangerous -- let's do it.</label>
+              </div>
+            )}
+            <button type="submit" className="execute" disabled={disabled}>
+              {buttonText}
+            </button>
             <div className="function-hint">
               {props.regions.length > 0 ? (
                 <>This will run on: {props.regions.join(", ")}</>
@@ -163,7 +179,7 @@ function Script(props: Props) {
             {error}
           </div>
         )}
-        {hasResult && (
+        {hasResult && result !== null && (
           <ScriptResult
             data={result}
             group={props.group}

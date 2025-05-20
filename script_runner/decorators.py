@@ -5,8 +5,8 @@ from typing import Any, Callable
 
 from flask import Response, jsonify, make_response, request
 
-from script_runner.app import config
 from script_runner.auth import UnauthorizedUser
+from script_runner.config import config
 from script_runner.utils import CombinedConfig, MainConfig
 
 
