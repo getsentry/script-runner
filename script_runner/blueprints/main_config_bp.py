@@ -1,4 +1,6 @@
+import functools
 import logging
+from typing import Any
 
 import requests
 from flask import (
@@ -13,9 +15,8 @@ from script_runner.config import config
 from script_runner.decorators import (
     authenticate_request,
     cache_autocomplete,
-    get_config,
 )
-from script_runner.utils import CombinedConfig, RegionConfig
+from script_runner.utils import CombinedConfig, MainConfig, RegionConfig
 
 main_config_bp: Blueprint = Blueprint("main_config", __name__)
 
@@ -136,6 +137,50 @@ def autocomplete() -> Response:
         results[region.name] = res.json()
 
     return make_response(jsonify(results), 200)
+
+
+@functools.lru_cache(maxsize=1)
+def get_config() -> dict[str, Any]:
+    assert isinstance(config, (MainConfig, CombinedConfig))
+
+    regions = config.main.regions
+    groups = config.groups
+
+    group_data = [
+        {
+            "group": g,
+            "functions": [
+                {
+                    "name": f.name,
+                    "docstring": f.docstring,
+                    "source": f.source,
+                    "parameters": [
+                        {
+                            "name": p.name,
+                            "type": p.type.value,
+                            "default": p.default,
+                            "enumValues": p.enum_values,
+                        }
+                        for p in f.parameters
+                    ],
+                    "isReadonly": f.is_readonly,
+                }
+                for f in function_group.functions
+            ],
+            "docstring": function_group.docstring,
+            "markdownFiles": [
+                {"name": file.filename, "content": file.content}
+                for file in function_group.markdown_files
+            ],
+        }
+        for (g, function_group) in groups.items()
+    ]
+
+    return {
+        "title": config.main.title,
+        "regions": [r.name for r in regions],
+        "groups": group_data,
+    }
 
 
 @main_config_bp.route("/config")
