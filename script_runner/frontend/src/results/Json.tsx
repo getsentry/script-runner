@@ -5,7 +5,7 @@ import { coy } from 'react-syntax-highlighter/dist/esm/styles/prism';
 type Props = {
   filteredResults: unknown;
   // ignore other unused props, these should be aligned across all components later
-  [key: string]: any;
+  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 

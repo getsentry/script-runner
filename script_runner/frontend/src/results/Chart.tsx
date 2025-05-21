@@ -75,7 +75,7 @@ type Props = {
   data: MergedRowData[] | null;
   regions: string[];
   // ignore other unused props, these should be aligned across all components later
-  [key: string]: any;
+  [key: string]: any;  // eslint-disable-line @typescript-eslint/no-explicit-any
 }
 
 function Chart(props: Props) {
