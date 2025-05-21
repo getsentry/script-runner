@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { AgCharts } from 'ag-charts-react';
-import { MergedRowData } from './types';
+import { MergedRowData } from '../types';
 
 type ChartData = {
   data: unknown[],
@@ -74,6 +74,8 @@ function getNumericFields(data: MergedRowData[]): string[] {
 type Props = {
   data: MergedRowData[] | null;
   regions: string[];
+  // ignore other unused props, these should be aligned across all components later
+  [key: string]: any;
 }
 
 function Chart(props: Props) {
@@ -119,7 +121,7 @@ function Chart(props: Props) {
     </div >
   } else {
     return <div className="function-result-chart">
-      <p className="no-data">data can't be displayed as a chart</p>
+      <p className="no-data">No data suitable for chart view.</p>
     </div>
   }
 
