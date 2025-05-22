@@ -283,12 +283,12 @@ li.home-search-result:hover {
   background-color: white;
   top: 22px;
   box-sizing: border-box;
+  z-index: 1000;
 }
 
 .autocomplete-list a {
   padding: 4px 8px;
   display: block;
-  z-index: 1000;
 }
 
 .autocomplete-list a.active {

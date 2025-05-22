@@ -1,3 +1,14 @@
+## 0.2.9
+
+### Various fixes & improvements
+
+- fix autocomplete z-index (for real this time) (#98) by @lynnagara
+- move the get_config function (#96) by @lynnagara
+- dynamic page title (#97) by @lynnagara
+- Add re execution to the scripts  (#95) by @kneeyo1
+- autocomplete: ui improvements (#93) by @lynnagara
+- fix: Fix circular dependency (#94) by @lynnagara
+
 ## 0.2.8
 
 ### Various fixes & improvements
