@@ -3,7 +3,7 @@ from typing import Generator
 from unittest.mock import patch
 
 import pytest
-from flask import Flask, jsonify, make_response
+from flask import Flask, Response, jsonify, make_response
 
 from script_runner.auth import UnauthorizedUser
 
@@ -40,7 +40,7 @@ def app() -> Flask:
 
     @app.route("/protected_route", methods=["GET", "POST"])
     @authenticate_request
-    def _protected_view():
+    def _protected_view() -> Response:
         return make_response(jsonify(message="Access Granted"), 200)
 
     return app
@@ -55,4 +55,16 @@ def test_auth_on_success(app: Flask) -> None:
 
 
 def test_no_auth_on_failure(app: Flask) -> None:
-    pass
+    from script_runner.config import config
+
+    with app.test_client() as client:
+        with patch.object(
+            config.auth,
+            "authenticate_request",
+            side_effect=UnauthorizedUser("Simulated direct auth failure"),
+        ) as mock_auth_call:
+            response = client.post("/protected_route", json={"group": "test_group"})
+
+    assert response.status_code == 401
+    assert response.get_json()["error"] == "Unauthorized"
+    mock_auth_call.assert_called_once()
