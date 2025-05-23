@@ -57,6 +57,14 @@ button:hover {
   color: white;
 }
 
+button:disabled {
+  background-color: var(--bg-light);
+  color: var(--text-hover);
+  border: 1px solid var(--text-hover);
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
 button:hover svg {
   fill: white;
 }
