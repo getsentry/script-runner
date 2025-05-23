@@ -1,5 +1,5 @@
-import React, {useState, useRef} from 'react';
-import {ConfigFunction, ConfigGroup, Route} from './types.tsx'
+import React, { useState, useRef } from 'react';
+import { ConfigFunction, ConfigGroup, Route } from './types.tsx'
 
 type Props = {
   route: Route,
@@ -8,7 +8,7 @@ type Props = {
 }
 
 function Home(props: Props) {
-  const [searchResults, setSearchResults] = useState<{function: ConfigFunction, group: string}[] | null>(null);
+  const [searchResults, setSearchResults] = useState<{ function: ConfigFunction, group: string }[] | null>(null);
   const [showResults, setShowResults] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
@@ -35,7 +35,7 @@ function Home(props: Props) {
         }
         // All substrings found
         if (found) {
-          results.push({function: f, group: group.group});
+          results.push({ function: f, group: group.group });
         }
 
       }
@@ -73,7 +73,7 @@ function Home(props: Props) {
             <ul>
               {searchResults.map((f, index) => (
                 <li key={index} className="home-search-result">
-                  <a onClick={() => props.navigate({...props.route, group: f.group, function: f.function.name})}>
+                  <a onClick={() => props.navigate({ ...props.route, group: f.group, function: f.function.name })}>
                     <span className="function-group">{f.group} / </span>
                     <span>{f.function.name}</span>
                   </a>

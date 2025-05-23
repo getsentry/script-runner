@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import ScriptResult from "./ScriptResult.tsx";
 import { RunResult, ConfigFunction } from "./types.tsx";
 import Tag from "./Tag";
 import Api from "./api.tsx";
 import Input from './Input.tsx'
+import Collapse from './assets/Collapse.tsx';
+import Expand from './assets/Expand.tsx';
+
 
 interface Props {
   regions: string[];
@@ -190,29 +194,33 @@ function Script(props: Props) {
       </div>
       {codeCollapsed ? (
         <div className="function-right-button">
-          <button onClick={() => setCodeCollapsed(false)} aria-label="open">
-            open
+          <button onClick={() => setCodeCollapsed(false)} aria-label="expand">
+            <Expand />
+            Expand
           </button>
         </div>
       ) : (
         <div className="function-right">
           <div className="function-right-description">
-            ✨ This is the <strong>{functionName}</strong> function definition
-            ✨
-          </div>
-          <SyntaxHighlighter
-            language="python"
-            customStyle={{ fontSize: 12, width: 500 }}
-          >
-            {source}
-          </SyntaxHighlighter>
-          <div className="function-right-button">
+            <div><strong>View the definition</strong></div>
             <button
               onClick={() => setCodeCollapsed(true)}
               aria-label="collapse"
             >
+              <Collapse />
               Collapse
             </button>
+
+          </div>
+          <div className="line" />
+          <div className="code">
+            <SyntaxHighlighter
+              language="python"
+              style={tomorrow}
+              customStyle={{ fontSize: 12, maxWidth: 500 }}
+            >
+              {source}
+            </SyntaxHighlighter>
           </div>
         </div>
       )}
