@@ -1,3 +1,10 @@
+## 1.0.0
+
+### Various fixes & improvements
+
+- implement new design (#100) by @lynnagara
+- split up the script result component (#99) by @lynnagara
+
 ## 0.2.9
 
 ### Various fixes & improvements
