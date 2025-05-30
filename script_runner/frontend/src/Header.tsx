@@ -73,7 +73,8 @@ function Header(props: Props) {
           className="header-title"
           onClick={() => props.navigate({ regions: props.route.regions })}
         >
-          ⚡️ {props.title || "script-runner"} ⚡️
+          <span className="logo">🐴</span>
+          {props.title || "script-runner"}
         </a>
       </div>
       <div className="header-right">
@@ -98,19 +99,20 @@ function Header(props: Props) {
           <ul>
             {props.regions.map((c) => (
               <li>
-                <label key={c}>{c}</label>
-                <input
-                  type="checkbox"
-                  value={c}
-                  checked={selected.includes(c)}
-                  onChange={() => toggleProject(c)}
-                />
+                <a onClick={() => toggleProject(c)}>
+                  <label key={c}>{c}</label>
+                  <input
+                    type="checkbox"
+                    value={c}
+                    checked={selected.includes(c)}
+                  />
+                </a>
               </li>
             ))}
           </ul>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
