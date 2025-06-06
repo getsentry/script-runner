@@ -11,7 +11,8 @@ from flask import (
     request,
 )
 
-from script_runner.config import config
+from script_runner.approval_policy import ApprovalStatus
+from script_runner.config import config, get_approvals
 from script_runner.decorators import (
     authenticate_request,
     cache_autocomplete,
@@ -39,6 +40,14 @@ def run_all() -> Response:
     function = next((f for f in group.functions if f.name == requested_function), None)
     assert function is not None, "Invalid function"
     params = data["parameters"]
+
+    # Check if the function requires approval
+    approval_status = get_approvals().requires_approval(
+        group_name, function, data["regions"]
+    )
+
+    if approval_status != ApprovalStatus.ALLOW:
+        raise RuntimeError("Function requires approval.")
 
     for requested_region in data["regions"]:
         region = next(
@@ -200,4 +209,56 @@ def fetch_config() -> Response:
     res["groups"] = filtered_groups
     res["groupsWithoutAccess"] = groups_without_access
 
+    # Map of approval requirements for every group function and region combination
+    approvals_policy = get_approvals().policy
+
+    res["accessMap"] = {
+        g["group"]: {
+            "functions": {
+                f["name"]: {
+                    r: approvals_policy.requires_approval(g["group"], f, r).value
+                    for r in res["regions"]
+                }
+                for f in g["functions"]
+            },
+        }
+        for g in filtered_groups
+    }
+
     return make_response(jsonify(res), 200)
+
+
+@main_config_bp.route("/requests", methods=["GET"])
+def fetch_approval_requests() -> Response:
+    """
+    Fetch execution requests for the user's groups which
+    are approved or pending approval.
+    """
+    raise NotImplementedError
+
+
+@main_config_bp.route("/requests", methods=["POST"])
+@authenticate_request
+def request_approval() -> Response:
+    raise NotImplementedError
+
+
+@main_config_bp.route("/requests/{request_id}/approve", methods=["POST"])
+@authenticate_request
+def approve_request() -> Response:
+    raise NotImplementedError
+
+
+@main_config_bp.route("/requests/{request_id}/cancel", methods=["POST"])
+@authenticate_request
+def cancel_request() -> Response:
+    raise NotImplementedError
+
+
+@main_config_bp.route("/requests/{request_id}/run", methods=["POST"])
+@authenticate_request
+def execute_request() -> Response:
+    """
+    execute an approved request.
+    """
+    raise NotImplementedError
