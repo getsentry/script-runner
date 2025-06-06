@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from script_runner.utils import Function
 from enum import Enum
+
+from script_runner.utils import Function
 
 
 class ApprovalStatus(Enum):

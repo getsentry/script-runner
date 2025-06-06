@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import TypedDict
 from enum import StrEnum
+from typing import TypedDict
 
 
 class ApprovalRequestStatus(StrEnum):

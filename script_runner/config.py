@@ -2,9 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from script_runner.utils import load_config, Function
-from script_runner.approval_store import ApprovalStore
 from script_runner.approval_policy import ApprovalPolicy, ApprovalStatus
+from script_runner.approval_store import ApprovalStore
+from script_runner.utils import Function, load_config
 
 config = load_config()
 

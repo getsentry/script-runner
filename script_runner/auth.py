@@ -49,7 +49,7 @@ class GoogleAuth(AuthMethod):
         prefix = "accounts.google.com:"
         if user_header.startswith(prefix):
             prefix_len = len(prefix)
-            return user_header[prefix_len:]
+            return str(user_header[prefix_len:])
         else:
             raise UnauthorizedUser(f"Invalid user header format: {user_header}")
 

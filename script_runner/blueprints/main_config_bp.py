@@ -11,14 +11,13 @@ from flask import (
     request,
 )
 
-from script_runner.config import config
+from script_runner.approval_policy import ApprovalStatus
+from script_runner.config import config, get_approvals
 from script_runner.decorators import (
     authenticate_request,
     cache_autocomplete,
 )
 from script_runner.utils import CombinedConfig, MainConfig, RegionConfig
-from script_runner.config import get_approvals
-from script_runner.approval_policy import ApprovalStatus
 
 main_config_bp: Blueprint = Blueprint("main_config", __name__)
 
