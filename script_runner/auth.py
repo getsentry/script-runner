@@ -44,7 +44,7 @@ class GoogleAuth(AuthMethod):
         self.USER_HEADER_KEY = "X-Goog-Authenticated-User-Email"
         self.JWT_HEADER_KEY = "X-Goog-Iap-Jwt-Assertion"
 
-    def get_user_email(self, request: Request) -> Any:
+    def get_user_email(self, request: Request) -> str:
         user_header = request.headers[self.USER_HEADER_KEY]
         prefix = "accounts.google.com:"
         if user_header.startswith(prefix):
