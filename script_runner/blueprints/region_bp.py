@@ -6,20 +6,22 @@ from script_runner.config import Config
 from script_runner.decorators import authenticate_request
 from script_runner.function import WrappedFunction
 from script_runner.function_parameter import DynamicAutocomplete
-from script_runner.utils import CombinedConfig, RegionConfig
+from script_runner.utils import CombinedConfig, MainConfig, RegionConfig
 
 
 def create_region_bp(app_config: Config) -> Blueprint:
+    config = app_config.config
+
+    assert not isinstance(config, MainConfig)
+
     region_bp: Blueprint = Blueprint("region_config", __name__)
 
     @region_bp.route("/run_region", methods=["POST"])
-    @authenticate_request
+    @authenticate_request(app_config)
     def run_one_region() -> Response:
         """
         Run a script for a specific region. Called from the `/run` endpoint.
         """
-        config = app_config.config
-
         assert isinstance(config, (RegionConfig, CombinedConfig))
 
         data = request.get_json()
@@ -51,10 +53,6 @@ def create_region_bp(app_config: Config) -> Blueprint:
         """
         Get autocomplete values for one region. Called from the `/autocomplete` endpoint.
         """
-        config = app_config.config
-
-        assert isinstance(config, (RegionConfig, CombinedConfig))
-
         group_name = request.args["group"]
         group = config.groups[group_name]
         requested_function = request.args["function"]
