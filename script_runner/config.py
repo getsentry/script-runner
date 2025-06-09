@@ -1,63 +1,23 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 
-from script_runner.approval_policy import ApprovalPolicy, ApprovalStatus
+from script_runner.approval_policy import ApprovalPolicy
 from script_runner.approval_store import ApprovalStore
-from script_runner.utils import Function, load_config
-
-config = load_config()
-
-
-"""
-Global variable to store the approval state
-"""
-_APPROVALS: Approvals | None = None
+from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_config
 
 
 @dataclass(frozen=True)
-class Approvals:
-    policy: ApprovalPolicy
-    store: ApprovalStore | None
-
-    def requires_approval(
-        self, group_name: str, func: Function, regions: list[str]
-    ) -> ApprovalStatus:
-        """
-        Check if a function requires approval for a list of regions.
-        Returns the strictest approval requirement if they vary by region.
-        """
-        statuses = set()
-
-        for region in regions:
-            statuses.add(self.policy.requires_approval(group_name, func, region))
-
-        if ApprovalStatus.DENY in statuses:
-            return ApprovalStatus.DENY
-
-        if ApprovalStatus.REQUIRE_APPROVAL in statuses:
-            return ApprovalStatus.REQUIRE_APPROVAL
-
-        return ApprovalStatus.ALLOW
+class Config:
+    config: CombinedConfig | MainConfig | RegionConfig
+    approvals_policy: ApprovalPolicy
+    approvals_store: ApprovalStore | None
 
 
-def configure_approvals(policy: ApprovalPolicy, store: ApprovalStore | None) -> None:
+def configure(
+    config_file_path: str, policy: ApprovalPolicy, store: ApprovalStore | None
+) -> Config:
     """
-    This gets run before the app is created.
+    This gets run once before the app is created.
     """
-    global _APPROVALS
+    config = load_config(config_file_path)
 
-    if _APPROVALS is not None:
-        raise RuntimeError("Approvals has already been configured.")
-
-    _APPROVALS = Approvals(policy, store)
-
-
-def get_approvals() -> Approvals:
-    """
-    Can only be called after `configure_approvals` has been called once.
-    """
-    if _APPROVALS is None:
-        raise RuntimeError("Approvals has not been set.")
-
-    return _APPROVALS
+    return Config(config, policy, store)
