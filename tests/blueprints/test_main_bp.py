@@ -7,10 +7,14 @@ from script_runner.app import create_flask_app
 from script_runner.approval_policy import AllowAll
 
 
-@pytest.fixture(scope="module", autouse=True, params=[
-    "example_config_combined.yaml",
-    "example_config_main.yaml",
-])
+@pytest.fixture(
+    scope="module",
+    autouse=True,
+    params=[
+        "example_config_combined.yaml",
+        "example_config_main.yaml",
+    ],
+)
 def app(request: pytest.FixtureRequest) -> Flask:
     config_file_path = request.param
     approval_policy = AllowAll()
