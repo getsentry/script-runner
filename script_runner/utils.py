@@ -22,9 +22,10 @@ from script_runner.audit_log import (
 from script_runner.auth import AuthMethod, GoogleAuth, NoAuth
 from script_runner.function import WrappedFunction
 from script_runner.function_parameter import FunctionParameter as RealFunctionParameter
-from script_runner.function_parameter import (
-    InputType,
-)
+from script_runner.function_parameter import InputType
+
+# Groups with these names are not allowed
+RESERVED_ROUTES = ["approvals"]
 
 
 class ConfigError(Exception):
@@ -279,11 +280,8 @@ def load_group(module_name: str, group: str) -> FunctionGroup:
     )
 
 
-@functools.lru_cache(maxsize=1)
-def load_config() -> RegionConfig | MainConfig | CombinedConfig:
-    config_file_path = os.getenv("CONFIG_FILE_PATH")
-    assert isinstance(config_file_path, str)
-
+@functools.lru_cache
+def load_config(config_file_path: str) -> RegionConfig | MainConfig | CombinedConfig:
     with open(config_file_path, "r") as file:
         config = yaml.safe_load(file)
 
@@ -305,3 +303,6 @@ def validate_config(config: Any) -> None:
         schema = json.load(f)
 
     jsonschema.validate(instance=config, schema=schema)
+
+    for group_name in config["groups"]:
+        assert group_name not in RESERVED_ROUTES

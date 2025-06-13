@@ -1,9 +1,4 @@
-from flask import (
-    Blueprint,
-    Response,
-    jsonify,
-    make_response,
-)
+from flask import Blueprint, Response, jsonify, make_response
 
 base_app_bp: Blueprint = Blueprint("base", __name__)
 

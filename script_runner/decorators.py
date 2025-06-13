@@ -5,22 +5,28 @@ from typing import Any, Callable
 from flask import Response, jsonify, make_response, request
 
 from script_runner.auth import UnauthorizedUser
-from script_runner.config import config
+from script_runner.config import Config
 
 
-def authenticate_request(f: Callable[..., Response]) -> Callable[..., Response]:
-    @wraps(f)
-    def authenticate(*args: Any, **kwargs: Any) -> Response:
-        try:
-            config.auth.authenticate_request(request)
-            res = f(*args, **kwargs)
-            return res
-        except UnauthorizedUser as e:
-            logging.error(e, exc_info=True)
-            err_response = make_response(jsonify({"error": "Unauthorized"}), 401)
-            return err_response
+def authenticate_request(
+    app_config: Config,
+) -> Callable[[Callable[..., Response]], Callable[..., Response]]:
+    def decorator(f: Callable[..., Response]) -> Callable[..., Response]:
+        @wraps(f)
+        def authenticate(*args: Any, **kwargs: Any) -> Response:
+            try:
+                config = app_config.config
+                config.auth.authenticate_request(request)
+                res = f(*args, **kwargs)
+                return res
+            except UnauthorizedUser as e:
+                logging.error(e, exc_info=True)
+                err_response = make_response(jsonify({"error": "Unauthorized"}), 401)
+                return err_response
 
-    return authenticate
+        return authenticate
+
+    return decorator
 
 
 def cache_static_files(f: Callable[..., Response]) -> Callable[..., Response]:
