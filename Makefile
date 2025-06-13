@@ -18,7 +18,7 @@ devserver-region:
 .PHONY: devserver-region
 
 serve:
-	CONFIG_FILE_PATH=example_config_combined.yaml gunicorn -b 0.0.0.0:5000 script_runner.app:app
+	CONFIG_FILE_PATH=example_config_combined.yaml gunicorn -b 0.0.0.0:5000 examples.app:app
 
 .PHONY: serve
 
