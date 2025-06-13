@@ -1,45 +1,62 @@
-import os
-from typing import Generator
-from unittest.mock import patch
+from dataclasses import replace
 
 import pytest
-from flask import Flask, Response, jsonify, make_response
+from flask import Flask, Request, Response, jsonify, make_response
 
-from script_runner.auth import UnauthorizedUser
-
-
-@pytest.fixture(scope="session", autouse=True)
-def setup() -> Generator[None, None, None]:
-    original_config_path = os.environ.get("CONFIG_FILE_PATH")
-
-    current_file_path = os.path.abspath(__file__)
-    project_root_dir = os.path.dirname(os.path.dirname(current_file_path))
-    test_config_path = os.path.join(
-        project_root_dir,
-        "example_config_combined.yaml",
-    )
-
-    os.environ["CONFIG_FILE_PATH"] = test_config_path
-
-    yield
-    if original_config_path:
-        os.environ["CONFIG_FILE_PATH"] = original_config_path
-    else:
-        os.environ.pop("CONFIG_FILE_PATH", None)
+from script_runner.approval_policy import AllowAll
+from script_runner.auth import AuthMethod, UnauthorizedUser
+from script_runner.config import configure
 
 
-@pytest.fixture()
+class MockAuthMethod(AuthMethod):
+    """
+    Mock auth method that only allows `test_group` access.
+    """
+
+    def authenticate_request(self, request: Request) -> None:
+        data = request.get_json()
+
+        if data["group"] == "test_group":
+            return None
+
+        raise UnauthorizedUser("User is not authorized for this group")
+
+    def get_user_email(self, request: Request) -> str | None:
+        return "test@test.com"
+
+    def has_group_access(self, request: Request, group: str) -> bool:
+        if group == "test_group":
+            return True
+        return False
+
+
+@pytest.fixture(scope="module")
 def app() -> Flask:
     """
     Flask app configured for testing.
     """
     from script_runner.decorators import authenticate_request
 
+    config_file_path = "example_config_combined.yaml"
+    approval_policy = AllowAll()
+    approval_store = None
+
+    app_config = configure(config_file_path, approval_policy, approval_store)
+
+    # switch out to the mock auth method
+    app_config_with_auth_mock = replace(
+        app_config,
+        config=replace(
+            app_config.config,
+            auth=MockAuthMethod(),
+        ),
+    )
+
     app = Flask(__name__)
     app.config["TESTING"] = True
 
-    @app.route("/protected_route", methods=["GET", "POST"])
-    @authenticate_request
+    @app.route("/protected_route", methods=["POST"])
+    @authenticate_request(app_config_with_auth_mock)
     def _protected_view() -> Response:
         return make_response(jsonify(message="Access Granted"), 200)
 
@@ -48,23 +65,15 @@ def app() -> Flask:
 
 def test_auth_on_success(app: Flask) -> None:
     with app.test_client() as client:
-        response = client.get("/protected_route")
+        response = client.post("/protected_route", json={"group": "test_group"})
 
     assert response.status_code == 200
     assert response.get_json()["message"] == "Access Granted"
 
 
 def test_no_auth_on_failure(app: Flask) -> None:
-    from script_runner.config import config
-
     with app.test_client() as client:
-        with patch.object(
-            config.auth,
-            "authenticate_request",
-            side_effect=UnauthorizedUser("Simulated direct auth failure"),
-        ) as mock_auth_call:
-            response = client.post("/protected_route", json={"group": "test_group"})
+        response = client.post("/protected_route", json={"group": "invalid_group"})
 
     assert response.status_code == 401
     assert response.get_json()["error"] == "Unauthorized"
-    mock_auth_call.assert_called_once()

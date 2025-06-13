@@ -30,6 +30,7 @@ class AuthMethod(ABC):
         """
         raise NotImplementedError
 
+    @abstractmethod
     def has_group_access(self, request: Request, group: str) -> bool:
         """
         Returns True if the user has access to the specified group.
