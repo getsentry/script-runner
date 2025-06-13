@@ -36,6 +36,7 @@ repos:
             types-setuptools,
             types-PyYAML,
             types-Flask,
+            pytest-mypy,
             types-requests,
             google-auth,
             PyJWT,
