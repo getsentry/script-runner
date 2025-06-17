@@ -1,3 +1,11 @@
+## 1.0.1
+
+### Various fixes & improvements
+
+- Update phrasing as we might report non write actions (#102) by @kneeyo1
+- add approval policy and storage abstract classes (#101) by @lynnagara
+- Adding tests for flask endpoints. starting with health (#83) by @kneeyo1
+
 ## 1.0.0
 
 ### Various fixes & improvements
