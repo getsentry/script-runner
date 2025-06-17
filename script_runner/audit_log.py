@@ -27,7 +27,7 @@ class DatadogEventLogger(AuditLogger):
 
     def log(self, user: str, group: str, function: str, region: str) -> None:
         self.__notifier.send(
-            title="Script Runner: Write action",
+            title="Script Runner Action",
             body=f"{group}:{function}",
             tags={
                 "group": group,
@@ -46,6 +46,6 @@ class SlackEventLogger(AuditLogger):
 
     def log(self, user: str, group: str, function: str, region: str) -> None:
         self.__notifier.send(
-            title="Script Runner: Write action",
+            title="Script Runner Action",
             body=f"User: {user}, Group: {group}, Function: {function}, Region: {region}",
         )
