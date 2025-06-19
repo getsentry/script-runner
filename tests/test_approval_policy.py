@@ -41,7 +41,7 @@ def test_readonly_unless_superuser() -> None:
     )
     mock_request_no_access = Mock(
         headers={
-            "X-Goog-Authenticated-User-Email": f"accounts.google.com:other@test.com"
+            "X-Goog-Authenticated-User-Email": "accounts.google.com:other@test.com"
         }
     )
 
