@@ -8,8 +8,8 @@ from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, load_c
 @dataclass(frozen=True)
 class Config:
     config: CombinedConfig | MainConfig | RegionConfig
-    approvals_policy: ApprovalPolicy
-    approvals_store: ApprovalStore | None
+    approval_policy: ApprovalPolicy
+    approval_store: ApprovalStore | None
 
 
 def configure(
@@ -19,5 +19,6 @@ def configure(
     This gets run once before the app is created.
     """
     config = load_config(config_file_path)
+    policy.set_auth_method(config.auth)
 
     return Config(config, policy, store)

@@ -13,7 +13,7 @@ from script_runner.utils import CombinedConfig, MainConfig, RegionConfig
 
 def create_main_bp(app_config: Config) -> Blueprint:
     config = app_config.config
-    approval_policy = app_config.approvals_policy
+    approval_policy = app_config.approval_policy
 
     assert not isinstance(config, RegionConfig)
 
@@ -41,7 +41,7 @@ def create_main_bp(app_config: Config) -> Blueprint:
 
         # Check if the function requires approval
         approval_status = approval_policy.requires_approval(
-            group_name, function, data["regions"]
+            request, group_name, function, data["regions"]
         )
 
         if approval_status != ApprovalStatus.ALLOW:
@@ -208,8 +208,8 @@ def create_main_bp(app_config: Config) -> Blueprint:
         res["accessMap"] = {
             g["group"]: {
                 f["name"]: {
-                    r: app_config.approvals_policy.requires_approval(
-                        g["group"], f, [r]
+                    r: app_config.approval_policy.requires_approval(
+                        request, g["group"], f, [r]
                     ).value
                     for r in res["regions"]
                 }
