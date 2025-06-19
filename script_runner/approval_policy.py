@@ -40,7 +40,9 @@ class ApprovalPolicy(ABC):
         statuses = set()
 
         for region in regions:
-            statuses.add(self.requires_approval_one_region(request, group_name, func, region))
+            statuses.add(
+                self.requires_approval_one_region(request, group_name, func, region)
+            )
 
         if ApprovalStatus.DENY in statuses:
             return ApprovalStatus.DENY
@@ -83,6 +85,7 @@ class ReadonlyUnlessSuperuser(ApprovalPolicy):
     Allows only users in specific superuser groups access to write functions.
     Can only be used with Google as auth method.
     """
+
     def __init__(self, superuser_groups_by_region: dict[str, list[str]]):
         # map of region name to list of superuser google groups for that region
         self.superuser_groups_by_region = superuser_groups_by_region
