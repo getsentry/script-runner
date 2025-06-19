@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-from script_runner.utils import Function
-from script_runner.auth import AuthMethod, GoogleAuth
 from flask import Request
+
+from script_runner.auth import AuthMethod, GoogleAuth
+from script_runner.utils import Function
 
 
 class ApprovalStatus(Enum):

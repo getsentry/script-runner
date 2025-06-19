@@ -1,8 +1,9 @@
-from script_runner.approval_policy import ReadonlyUnlessSuperuser, ApprovalStatus
-from script_runner.auth import GoogleAuth, UnauthorizedUser
-from flask import Request
 from unittest.mock import Mock
 
+from flask import Request
+
+from script_runner.approval_policy import ApprovalStatus, ReadonlyUnlessSuperuser
+from script_runner.auth import GoogleAuth, UnauthorizedUser
 
 ALLOWED_USER_EMAIL = "allowed_user@test.com"
 
