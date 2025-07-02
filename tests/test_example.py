@@ -3,6 +3,7 @@ from script_runner.testutils import execute_with_context
 from tests.example import basic_autocomplete, dynamic_autocomplete, hello
 
 mock_context = FunctionContext(
+    user="test_user",
     region="test",
     group_config=None,
 )
