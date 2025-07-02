@@ -2,7 +2,7 @@ import logging
 from functools import wraps
 from typing import Any, Callable
 
-from flask import Response, jsonify, make_response, request
+from flask import Response, g, jsonify, make_response, request
 
 from script_runner.auth import UnauthorizedUser
 from script_runner.config import Config
@@ -18,6 +18,8 @@ def authenticate_request(
                 config = app_config.config
                 config.auth.authenticate_request(request)
                 res = f(*args, **kwargs)
+                user_email = config.auth.get_user_email(request)
+                g.user = user_email
                 return res
             except UnauthorizedUser as e:
                 logging.error(e, exc_info=True)
