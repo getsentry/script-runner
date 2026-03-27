@@ -8,12 +8,12 @@ from flask import Blueprint, Response, jsonify, make_response, request
 from script_runner.approval_policy import ApprovalStatus
 from script_runner.config import Config
 from script_runner.decorators import authenticate_request, cache_autocomplete
-from script_runner.utils import CombinedConfig, MainConfig, RegionConfig
+from script_runner.utils import CombinedConfig, MainConfig, RegionConfig, Function
 
 
 def create_main_bp(app_config: Config) -> Blueprint:
     config = app_config.config
-    approval_policy = app_config.approvals_policy
+    approval_policy = app_config.approval_policy
 
     assert not isinstance(config, RegionConfig)
 
@@ -41,11 +41,12 @@ def create_main_bp(app_config: Config) -> Blueprint:
 
         # Check if the function requires approval
         approval_status = approval_policy.requires_approval(
-            group_name, function, data["regions"]
+            request, group_name, function, data["regions"]
         )
 
         if approval_status != ApprovalStatus.ALLOW:
-            raise RuntimeError("Function requires approval.")
+            return make_response(jsonify({"error": "You don't have permission to run this function"}), 400)
+
 
         for requested_region in data["regions"]:
             region = next(
@@ -204,12 +205,25 @@ def create_main_bp(app_config: Config) -> Blueprint:
         res["groups"] = filtered_groups
         res["groupsWithoutAccess"] = groups_without_access
 
+
+
+
+
         # Map of approval requirements for every group function and region combination
+        def get_function(group: str, name: str) -> Function:
+            group = config.groups[group]
+            function = next(
+                (f for f in group.functions if f.name == name), None
+            )
+            assert function is not None
+            return function
+
+
         res["accessMap"] = {
             g["group"]: {
                 f["name"]: {
-                    r: app_config.approvals_policy.requires_approval(
-                        g["group"], f, [r]
+                    r: app_config.approval_policy.requires_approval(
+                        request, g["group"], get_function(g["group"], f["name"]), [r]
                     ).value
                     for r in res["regions"]
                 }
