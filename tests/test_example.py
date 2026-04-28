@@ -10,17 +10,17 @@ mock_context = FunctionContext(
 
 
 def test_simple_function() -> None:
-    (result, _) = execute_with_context(hello, mock_context, ["there"])
+    result, _ = execute_with_context(hello, mock_context, ["there"])
     assert result == "hello there"
 
 
 def test_basic_autocomplete() -> None:
-    (result, _) = execute_with_context(basic_autocomplete, mock_context, ["bar"])
+    result, _ = execute_with_context(basic_autocomplete, mock_context, ["bar"])
     assert result == "hello bar"
 
 
 def test_dynamic_autocomplete() -> None:
-    (result, autocompletions) = execute_with_context(
+    result, autocompletions = execute_with_context(
         dynamic_autocomplete, mock_context, ["foo"]
     )
     assert result == "Selected foo"
