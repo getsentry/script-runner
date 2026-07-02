@@ -19,6 +19,7 @@ def execute_with_context(
     """
     app = Flask(__name__)
     with app.app_context():
+        g.user = mock_context.user
         g.region = mock_context.region
         g.group_config = mock_context.group_config
 
