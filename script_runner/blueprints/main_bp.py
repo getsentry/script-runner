@@ -1,3 +1,4 @@
+import copy
 import functools
 import logging
 from typing import Any
@@ -189,7 +190,9 @@ def create_main_bp(app_config: Config) -> Blueprint:
 
     @main_config_bp.route("/config")
     def fetch_config() -> Response:
-        res = get_config()
+        # Copy the cached config: mutating the shared cached dict would hide
+        # groups from all subsequent requests in this process.
+        res = copy.deepcopy(get_config())
 
         groups_without_access = []
 
