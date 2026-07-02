@@ -1,3 +1,31 @@
+## 1.0.2
+
+### Bug Fixes 🐛
+
+- Avoid mutating cached config in /config endpoint by @lynnagara in [#112](https://github.com/getsentry/script-runner/pull/112)
+
+### Internal Changes 🔧
+
+#### Deps
+
+- Bump vite from 6.2.2 to 6.4.2 by @strongs in [#108](https://github.com/getsentry/script-runner/pull/108)
+- Bump rollup transitive from 4.34.8 to 4.60.2 by @strongs in [#110](https://github.com/getsentry/script-runner/pull/110)
+- Bump black from 25.1.0 to 26.3.1 by @strongs in [#109](https://github.com/getsentry/script-runner/pull/109)
+
+#### Release
+
+- Fix changelog-preview permissions by @BYK in [#106](https://github.com/getsentry/script-runner/pull/106)
+- Switch from action-prepare-release to Craft by @BYK in [#105](https://github.com/getsentry/script-runner/pull/105)
+
+#### Other
+
+- Update codeowners by @lynnagara in [#111](https://github.com/getsentry/script-runner/pull/111)
+- Pin GitHub Actions to full-length commit SHAs by @joshuarli in [#107](https://github.com/getsentry/script-runner/pull/107)
+
+### Other
+
+- add user email to the flask G object for easy audting retrieval by @kneeyo1 in [#104](https://github.com/getsentry/script-runner/pull/104)
+
 ## 1.0.1
 
 ### Various fixes & improvements
