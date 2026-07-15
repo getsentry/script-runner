@@ -1,3 +1,9 @@
+## 1.0.3
+
+### Bug Fixes 🐛
+
+- (testutils) Set g.user in execute_with_context by @lynnagara in [#114](https://github.com/getsentry/script-runner/pull/114)
+
 ## 1.0.2
 
 ### Bug Fixes 🐛
