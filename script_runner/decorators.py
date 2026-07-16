@@ -17,9 +17,10 @@ def authenticate_request(
             try:
                 config = app_config.config
                 config.auth.authenticate_request(request)
+                # Set g.user before running the wrapped function so it is
+                # available via get_function_context() during execution.
+                g.user = config.auth.get_user_email(request)
                 res = f(*args, **kwargs)
-                user_email = config.auth.get_user_email(request)
-                g.user = user_email
                 return res
             except UnauthorizedUser as e:
                 logging.error(e, exc_info=True)

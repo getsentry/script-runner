@@ -1,11 +1,12 @@
 from dataclasses import replace
 
 import pytest
-from flask import Flask, Request, Response, jsonify, make_response
+from flask import Flask, Request, Response, g, jsonify, make_response
 
 from script_runner.approval_policy import AllowAll
 from script_runner.auth import AuthMethod, UnauthorizedUser
 from script_runner.config import configure
+from script_runner.context import get_function_context
 
 
 class MockAuthMethod(AuthMethod):
@@ -60,6 +61,15 @@ def app() -> Flask:
     def _protected_view() -> Response:
         return make_response(jsonify(message="Access Granted"), 200)
 
+    @app.route("/context_route", methods=["POST"])
+    @authenticate_request(app_config_with_auth_mock)
+    def _context_view() -> Response:
+        # Scripts read the context while the wrapped function runs, so g.user
+        # must already be set by the decorator at this point.
+        g.region = "test"
+        g.group_config = None
+        return make_response(jsonify(user=get_function_context().user), 200)
+
     return app
 
 
@@ -77,3 +87,13 @@ def test_no_auth_on_failure(app: Flask) -> None:
 
     assert response.status_code == 401
     assert response.get_json()["error"] == "Unauthorized"
+
+
+def test_context_available_during_execution(app: Flask) -> None:
+    # Regression: g.user must be set before the wrapped function runs, otherwise
+    # get_function_context() raises AttributeError and the request 500s.
+    with app.test_client() as client:
+        response = client.post("/context_route", json={"group": "test_group"})
+
+    assert response.status_code == 200
+    assert response.get_json()["user"] == "test@test.com"
