@@ -1,3 +1,9 @@
+## 1.0.4
+
+### Bug Fixes 🐛
+
+- Set g.user before running the wrapped function by @ldelvoye in [#115](https://github.com/getsentry/script-runner/pull/115)
+
 ## 1.0.3
 
 ### Bug Fixes 🐛
