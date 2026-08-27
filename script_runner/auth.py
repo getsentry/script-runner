@@ -101,11 +101,11 @@ class GoogleAuth(AuthMethod):
 
     def __is_user_in_google_group(self, user_email: str, group_email: str) -> bool:
         """
-        We cache the user's membership status for up to a day.
+        We cache the user's membership status for up to an hour.
         """
-        epoch_day = int(time.time()) // 86400  # 1 day = 86400 seconds
+        epoch_hour = int(time.time()) // 3600  # 1 day = 3600 seconds
 
-        members = self.__get_group_membership(group_email, epoch_day)
+        members = self.__get_group_membership(group_email, epoch_hour)
 
         if user_email in members:
             return True
