@@ -1,8 +1,11 @@
-minVersion: 0.1.0
+minVersion: 3.9.0
+versioning:
+  policy: manual
 github:
   owner: getsentry
   repo: script-runner
-changelogPolicy: auto
+changelog:
+  policy: auto
 preReleaseCommand: bash ./bin/bump-version.sh
 releaseBranchPrefix: release
 targets:
