@@ -1,5 +1,8 @@
+import logging
+
 import sentry_sdk
 from flask import Flask
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 from script_runner.approval_policy import ApprovalPolicy
 from script_runner.approval_store import ApprovalStore
@@ -26,6 +29,32 @@ def create_flask_app(
     if config.sentry_dsn:
         sentry_sdk.init(
             dsn=config.sentry_dsn,
+            data_collection={
+                "user_info": False,
+                "http_bodies": ["incoming_request"],
+                "graphql": {"document": False, "variables": False},
+                "gen_ai": {"inputs": False, "outputs": False},
+                "mcp": {"inputs": False, "outputs": False},
+                "database_query_data": False,
+                "queues": False,
+                "http_headers": {
+                    "request": {
+                        "mode": "denylist",
+                        "terms": ["forwarded", "-ip", "remote-", "via", "-user"],
+                    },
+                },
+                "cookies": {
+                    "mode": "denylist",
+                    "terms": ["forwarded", "-ip", "remote-", "via", "-user"],
+                },
+                "url_query_params": {
+                    "mode": "denylist",
+                    "terms": ["forwarded", "-ip", "remote-", "via", "-user"],
+                },
+                "stack_frame_variables": {"mode": "denylist"},
+            },
+            attach_stacktrace=False,
+            integrations=[LoggingIntegration(level=None, event_level=logging.ERROR)],
         )
 
     app = Flask(__name__)
